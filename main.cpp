@@ -1,9 +1,4 @@
-#include <SDL.h>
-int main(int argc, char* argv[]) { SDL_Event e;
-    if (SDL_Init(SDL_INIT_EVERYTHING) < 0) return -1;
-    if (!SDL_CreateWindow("Daniel Atalaya's First SDL2 Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 680, 480, 0)) return -1;
-    for (;;) while (SDL_PollEvent(&e) > 0) if (e.type == SDL_QUIT) return 0; }
-/*#include <iostream>
+#include <iostream>
 #include <SDL.h>
 int main(int argc, char* argv[]) {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
@@ -37,4 +32,4 @@ int main(int argc, char* argv[]) {
         }
     }
     return 0;
-}*/
+}
