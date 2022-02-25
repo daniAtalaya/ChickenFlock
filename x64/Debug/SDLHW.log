@@ -1,2 +1,4 @@
 ﻿  main.cpp
-  SDLHW.vcxproj -> E:\C++\SDLHW\guerrila-war-SDL\x64\Debug\SDLHW.exe
+  window.cpp
+  Generating Code...
+LINK : fatal error LNK1104: cannot open file 'SDL2.lib'
