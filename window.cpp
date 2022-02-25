@@ -1,6 +1,7 @@
 #include "window.h"
 #include "general.h"
 
+
 Window::Window(const std::string& title) :
 _title(title) {
 	_closed = !init();
@@ -30,40 +31,28 @@ bool Window::init() {
 }
 
 void Window::draw() {
-	SDL_Event event;
-	if (SDL_PollEvent(&event)) {
-		switch (event.type) {
-			case SDL_QUIT:
-				_closed = true;
-				break;
-			case SDL_KEYDOWN:
-				switch (event.key.keysym.sym) {
-					case SDLK_ESCAPE:
-						_closed = true;
-						break;
-					case SDLK_w:
-						rect.y -= 5;
-						break;
-					case SDLK_a:
-						rect.x -= 5;
-						break;
-					case SDLK_s:
-						rect.y += 5;
-						break;
-					case SDLK_d:
-						rect.x += 5;
-						break;
-				}
-			default:
-				break;
-		}
-	}
+	SDL_SetRenderDrawColor(_renderer, 0, 120, 200, 255);
+	SDL_RenderClear(_renderer);
+	SDL_SetRenderDrawColor(_renderer, 200, 0, 200, 255);
+	SDL_RenderFillRect(_renderer, &rect);
+	SDL_RenderPresent(_renderer);
 }
 
 void Window::update() {
-	SDL_SetRenderDrawColor(_renderer, 0, 120, 200, 255);
-	SDL_RenderClear(_renderer);
-	SDL_SetRenderDrawColor(_renderer, 200, 0, 200, 255); 
-	SDL_RenderFillRect(_renderer, &rect);
-	SDL_RenderPresent(_renderer);
+	SDL_Event event;
+	if (SDL_PollEvent(&event)) {
+		const Uint8* ks = SDL_GetKeyboardState(NULL);
+		switch (event.type) {
+		case SDL_QUIT:
+			_closed = true;
+			break;
+		default:
+			break;
+		}
+		if (ks[SDL_SCANCODE_ESCAPE])_closed = true;
+		if (ks[SDL_SCANCODE_W] || ks[SDL_SCANCODE_UP]) rect.y -= 10;
+		if (ks[SDL_SCANCODE_A] || ks[SDL_SCANCODE_LEFT]) rect.x -= 10;
+		if (ks[SDL_SCANCODE_S] || ks[SDL_SCANCODE_DOWN]) rect.y += 10;
+		if (ks[SDL_SCANCODE_D] || ks[SDL_SCANCODE_RIGHT]) rect.x += 10;
+	}
 }
