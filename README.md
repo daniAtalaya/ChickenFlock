@@ -1,2 +1,2 @@
 # guerrila war SDL
- Sample text
+Hola mundo (Andreu Miró)
