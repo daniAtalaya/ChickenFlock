@@ -1,5 +1,5 @@
 #include "window.h"
-#include <iostream>
+#include "general.h"
 
 Window::Window(const std::string& title) :
 _title(title) {

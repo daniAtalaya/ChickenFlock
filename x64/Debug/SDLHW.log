@@ -1,2 +1,1 @@
-﻿  main.cpp
-LINK : fatal error LNK1104: cannot open file 'SDL2.lib'
+﻿  SDLHW.vcxproj -> D:\C++\SDLHW\guerrila-war-SDL\x64\Debug\SDLHW.exe
