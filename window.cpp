@@ -22,6 +22,10 @@ bool Window::init() {
 		SDL_WINDOW_SHOWN
 	);
 	_renderer = SDL_CreateRenderer(_window, -1, 0);
+	rect.x = 100;
+	rect.y = 100;
+	rect.w = 50;
+	rect.h = 75;
 	return true;
 }
 
@@ -38,16 +42,16 @@ void Window::draw() {
 						_closed = true;
 						break;
 					case SDLK_w:
-						rect.y -= 5;;
+						rect.y -= 5;
 						break;
 					case SDLK_a:
 						rect.x -= 5;
 						break;
 					case SDLK_s:
-						rect.x += 5;
+						rect.y += 5;
 						break;
 					case SDLK_d:
-						rect.y += 5;
+						rect.x += 5;
 						break;
 				}
 			default:
