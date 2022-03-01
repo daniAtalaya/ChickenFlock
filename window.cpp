@@ -1,10 +1,18 @@
 #include "window.h"
 #include "general.h"
 
-
-Window::Window(const std::string& title) :
-_title(title) {
-	_closed = !init();
+Window::Window() {
+	SDL_Init(SDL_INIT_EVERYTHING);
+	_window = SDL_CreateWindow(
+		WINDOW_T,
+		SDL_WINDOWPOS_CENTERED,
+		SDL_WINDOWPOS_CENTERED,
+		WINDOW_W, WINDOW_H,
+		SDL_WINDOW_SHOWN
+	);
+	_renderer = SDL_CreateRenderer(_window, -1, 0);
+	_keyboard = SDL_GetKeyboardState(NULL);
+	isOpen = true;
 }
 
 Window::~Window(){
@@ -13,46 +21,30 @@ Window::~Window(){
 	SDL_Quit();
 }
 
-bool Window::init() {
-	SDL_Init(SDL_INIT_EVERYTHING);
-	_window = SDL_CreateWindow(
-		_title.c_str(),
-		SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED,
-		width, height,
-		SDL_WINDOW_SHOWN
-	);
-	_renderer = SDL_CreateRenderer(_window, -1, 0);
-	rect.x = 100;
-	rect.y = 100;
-	rect.w = 50;
-	rect.h = 75;
-	return true;
-}
-
-void Window::draw() {
-	SDL_SetRenderDrawColor(_renderer, 0, 120, 200, 255);
-	SDL_RenderClear(_renderer);
-	SDL_SetRenderDrawColor(_renderer, 200, 0, 200, 255);
-	SDL_RenderFillRect(_renderer, &rect);
-	SDL_RenderPresent(_renderer);
+void Window::input() {
+	if (SDL_PollEvent(&_event)) {
+		switch (_event.type) {
+			case SDL_QUIT:
+				isOpen = false;
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 void Window::update() {
-	SDL_Event event;
-	if (SDL_PollEvent(&event)) {
-		const Uint8* ks = SDL_GetKeyboardState(NULL);
-		switch (event.type) {
-		case SDL_QUIT:
-			_closed = true;
-			break;
-		default:
-			break;
-		}
-		if (ks[SDL_SCANCODE_ESCAPE])_closed = true;
-		if (ks[SDL_SCANCODE_W] || ks[SDL_SCANCODE_UP]) rect.y -= 10;
-		if (ks[SDL_SCANCODE_A] || ks[SDL_SCANCODE_LEFT]) rect.x -= 10;
-		if (ks[SDL_SCANCODE_S] || ks[SDL_SCANCODE_DOWN]) rect.y += 10;
-		if (ks[SDL_SCANCODE_D] || ks[SDL_SCANCODE_RIGHT]) rect.x += 10;
-	}
+	if (_keyboard[SDL_SCANCODE_ESCAPE]) isOpen = false;
+	if (_keyboard[SDL_SCANCODE_A] || _keyboard[SDL_SCANCODE_LEFT]) player.move(0, 0);
+	if (_keyboard[SDL_SCANCODE_W] || _keyboard[SDL_SCANCODE_UP]) player.move(1, 0);
+	if (_keyboard[SDL_SCANCODE_D] || _keyboard[SDL_SCANCODE_RIGHT]) player.move(0, 1);
+	if (_keyboard[SDL_SCANCODE_S] || _keyboard[SDL_SCANCODE_DOWN]) player.move(1, 1);
+}
+
+void Window::draw() {
+	SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 0);
+	SDL_RenderClear(_renderer);
+	SDL_SetRenderDrawColor(_renderer, player.cR, player.cG, player.cB, player.cA);
+	SDL_RenderFillRect(_renderer, &player.rect);
+	SDL_RenderPresent(_renderer);
 }

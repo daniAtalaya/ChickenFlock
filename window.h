@@ -1,21 +1,18 @@
 #pragma once
-
 #include "general.h"
+#include "cuadrado.h"
 class Window {
 	public:
-		Window(const std::string& title);
+		Window();
 		~Window();
+		void input();
 		void update();
 		void draw();
-		static const int width = 800;
-		static const int height = 600;
-		SDL_Rect rect;
-		inline bool isClosed() const { return _closed; }
+		bool isOpen = false;
+		Cuadrado player;
 	private:
-		bool init();
-		std::string _title;
-		bool _closed = false;
+		SDL_Event _event;
+		const Uint8* _keyboard;
 		SDL_Window* _window = nullptr;
 		SDL_Renderer* _renderer = nullptr;
-
 };
