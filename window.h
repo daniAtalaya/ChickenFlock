@@ -1,6 +1,7 @@
 #pragma once
 #include "general.h"
-#include "cuadrado.h"
+#include "jugador.h"
+#include "bala.h"
 class Window {
 	public:
 		Window();
@@ -8,11 +9,14 @@ class Window {
 		void input();
 		void update();
 		void draw();
+		void loop();
+		void destroy();
 		bool isOpen = false;
-		Cuadrado player;
+		std::vector<Bala> bullets;
+		Jugador player;
 	private:
-		SDL_Event _event;
-		const Uint8* _keyboard;
-		SDL_Window* _window = nullptr;
-		SDL_Renderer* _renderer = nullptr;
+		SDL_Event event;
+		const Uint8* keyboard;
+		SDL_Window* window = nullptr;
+		SDL_Renderer* renderer = nullptr;
 };

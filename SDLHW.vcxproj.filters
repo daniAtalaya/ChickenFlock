@@ -24,6 +24,12 @@
     <ClCompile Include="cuadrado.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="bala.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="jugador.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">
@@ -33,6 +39,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cuadrado.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bala.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jugador.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
