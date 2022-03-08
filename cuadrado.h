@@ -6,14 +6,14 @@ class Cuadrado {
 		//Empty constructor for the player
 		Cuadrado() = default;
 					//     X    Y    W  H
-		SDL_Rect rect = { 100, 100, 120, 70 };
-		int sX = 10;
-		int sY = 10;
+		SDL_Rect rect;
+		int sX = 5;
+		int sY = 5;
 		int cR = 0;
 		int cG = 0;
 		int cB = 0;
 		int cA = 0;
-		bool disposable = false;
+		void update(int, int);
 		void draw(SDL_Renderer*);
 	private:
 };

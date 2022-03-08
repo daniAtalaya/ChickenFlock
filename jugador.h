@@ -4,6 +4,7 @@
 class Jugador : public Cuadrado
 {
 	public:
-		void update();
+		void update(int, int);
+		void draw(SDL_Renderer*);
 		Jugador() { cR = 255; }
 };

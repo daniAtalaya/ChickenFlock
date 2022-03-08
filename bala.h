@@ -6,6 +6,6 @@ class Bala : public Cuadrado
 {
 	public:
 		Bala(SDL_Rect);
-		void update();
+		void draw(SDL_Renderer*, SDL_Texture*, bool);
 };
 
