@@ -7,6 +7,7 @@
 #include "SDL/include/SDL.h"
 #include <string>
 #include <vector>
+#include <map>
 #include <iostream>
 #define WINDOW_W 800
 #define WINDOW_H 600

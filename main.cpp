@@ -1,8 +1,12 @@
-#include "window.h"
+#include "game.h"
 #include "general.h"
 
+bool Game::god = false;
+bool Game::paused = false;
+SDL_Renderer* Game::renderer = nullptr;
+
 int main(int argc, char* argv[]) {
-    Window window;
-    while (window.isOpen) window.loop();
+    Game game;
+    while (game.isOpen) game.loop();
     return 0;
 }

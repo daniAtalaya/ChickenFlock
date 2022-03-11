@@ -1,13 +1,23 @@
 #include "cuadrado.h"
-#include "window.h"
+#include "general.h"
+#include "game.h"
 
-void Cuadrado::draw(SDL_Renderer* rend) {
-	SDL_SetRenderDrawColor(rend, cR, cG, cB, cA);
-	SDL_RenderFillRect(rend, &rect);
+void Cuadrado::draw() {
+	SDL_SetRenderDrawColor(Game::renderer, cR, cG, cB, cA);
+	SDL_RenderFillRect(Game::renderer, &rect);
+	if (Game::god) drawHitbox();
 }
 
-void Cuadrado::update(int dx, int dy)
-{
+void Cuadrado::draw(SDL_Texture* img) {
+	SDL_RenderCopy(Game::renderer, img, NULL, &rect);
+	if (Game::god) drawHitbox();
+}
+
+void Cuadrado::update(int dx, int dy) {
 	rect.x += dx * sX;
 	rect.y += dy * sY;
+}
+void Cuadrado::drawHitbox() {
+	SDL_SetRenderDrawColor(Game::renderer, 192, 0, 0, 255);
+	SDL_RenderDrawRect(Game::renderer, &rect);
 }

@@ -145,18 +145,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bala.cpp" />
+    <ClCompile Include="almacen.cpp" />
     <ClCompile Include="cuadrado.cpp" />
-    <ClCompile Include="jugador.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="window.cpp" />
+    <ClCompile Include="game.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bala.h" />
+    <ClInclude Include="almacen.h" />
     <ClInclude Include="cuadrado.h" />
     <ClInclude Include="general.h" />
-    <ClInclude Include="jugador.h" />
-    <ClInclude Include="window.h" />
+    <ClInclude Include="game.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

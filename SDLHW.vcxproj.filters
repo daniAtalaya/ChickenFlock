@@ -18,21 +18,18 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="window.cpp">
+    <ClCompile Include="game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cuadrado.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bala.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="jugador.cpp">
+    <ClCompile Include="almacen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="window.h">
+    <ClInclude Include="game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="general.h">
@@ -41,10 +38,7 @@
     <ClInclude Include="cuadrado.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bala.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jugador.h">
+    <ClInclude Include="almacen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,3 +1,3 @@
-﻿  window.cpp
-D:\C++\SDLHW\guerrila-war-SDL\window.cpp(8,2): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+﻿  game.cpp
+D:\C++\SDLHW\guerrila-war-SDL\game.cpp(7,2): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   SDLHW.vcxproj -> D:\C++\SDLHW\guerrila-war-SDL\x64\Debug\SDLHW.exe

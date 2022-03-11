@@ -14,6 +14,7 @@ class Cuadrado {
 		int cB = 0;
 		int cA = 0;
 		void update(int, int);
-		void draw(SDL_Renderer*);
-	private:
+		void draw();
+		void drawHitbox();
+		void draw(SDL_Texture*);
 };
