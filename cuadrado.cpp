@@ -3,7 +3,7 @@
 #include "game.h"
 
 void Cuadrado::draw() {
-	SDL_SetRenderDrawColor(Game::renderer, cR, cG, cB, cA);
+	SDL_SetRenderDrawColor(Game::renderer, color.r, color.g, color.b, color.a);
 	SDL_RenderFillRect(Game::renderer, &rect);
 	if (Game::god) drawHitbox();
 }

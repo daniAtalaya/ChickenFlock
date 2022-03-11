@@ -117,11 +117,12 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>${SolutionDir}SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\C++\SDLHW\guerrila-war-SDL\SDL\x64;${SolutionDir}SDL\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\C++\guerrila-war-SDL\SDL\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -146,15 +147,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="almacen.cpp" />
+    <ClCompile Include="button.cpp" />
+    <ClCompile Include="color.cpp" />
     <ClCompile Include="cuadrado.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="menu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="almacen.h" />
+    <ClInclude Include="button.h" />
+    <ClInclude Include="color.h" />
     <ClInclude Include="cuadrado.h" />
     <ClInclude Include="general.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="menu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -9,8 +9,8 @@
 #include <vector>
 #include <map>
 #include <iostream>
-#define WINDOW_W 800
-#define WINDOW_H 600
-#define WINDOW_T "Daniel Atalaya's Seventh SDL2 Window"
+#include <functional>
+#define WINDOW_W 1920
+#define WINDOW_H 1080
 #define INIT_R srand(time(NULL))
 #define R_NUM(min, max) min + rand() % ((max + 1) - min)

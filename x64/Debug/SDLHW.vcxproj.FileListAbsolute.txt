@@ -1,3 +1,4 @@
 E:\C++\SDLHW\x64\Debug\SDLHW.exe
 E:\C++\SDLHW\guerrila-war-SDL\x64\Debug\SDLHW.exe
 D:\C++\SDLHW\guerrila-war-SDL\x64\Debug\SDLHW.exe
+D:\C++\guerrila-war-SDL\x64\Debug\SDLHW.exe
