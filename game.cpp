@@ -30,12 +30,12 @@ Game::Game() {
 
 void Game::things() {
 	player.color = Color(255, 0, 255, 0);
-	camera.img = images.get("back");
+	camera.img = images.get("mapa2");
 	botonSonido.img = images.get("soundOn");
 	botonSonido.dstRect = new SDL_Rect({ 50, 50, 50, 50 });
 	player.srcRect = NULL;
 	nivel.dstRect = new SDL_Rect({ 0, 0, 0, 0 });
-	SDL_QueryTexture(images.get("back"), NULL, NULL, &nivel.dstRect->w, &nivel.dstRect->h);
+	SDL_QueryTexture(images.get("mapa2"), NULL, NULL, &nivel.dstRect->w, &nivel.dstRect->h);
 	player.dstRect = new SDL_Rect({ 50, 50 , 50, 50 });
 	camera.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H });
 	camera.srcRect = new SDL_Rect({ 0, nivel.dstRect->h - WINDOW_H, WINDOW_W, WINDOW_H });
@@ -45,7 +45,7 @@ bool Game::load() {
 	if (!tracks.load("main_theme", "sample_ogg.ogg")) return false;
 	if (!images.load("soundOn", "soundOn.png")) return false;
 	if (!images.load("soundOff", "soundOff.png")) return false;
-	if (!images.load("back", "back.png")) return false;
+	if (!images.load("mapa2", "mapa2.png")) return false;
 	//Mix_PlayMusic(tracks.get("main_theme"), -1);
 	return true;
 }

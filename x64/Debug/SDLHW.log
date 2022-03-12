@@ -1,2 +1,3 @@
-﻿  button.cpp
-  SDLHW.vcxproj -> D:\C++\guerrila-war-SDL\x64\Debug\SDLHW.exe
+﻿  game.cpp
+C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(9,2): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+  SDLHW.vcxproj -> C:\Users\lapiz\OneDrive\Documentos\GitHub\x64\Debug\SDLHW.exe
