@@ -4,6 +4,7 @@
 #include "button.h"
 #include "almacen.h"
 #include "player.h"
+#include "enums.h"
 class Game {
 	public:
 		Game();
@@ -12,6 +13,7 @@ class Game {
 		static bool god;
 		static bool muted;
 		static bool paused;
+		static Escena escena;
 		bool isOpen = false;
 		static SDL_Renderer* renderer;
 	private:
@@ -20,6 +22,7 @@ class Game {
 		void input();
 		void draw();
 		bool load();
+		void cambiaEscena(Escena);
 		Button botonSonido;
 		Cuadrado nivel;
 		Camera camera;

@@ -22,15 +22,16 @@ Game::Game() {
 	keyboard = SDL_GetKeyboardState(NULL);
 	SDL_RenderSetScale(renderer, 2, 2);
 	//for (const auto& entry : std::filesystem::directory_iterator("./sprites")) std::cout << entry.path() << std::endl;
-	player.color = Color(255, 0, 255, 0);
 	isOpen = load();
-	camera.img = images.get("back");
-	SDL_ShowWindow(window);
 	things();
+	SDL_ShowWindow(window);
 	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 }
 
 void Game::things() {
+	player.color = Color(255, 0, 255, 0);
+	camera.img = images.get("back");
+	botonSonido.img = images.get("soundOn");
 	botonSonido.dstRect = new SDL_Rect({ 50, 50, 50, 50 });
 	player.srcRect = NULL;
 	nivel.dstRect = new SDL_Rect({ 0, 0, 0, 0 });
@@ -46,7 +47,6 @@ bool Game::load() {
 	if (!images.load("soundOff", "soundOff.png")) return false;
 	if (!images.load("back", "back.png")) return false;
 	//Mix_PlayMusic(tracks.get("main_theme"), -1);
-	botonSonido.img = images.get("soundOn");
 	return true;
 }
 
@@ -90,31 +90,94 @@ void Game::input() {
 	}
 }
 
+void Game::cambiaEscena(Escena nuevaEscena) {
+	switch (escena) {
+		case INICI:
+			break;
+		case MENU:
+			break;
+		case JOC:
+			break;
+		case GAMEOVER:
+			break;
+		case TIENDA:
+			break;
+		case PAUSA:
+			break;
+		default:
+			break;
+	}
+	escena = nuevaEscena;
+	switch (nuevaEscena) {
+		case INICI:
+			break;
+		case MENU:
+			break;
+		case JOC:
+			break;
+		case GAMEOVER:
+			break;
+		case TIENDA:
+			break;
+		case PAUSA:
+			break;
+		default:
+			break;
+	}
+}
+
 void Game::update() {
 	if (keyboard[SDL_SCANCODE_ESCAPE]) isOpen = false;
-	std::cout << player.dstRect->x << " - " << player.dstRect->y << std::endl;
-	std::cout << camera.srcRect->x << " - " << camera.srcRect->y << std::endl;
-	if (keyboard[SDL_SCANCODE_W]) {
-		player.update(0, -1);
+	switch (escena) {
+		case INICI:
+			if (keyboard[SDL_SCANCODE_RETURN]) escena = MENU;
+			break;
+		case MENU:
+			break;
+		case JOC:
+			if (keyboard[SDL_SCANCODE_W]) {
+				player.update(0, -1);
+			}
+			if (keyboard[SDL_SCANCODE_S]) {
+				player.update(0, 1);
+			}
+			if (keyboard[SDL_SCANCODE_A]) {
+				player.update(-1, 0);
+			}
+			if (keyboard[SDL_SCANCODE_D]) {
+				player.update(1, 0);
+			}
+			camera.update();
+			break;
+		case GAMEOVER:
+			break;
+		case TIENDA:
+			break;
+		case PAUSA:
+			break;
 	}
-	if (keyboard[SDL_SCANCODE_S]) {
-		player.update(0, 1);
-	}
-	if (keyboard[SDL_SCANCODE_A]) {
-		player.update(-1, 0);
-	}
-	if (keyboard[SDL_SCANCODE_D]) {
-		player.update(1, 0);
-	}
-	camera.update();
 }
 
 void Game::draw() {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
-	camera.draw();
-	botonSonido.draw();
-	player.draw();
+	switch (escena) {
+		case INICI:
+			break;
+		case MENU:
+			break;
+		case JOC:
+			camera.draw();
+			botonSonido.draw();
+			player.draw();
+			break;
+		case GAMEOVER:
+			break;
+		case TIENDA:
+			break;
+		case PAUSA:
+			break;
+	}
 	SDL_RenderPresent(renderer);
 }
 
