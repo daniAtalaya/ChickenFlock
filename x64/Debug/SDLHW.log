@@ -1,3 +1,7 @@
 ﻿  game.cpp
 C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(9,2): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+<<<<<<< Updated upstream
+=======
+C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(47,39): warning C4390: ';': se encontró una instrucción controlada vacía; ¿es esa la intención?
+>>>>>>> Stashed changes
   SDLHW.vcxproj -> C:\Users\lapiz\OneDrive\Documentos\GitHub\x64\Debug\SDLHW.exe

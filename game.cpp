@@ -35,7 +35,11 @@ void Game::things() {
 	botonSonido.dstRect = new SDL_Rect({ 50, 50, 50, 50 });
 	player.srcRect = NULL;
 	nivel.dstRect = new SDL_Rect({ 0, 0, 0, 0 });
+<<<<<<< Updated upstream
 	SDL_QueryTexture(images.get("mapa2"), NULL, NULL, &nivel.dstRect->w, &nivel.dstRect->h);
+=======
+	SDL_QueryTexture(images.get("mapa"), NULL, NULL, &nivel.dstRect->w, &nivel.dstRect->h);
+>>>>>>> Stashed changes
 	player.dstRect = new SDL_Rect({ 50, 50 , 50, 50 });
 	camera.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H });
 	camera.srcRect = new SDL_Rect({ 0, nivel.dstRect->h - WINDOW_H, WINDOW_W, WINDOW_H });
@@ -45,7 +49,11 @@ bool Game::load() {
 	if (!tracks.load("main_theme", "sample_ogg.ogg")) return false;
 	if (!images.load("soundOn", "soundOn.png")) return false;
 	if (!images.load("soundOff", "soundOff.png")) return false;
+<<<<<<< Updated upstream
 	if (!images.load("mapa2", "mapa2.png")) return false;
+=======
+	if (!images.load("mapa", "mapa.png")); return false;
+>>>>>>> Stashed changes
 	//Mix_PlayMusic(tracks.get("main_theme"), -1);
 	return true;
 }
