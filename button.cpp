@@ -1,5 +1,4 @@
 #include "button.h"
-
-void Button::action(){
-
-}
+bool Button::isClicked(SDL_Rect* mouse) {
+	return SDL_HasIntersection(dstRect, mouse);
+};

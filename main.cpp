@@ -2,6 +2,7 @@
 #include "general.h"
 
 bool Game::god = false;
+bool Game::muted = false;
 bool Game::paused = false;
 SDL_Renderer* Game::renderer = nullptr;
 

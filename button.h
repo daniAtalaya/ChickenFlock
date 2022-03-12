@@ -1,12 +1,12 @@
 #pragma once
 #include "general.h"
-class Button
-{
+#include "cuadrado.h"
+class Button : public Cuadrado {
 	public:
-		Button() {};
-		void setHandler(std::function<void(void)> func) { function = func; };
-		void action() { function(); };
-	private:
-		std::function<void(void)> function;
+		Button() {
+			Cuadrado::Cuadrado();
+		};
+
+		bool isClicked(SDL_Rect*);
 };
 
