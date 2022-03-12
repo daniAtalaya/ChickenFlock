@@ -33,9 +33,6 @@
     <ClCompile Include="color.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="spritesheet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -43,6 +40,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="corazon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gallina.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rupia.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="avestruz.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pajaro.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,9 +77,6 @@
     <ClInclude Include="color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sprite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="spritesheet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -75,6 +84,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="enums.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="corazon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gallina.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rupia.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="avestruz.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pajaro.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

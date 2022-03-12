@@ -1,19 +1,34 @@
 #pragma once
 #include "general.h"
 #include "cuadrado.h"
-class Player : public Cuadrado
-{
+#include "spritesheet.h"
+#include "corazon.h"
+class Player : public Cuadrado {
 	public:
+		SpriteSheet spritesheet;
+		int direccion = 1; 
+		int index = 0;
+		int vides = 3;
+		Corazon corazones[3];
 		Player() {
 			Cuadrado::Cuadrado();
+			for (int i = 0; i < 3; i++) corazones[i] = Corazon(i);
 		}
-		void update(int dx, int dy) {
+		void init(SDL_Texture*);
+		void update(int dx, int dy) { 
 			Cuadrado::update(dx, dy);
 		}
-		void draw() {
-			Cuadrado::draw();
-
-			std::cout << "PLAYER DRAWN" << std::endl;
+		void daño() {
+			if (vides-- > 0) {
+				corazones[vides].img = corazones[vides].dead;
+			}
+		}
+		void animateY(){
+			srcRect->y = spritesheet.frameH * direccion;
+		}
+		void animateX() {
+			srcRect->x = spritesheet.frameW * index;
+			if (++index > spritesheet.maxF) index = 0;
 		}
 };
 

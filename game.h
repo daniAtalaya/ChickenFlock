@@ -4,7 +4,10 @@
 #include "button.h"
 #include "almacen.h"
 #include "player.h"
+#include "gallina.h"
+#include "rupia.h"
 #include "enums.h"
+#include "rupia.h"
 class Game {
 	public:
 		Game();
@@ -23,7 +26,10 @@ class Game {
 		void draw();
 		bool load();
 		void cambiaEscena(Escena);
+		bool showPausaText = true;
 		Button botonSonido;
+		Button botonPlay;
+		Button botonShop;
 		Cuadrado nivel;
 		Camera camera;
 		Player player;
@@ -33,4 +39,7 @@ class Game {
 		Almacen<SDL_Texture*> images;
 		Almacen<Mix_Music*> tracks;
 		Almacen<Mix_Chunk*> sfxs;
+		std::vector<Cuadrado> obstaculos;
+		std::vector<Rupia> rupias;
+		std::vector<Gallina> gallinas;
 };
