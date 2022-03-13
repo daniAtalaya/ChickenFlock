@@ -39,6 +39,7 @@ class Game {
 		Button botonPlay;
 		Button botonShop;
 		Button botonBack;
+		Button botonExitShop;
 		Cuadrado nivel;
 		Cuadrado horda;
 		Camera camera;
