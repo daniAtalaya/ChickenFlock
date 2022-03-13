@@ -135,7 +135,8 @@ bool Game::load() {
 	if (!images.load("gallinaMarron", "gallinaMarron.png")) return false;
 	if (!images.load("gallinaBlanca", "gallinaBlanca.png")) return false;
 	if (!images.load("gallinaOscura", "gallinaOscura.png")) return false;
-	//Mix_PlayMusic(tracks.get("main_theme"), -1);
+	
+	Mix_PlayMusic(tracks.get("Intro"), 1);
 	return true;
 }
 
