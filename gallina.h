@@ -6,6 +6,7 @@ class Gallina : public Cuadrado {
 	public:
 		SpriteSheet spritesheet;
 		int index = 0;
+		int tipus = 1;
 		int direccion = 1;
 		Gallina() {
 			Cuadrado::Cuadrado();

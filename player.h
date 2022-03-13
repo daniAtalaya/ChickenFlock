@@ -9,7 +9,8 @@ class Player : public Cuadrado {
 		int direccion = 1; 
 		int index = 0;
 		int vides = 3;
-		int money = 69;
+		int money = 0;
+		int gallinasDesbloqueadas = 1;
 		Corazon corazones[3];
 		Player() {
 			Cuadrado::Cuadrado();

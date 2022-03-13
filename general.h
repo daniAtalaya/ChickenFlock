@@ -7,6 +7,7 @@
 #include "SDL/include/SDL.h"
 #include <string>
 #include <vector>
+#include <cmath>
 #include <map>
 #include <iostream>
 #include <functional>

@@ -3,7 +3,6 @@
 #include "general.h"
 class Rupia : public Cuadrado {
 	public:
-		int valor = 1;
 		int tipus;
 		Rupia() {
 			Cuadrado::Cuadrado();

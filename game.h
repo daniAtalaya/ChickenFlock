@@ -47,14 +47,13 @@ class Game {
 		SDL_Window* window;
 		const Uint8* keyboard;
 		Almacen<Mix_Chunk*> sfxs;
-		std::vector<Rupia> rupias;
+		std::vector<Rupia*> rupias;
 		Almacen<Mix_Music*> tracks;
 		Almacen<SDL_Texture*> images;
-		std::vector<Gallina> gallinas;
-		std::vector<Cuadrado> obstaculos;
+		std::vector<Gallina*> gallinas;
+		std::vector<Cuadrado*> obstaculos;
 		Cuadrado paredHitboxLeft;
 		Cuadrado paredHitboxRight;
 		Cuadrado rioHitboxLeft;
 		Cuadrado rioHitboxRight;
-		std::vector<Cuadrado> paco;
 };

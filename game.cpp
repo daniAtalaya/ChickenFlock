@@ -29,6 +29,20 @@ Game::Game() {
 	init();
 	SDL_ShowWindow(window);
 	SDL_GetMouseState(&mouse->x, &mouse->y);
+	/*for (int i = 1; i <= 3; i++) {
+		Rupia* rupia = new Rupia();
+		rupia->tipus = i;
+		rupia->img = images.get("rupia" + std::to_string(i));
+		rupia->dstRect = new SDL_Rect({ 500, 50 * i, 40, 40 });
+		rupias.push_back(rupia);
+	}*/
+	for (int i = 1; i <= 5; i++) {
+		Gallina* gallina = new Gallina();
+		gallina->tipus = R_NUM(1, player.gallinasDesbloqueadas);
+		gallina->img = images.get("gallina" + std::to_string(i));
+		gallina->dstRect = new SDL_Rect({ 500, 50 * i, 40, 40 });
+		gallinas.push_back(gallina);
+	}
 	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 }
 
@@ -68,7 +82,6 @@ void Game::init() {
 		player.corazones[i].alive = player.corazones[i].img;
 		player.corazones[i].dead = images.get("corazont");
 	}
-
 }
 
 bool Game::load() {
@@ -85,7 +98,9 @@ bool Game::load() {
 	if (!images.load("mapa3", "mapa3.png")) return false;
 	if (!images.load("play", "play.png")) return false;
 	if (!images.load("link", "link.png")) return false;
-	if (!images.load("rupia", "rupia.png")) return false;
+	if (!images.load("rupia1", "rupia1.png")) return false;
+	if (!images.load("rupia2", "rupia2.png")) return false;
+	if (!images.load("rupia3", "rupia3.png")) return false;
 	if (!images.load("pajaro", "pajaro.png")) return false;
 	if (!images.load("corazon", "corazon.png")) return false;
 	if (!images.load("corazont", "corazont.png")) return false;
@@ -132,11 +147,11 @@ bool Game::load() {
 	if (!images.load("arbol3", "arbol3.png")) return false;
 	if (!images.load("arbol4", "arbol4.png")) return false;
 	if (!images.load("pausaT", "pausaT.png")) return false;
-	if (!images.load("gallinaAzul", "gallinaAzul.png")) return false;
-	if (!images.load("gallinaGolden", "gallinaGolden.png")) return false;
-	if (!images.load("gallinaMarron", "gallinaMarron.png")) return false;
-	if (!images.load("gallinaBlanca", "gallinaBlanca.png")) return false;
-	if (!images.load("gallinaOscura", "gallinaOscura.png")) return false;
+	if (!images.load("gallina1", "gallinaBlanca.png")) return false;
+	if (!images.load("gallina2", "gallinaMarron.png")) return false;
+	if (!images.load("gallina3", "gallinaOscura.png")) return false;
+	if (!images.load("gallina4", "gallinaGolden.png")) return false;
+	if (!images.load("gallina5", "gallinaAzul.png")) return false;
 	
 	Mix_PlayMusic(tracks.get("Intro"), 1);
 	return true;
@@ -280,6 +295,8 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 }
 
 void Game::update() {
+	destroy();
+	if (keyboard[SDL_SCANCODE_ESCAPE]) isOpen = false;
 	if (isClicking) {
 		if (botonSonido.isClicked(mouse)) mute();
 		if (botonBack.isClicked(mouse) && (escena == PAUSA || escena == TIENDA)) cambiaEscena(MENU);
@@ -297,6 +314,10 @@ void Game::update() {
 		case JOC:
 			if (player.vides == 0) cambiaEscena(GAMEOVER);
 			if(!paused){
+				if (camera.srcRect->y > 0) camera.update();
+				else {
+					std::cout << "FI DEL NIVELL!!" << std::endl;
+				}
 				if (keyboard[SDL_SCANCODE_W]) {
 					player.direccion = 1;
 					player.update(0, -1);
@@ -317,9 +338,12 @@ void Game::update() {
 					player.damage();
 					player.dstRect->y -= horda.dstRect->h + 10;
 				}
-				if(camera.srcRect->y > 0) camera.update();
-				else {
-					std::cout << "FI DEL NIVELL!!" << std::endl;
+				for (Rupia* r : rupias) {
+					r->update(R_NUM(-1, 1), 1);
+					if (player.checkCollision(r->dstRect)) {
+						r->disposable = true;
+						player.money += pow(5, r->tipus-1);
+					}
 				}
 			}
 			break;
@@ -380,9 +404,10 @@ void Game::draw() {
 					SDL_RenderCopy(renderer, images.get("horda"), NULL, new SDL_Rect({horda.dstRect->x, WINDOW_H - horda.dstRect->h * i, horda.dstRect->w, horda.dstRect->h}));
 				}
 			}
+			for (Rupia* r : rupias) r->draw();
 			player.draw();
 			for (int i = 0; i < 3; i++) player.corazones[i].draw();
-			SDL_RenderCopy(renderer, images.get("rupia"), NULL, new SDL_Rect({ WINDOW_W - 60, 90, 40, 40 }));
+			SDL_RenderCopy(renderer, images.get("rupia1"), NULL, new SDL_Rect({ WINDOW_W - 60, 90, 40, 40 }));
 			num = std::to_string(player.money);
 			for (int i = num.length() - 1; i >= 0; i--) {
 				s = "n";
@@ -412,7 +437,7 @@ void Game::draw() {
 			botonBack.draw();
 			player.draw();
 			SDL_QueryTexture(images.get("popupTienda"), NULL, NULL, &w, &h);
-			SDL_RenderCopy(renderer, images.get("popupTienda"), NULL, new SDL_Rect({ WINDOW_W / 5 - 10, 40, w, h }));
+			SDL_RenderCopy(renderer, images.get("popupTienda"), NULL, new SDL_Rect({ WINDOW_W / 5 - 60, 20, w - 100, h - 100 }));
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 32);
 			SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
 			botonSonido.draw();
@@ -437,17 +462,17 @@ void Game::draw() {
 }
 
 void Game::destroy() {
-	obstaculos.erase(std::remove_if(obstaculos.begin(), obstaculos.end(), [](const Cuadrado& o) {
-		bool temp = o.dstRect->x < -o.dstRect->w || o.dstRect->x > WINDOW_W + o.dstRect->w || o.dstRect->y > WINDOW_H + o.dstRect->h;
-		return o.disposable || temp;
+	obstaculos.erase(std::remove_if(obstaculos.begin(), obstaculos.end(), [](const Cuadrado* o) {
+		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
+		return o->disposable || temp;
 	}), obstaculos.end());
-	rupias.erase(std::remove_if(rupias.begin(), rupias.end(), [](const Cuadrado& o) {
-		bool temp = o.dstRect->x < -o.dstRect->w || o.dstRect->x > WINDOW_W + o.dstRect->w || o.dstRect->y > WINDOW_H + o.dstRect->h;
-		return o.disposable || temp;
+	rupias.erase(std::remove_if(rupias.begin(), rupias.end(), [](const Cuadrado* o) {
+		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
+		return o->disposable || temp;
 	}), rupias.end());
-	gallinas.erase(std::remove_if(gallinas.begin(), gallinas.end(), [](const Cuadrado& o) {
-		bool temp = o.dstRect->x < -o.dstRect->w || o.dstRect->x > WINDOW_W + o.dstRect->w || o.dstRect->y > WINDOW_H + o.dstRect->h;
-		return o.disposable || temp;
+	gallinas.erase(std::remove_if(gallinas.begin(), gallinas.end(), [](const Cuadrado* o) {
+		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
+		return o->disposable || temp;
 	}), gallinas.end());
 }
 
