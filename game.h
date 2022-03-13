@@ -36,6 +36,7 @@ class Game {
 		bool showPausaText = true;
 		Button botonSonido; 
 		int loreShown = 0;
+		int loreTienda = 0;
 		Button botonPlay;
 		Button botonShop;
 		Button botonBack;

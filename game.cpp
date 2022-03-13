@@ -119,6 +119,14 @@ bool Game::load() {
 	if (!images.load("lore11", "lore11.png")) return false;
 	if (!images.load("lore12", "lore12.png")) return false;
 	if (!images.load("lore13", "lore13.png")) return false; 
+	if (!images.load("tiendalore1", "Tiendalore_1.png")) return false;
+	if (!images.load("tiendalore2", "Tiendalore_2.png")) return false;
+	if (!images.load("tiendalore3", "Tiendalore_3.png")) return false;
+	if (!images.load("tiendalore4", "Tiendalore_4.png")) return false;
+	if (!images.load("tiendalore5", "Tiendalore_5.png")) return false;
+	if (!images.load("tiendalore6", "Tiendalore_6.png")) return false;
+	if (!images.load("tiendalore7", "Tiendalore_7.png")) return false;
+	if (!images.load("tiendalore8", "Tiendalore_8.png")) return false;
 	if (!images.load("n0", "0.png")) return false;
 	if (!images.load("n1", "1.png")) return false;
 	if (!images.load("n2", "2.png")) return false;
@@ -274,6 +282,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 		case TIENDA:
 			botonBack.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
 			Mix_PlayMusic(tracks.get("Tienda"), -1);
+			if (++loreTienda > 8) loreTienda = 1; 
 			break;
 		case PAUSA:
 			break;
@@ -412,12 +421,15 @@ void Game::draw() {
 			camera.draw();
 			botonBack.draw();
 			player.draw();
-			SDL_QueryTexture(images.get("popupTienda"), NULL, NULL, &w, &h);
-			SDL_RenderCopy(renderer, images.get("popupTienda"), NULL, new SDL_Rect({ WINDOW_W / 5 - 10, 40, w, h }));
-			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 32);
-			SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
 			botonSonido.draw();
 			botonExitShop.draw();
+			SDL_QueryTexture(images.get("popupTienda"), NULL, NULL, &w, &h);
+			SDL_RenderCopy(renderer, images.get("popupTienda"), NULL, new SDL_Rect({ WINDOW_W / 5 , 20, w - 100, h - 100 }));
+			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 32);
+			SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
+			if (loreTienda == 0) loreTienda = 1;
+			SDL_QueryTexture(images.get("tiendalore" + std::to_string(loreTienda)), NULL, NULL, &w, &h);
+			SDL_RenderCopy(renderer, images.get("tiendalore" + std::to_string(loreTienda)), NULL, new SDL_Rect({ WINDOW_W -280, 670, w , h }));
 			break;
 		case PAUSA:
 			camera.draw();
