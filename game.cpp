@@ -51,7 +51,7 @@ void Game::init() {
 	botonSonido.img = images.get("soundOn");
 	botonSonido.dstRect = new SDL_Rect({ 20, 20, 100, 100 });
 	botonPlay.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
-	botonBack.dstRect = new SDL_Rect({ 20, 250, 100, 100 });
+	botonBack.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
 	botonShop.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
 	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
 	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
@@ -97,6 +97,7 @@ bool Game::load() {
 	if (!images.load("back", "back.png")) return false;
 	if (!images.load("gameoverT", "gameoverT.png")) return false;
 	if (!images.load("linksad", "linksad.png")) return false;
+	if (!images.load("popupTienda", "popupTienda.png")) return false;
 	if (!images.load("arbol1", "arbol1.png")) return false;
 	if (!images.load("tienda", "tienda.png")) return false;
 	if (!images.load("roca4", "roca4.png")) return false;
@@ -198,6 +199,10 @@ void Game::input() {
 					//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 				}
 				if (event.window.event == SDL_WINDOWEVENT_LEAVE) paused = true;
+				break;
+			case SDL_MOUSEMOTION:
+				break;
+			case SDL_MOUSEBUTTONDOWN:
 				break;
 		}
 	}
@@ -375,8 +380,12 @@ void Game::draw() {
 		case TIENDA:
 			camera.sY = 0;
 			camera.draw();
+			botonBack.draw();
 			player.draw();
-			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
+			SDL_QueryTexture(images.get("popupTienda"), NULL, NULL, &w, &h);
+			SDL_RenderCopy(renderer, images.get("popupTienda"), NULL, new SDL_Rect({ WINDOW_W / 5 , 100, w , h }));
+		
+			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 32);
 			SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
 			botonSonido.draw();
 			break;
