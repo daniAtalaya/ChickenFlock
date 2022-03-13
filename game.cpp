@@ -3,14 +3,15 @@
 #include "game.h"
 #include "general.h"
 #include "color.h"
-#include <fstream>
 #include <filesystem>
-
+#include <sstream>
+#define SSTR( x ) dynamic_cast< std::ostringstream & >( \
+            ( std::ostringstream() << std::dec << x ) ).str()
 Game::Game() {
 	INIT_R;
 	SDL_Init(SDL_INIT_EVERYTHING);
 	window = SDL_CreateWindow(
-		"Escape from Chickens",
+		"Cock Flock",
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
 		WINDOW_W, WINDOW_H,
@@ -39,11 +40,10 @@ void Game::assignImg() {
 
 void Game::init() {
 	assignImg();
-	hitboxes.clear();
-	hitboxes.push_back(Cuadrado());
-	hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({ 1, 1, 150, 8100});
-	paco.push_back(Cuadrado());
-	paco[paco.size() - 1].dstRect = new SDL_Rect({ 810, 1, 150, 8100 });
+	paredHitboxLeft = Cuadrado();
+	paredHitboxRight = Cuadrado();
+	paredHitboxLeft.dstRect = new SDL_Rect({ 1, 1, 150, 8100 });
+	paredHitboxRight.dstRect = new SDL_Rect({ 810, 1, 150, 8100 });
 	//hitboxes.push_back(Cuadrado());
 	//hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({ 150, 200, 210, 300 });
 	//hitboxes.push_back(Cuadrado());
@@ -174,7 +174,7 @@ void Game::input() {
 					) && escena == INICI) cambiaEscena(MENU);
 					if (event.key.keysym.sym == SDLK_t && escena == MENU) cambiaEscena(TIENDA);
 					if (event.key.keysym.sym == SDLK_q && escena == PAUSA) cambiaEscena(MENU);
-					if (event.key.keysym.sym == SDLK_h) player.daño();
+					if (event.key.keysym.sym == SDLK_h) player.damage();
 					if (event.key.keysym.sym == SDLK_F1) god = !god;
 					if (event.key.keysym.sym == SDLK_m) {
 						muted = !muted;
@@ -279,21 +279,15 @@ void Game::update() {
 				}
 				if (keyboard[SDL_SCANCODE_A]) {
 					player.direccion = 0;
-					player.update(-1, 0);
+					if (!player.checkCollision(paredHitboxLeft.dstRect)) player.update(-1, 0);
 				}
 				if (keyboard[SDL_SCANCODE_D]) {
 					player.direccion = 2;
-					player.update(1, 0);
+					if(!player.checkCollision(paredHitboxRight.dstRect)) player.update(1, 0);
 				}
 				if (player.checkCollision(horda.dstRect)) {
-					player.daño();
+					player.damage();
 					player.dstRect->y -= horda.dstRect->h + 10;
-				}
-				if (player.checkCollision(paco[paco.size() - 1].dstRect)) {
-					player.dstRect->x -= 10;
-				}
-				if (player.checkCollision(hitboxes[hitboxes.size() - 1].dstRect)) {
-					player.dstRect->x += 10;
 				}
 				if(camera.srcRect->y > 0) camera.update();
 				else {
@@ -317,7 +311,7 @@ void Game::draw() {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 	int w, h; 
-	std::string num, s;
+	std::string num;
 	switch (escena) {
 		case INICI:
 			SDL_QueryTexture(images.get("studio"), NULL, NULL, &w, &h);
@@ -357,17 +351,11 @@ void Game::draw() {
 			for (int i = 0; i < 3; i++) player.corazones[i].draw();
 			SDL_RenderCopy(renderer, images.get("rupia"), NULL, new SDL_Rect({ WINDOW_W - 60, 90, 40, 40 }));
 			num = std::to_string(player.money);
-			//std::cout << num;
 			for (int i = num.length() - 1; i >= 0; i--) {
-				s = 'n' << num[i];
-				std::cout << s;
-				SDL_RenderCopy(renderer, images.get(s), NULL, new SDL_Rect({WINDOW_W - 110 - i * 50, 90, 40, 40}));
+				SDL_RenderCopy(renderer, images.get("n" + num[i]), NULL, new SDL_Rect({WINDOW_W - 110 - i * 50, 90, 40, 40}));
 			}
-			std::cout << std::endl;
-			for (int i = 0; i < hitboxes.size(); i++)
-			{
-				hitboxes[i].draw();
-			}
+			paredHitboxLeft.draw();
+			paredHitboxRight.draw();
 			//dstRect->x = WINDOW_W - 60 - i * 50;
 
 			break;

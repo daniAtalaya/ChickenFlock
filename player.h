@@ -21,7 +21,7 @@ class Player : public Cuadrado {
 		void update(int dx, int dy) {
 			Cuadrado::update(dx, dy);
 		}
-		void daño() {
+		void damage() {
 			if (vides-- > 0) {
 				corazones[vides].img = corazones[vides].dead;
 			}
