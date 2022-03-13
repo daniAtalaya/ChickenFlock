@@ -16,6 +16,7 @@ class Game {
 		static bool god;
 		static bool muted;
 		static bool paused;
+		int mouseX, mouseY;
 		static Escena escena;
 		bool isOpen = false;
 		static SDL_Renderer* renderer;
@@ -27,6 +28,7 @@ class Game {
 		void input();
 		void draw();
 		bool load();
+		bool hardMode = false;
 		void cambiaEscena(Escena);
 		bool showPausaText = true;
 		Button botonSonido; 
