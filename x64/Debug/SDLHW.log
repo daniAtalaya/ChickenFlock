@@ -2,8 +2,8 @@
   camera.cpp
   cuadrado.cpp
   game.cpp
-D:\C++\guerrila-war-SDL\game.cpp(9,2): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
-D:\C++\guerrila-war-SDL\game.cpp(333,4): warning C4267: 'inicializando': conversión de 'size_t' a 'int'; posible pérdida de datos
+C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(10,2): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(346,4): warning C4267: 'inicializando': conversión de 'size_t' a 'int'; posible pérdida de datos
   main.cpp
   Generando código...
-  SDLHW.vcxproj -> D:\C++\guerrila-war-SDL\x64\Debug\SDLHW.exe
+  SDLHW.vcxproj -> C:\Users\lapiz\OneDrive\Documentos\GitHub\x64\Debug\SDLHW.exe

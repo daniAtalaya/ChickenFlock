@@ -5,6 +5,7 @@
 #include "color.h"
 #include <fstream>
 #include <filesystem>
+
 Game::Game() {
 	INIT_R;
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -38,7 +39,13 @@ void Game::assignImg() {
 void Game::init() {
 	assignImg();
 	hitboxes.push_back(Cuadrado());
-	hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({400, 550, 220, 220});
+	hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({ 1, 1, 150, 8100});
+	paco.push_back(Cuadrado());
+	paco[paco.size() - 1].dstRect = new SDL_Rect({ 810, 1, 150, 8100 });
+	//hitboxes.push_back(Cuadrado());
+	//hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({ 150, 200, 210, 300 });
+	//hitboxes.push_back(Cuadrado());
+	//hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({ 810, 200, 210, 300 });
 	botonSonido.img = images.get("soundOn");
 	botonSonido.dstRect = new SDL_Rect({ 20, 20, 100, 100 });
 	botonPlay.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
@@ -266,6 +273,12 @@ void Game::update() {
 				if (player.checkCollision(horda.dstRect)) {
 					player.daño();
 					player.dstRect->y -= horda.dstRect->h + 10;
+				}
+				if (player.checkCollision(paco[paco.size() - 1].dstRect)) {
+					player.dstRect->x -= 10;
+				}
+				if (player.checkCollision(hitboxes[hitboxes.size() - 1].dstRect)) {
+					player.dstRect->x += 10;
 				}
 				if(camera.srcRect->y > 0) camera.update();
 				else {
