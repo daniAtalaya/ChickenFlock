@@ -17,3 +17,6 @@ void Cuadrado::drawHitbox() {
 	SDL_SetRenderDrawColor(Game::renderer, 192, 0, 0, 255);
 	SDL_RenderDrawRect(Game::renderer, dstRect);
 }
+bool Cuadrado::checkCollision(SDL_Rect* otherRect) {
+	return SDL_HasIntersection(dstRect, otherRect);
+}

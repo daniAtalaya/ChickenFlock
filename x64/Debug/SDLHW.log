@@ -1,13 +1,3 @@
-﻿  almacen.cpp
-  avestruz.cpp
-  camera.cpp
-  cuadrado.cpp
-  gallina.cpp
-  main.cpp
-  game.cpp
+﻿  game.cpp
 D:\C++\guerrila-war-SDL\game.cpp(9,2): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
-  pajaro.cpp
-  player.cpp
-  rupia.cpp
-  Generando código...
   SDLHW.vcxproj -> D:\C++\guerrila-war-SDL\x64\Debug\SDLHW.exe

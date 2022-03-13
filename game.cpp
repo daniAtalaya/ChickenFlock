@@ -23,31 +23,38 @@ Game::Game() {
 	SDL_RenderSetScale(renderer, 1, 1);
 	//for (const auto& entry : std::filesystem::directory_iterator("./sprites")) std::cout << entry.path() << std::endl;
 	isOpen = load();
-	things();
+	init();
 	SDL_ShowWindow(window);
 	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 }
 
-void Game::things() {
+void Game::assignImg() {
 	camera.img = images.get("mapa3");
+	botonPlay.img = images.get("play");
+	botonShop.img = images.get("tienda");
+	horda.img = images.get("horda");
+}
+
+void Game::init() {
+	assignImg();
 	botonSonido.img = images.get("soundOn");
 	botonSonido.dstRect = new SDL_Rect({ 20, 20, 100, 100 });
-	botonPlay.img = images.get("play");
 	botonPlay.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
-	botonShop.img = images.get("tienda");
-	botonPlay.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
+	botonShop.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
 	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
-	SDL_QueryTexture(images.get("mapa3"), NULL, NULL, NULL, &nivel.dstRect->h);
 	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 200 , 50, 50 });
+	SDL_QueryTexture(images.get("mapa3"), NULL, NULL, NULL, &nivel.dstRect->h);
+	camera.srcRect = new SDL_Rect({ 0, nivel.dstRect->h - WINDOW_H, WINDOW_W, WINDOW_H });
+	horda.dstRect = new SDL_Rect({ 130, WINDOW_H, 0, 0 });
 	player.init(images.get("link"));
+	SDL_QueryTexture(images.get("horda"), NULL, NULL, &horda.dstRect->w, &horda.dstRect->h);
+	horda.dstRect->y = WINDOW_H - horda.dstRect->h;
+	player.vides = 3;
 	for (int i = 0; i < 3; i++) {
 		player.corazones[i].img = images.get("corazon");
 		player.corazones[i].alive = player.corazones[i].img;
 		player.corazones[i].dead = images.get("corazont");
 	}
-	camera.srcRect = new SDL_Rect({ 0, nivel.dstRect->h - WINDOW_H, WINDOW_W, WINDOW_H });
-
-	
 
 }
 
@@ -73,6 +80,8 @@ bool Game::load() {
 	if (!images.load("roca1", "roca1.png")) return false;
 	if (!images.load("roca2", "roca2.png")) return false;
 	if (!images.load("roca3", "roca3.png")) return false;
+	if (!images.load("gameoverT", "gameoverT.png")) return false;
+	if (!images.load("linksad", "linksad.png")) return false;
 	if (!images.load("roca4", "roca4.png")) return false;
 	if (!images.load("arbol1", "arbol1.png")) return false;
 	if (!images.load("arbol2", "arbol2.png")) return false;
@@ -105,9 +114,24 @@ void Game::input() {
 				break;
 			case SDL_KEYDOWN:
 				if (!event.key.repeat) {
-					if (event.key.keysym.sym == SDLK_RETURN && escena == MENU) cambiaEscena(JOC);
-					if (event.key.keysym.sym == SDLK_RETURN && escena == INICI) cambiaEscena(MENU);
+					if ((
+						event.key.keysym.sym == SDLK_RETURN ||
+						event.key.keysym.sym == SDLK_SPACE
+						) && escena == GAMEOVER) cambiaEscena(MENU);
+					if ((
+						event.key.keysym.sym == SDLK_RETURN ||
+						event.key.keysym.sym == SDLK_SPACE
+					) && escena == LORE) cambiaEscena(JOC);
+					if ((
+						event.key.keysym.sym == SDLK_RETURN ||
+						event.key.keysym.sym == SDLK_SPACE
+					) && escena == MENU) cambiaEscena(LORE);
+					if ((
+						event.key.keysym.sym == SDLK_RETURN ||
+						event.key.keysym.sym == SDLK_SPACE
+					) && escena == INICI) cambiaEscena(MENU);
 					if (event.key.keysym.sym == SDLK_t && escena == MENU) cambiaEscena(TIENDA);
+					if (event.key.keysym.sym == SDLK_q && escena == PAUSA) cambiaEscena(MENU);
 					if (event.key.keysym.sym == SDLK_h) player.daño();
 					if (event.key.keysym.sym == SDLK_F1) god = !god;
 					if (event.key.keysym.sym == SDLK_m) {
@@ -166,6 +190,8 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 		case LORE:
 			break;
 		case JOC:
+			paused = false;
+			init();
 			break;
 		case GAMEOVER:
 			break;
@@ -208,6 +234,10 @@ void Game::update() {
 					player.direccion = 2;
 					player.update(1, 0);
 				}
+				if (player.checkCollision(horda.dstRect)) {
+					player.daño();
+					player.dstRect->y -= horda.dstRect->h + 10;
+				}
 				if(camera.srcRect->y > 0) camera.update();
 				else {
 					std::cout << "FI DEL NIVELL!!" << std::endl;
@@ -249,16 +279,17 @@ void Game::draw() {
 			SDL_RenderCopy(renderer, images.get("start"), NULL, new SDL_Rect({ WINDOW_W - 100 - w / 3, 550, w *1/3, h * 4 / 10 }));
 			break;
 		case LORE:
+			camera.draw();
+			player.draw();
 			break;
 		case JOC:
 			camera.sY = 2;
 			camera.draw();
 			botonSonido.draw();
 			botonPlay.draw();
-			if (SDL_GetTicks() % 20 == 0 && !paused) player.animateX();
+			if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) player.animateX();
 			if (!paused) player.animateY();
-			SDL_QueryTexture(images.get("horda"), NULL, NULL, &w, &h);
-			SDL_RenderCopy(renderer, images.get("horda"), NULL, new SDL_Rect({0, WINDOW_H - h, w, h}));
+			horda.draw();
 			player.draw();
 			for (int i = 0; i < 3; i++) player.corazones[i].draw();
 			break;
@@ -268,6 +299,9 @@ void Game::draw() {
 			player.draw();
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
 			SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
+			SDL_QueryTexture(images.get("gameoverT"), NULL, NULL, &w, &h);
+			SDL_RenderCopy(renderer, images.get("gameoverT"), NULL, new SDL_Rect({ WINDOW_W - 100 - w / 3, 100, w * 1 / 3, h * 4 / 10 }));
+			SDL_RenderCopy(renderer, images.get("linksad"), NULL, new SDL_Rect({ (WINDOW_W / 2) - 200, (WINDOW_H / 2), 350, 350 }));
 			break;
 		case GUANYAT:
 			break;
@@ -295,6 +329,21 @@ void Game::draw() {
 			break;
 	}
 	SDL_RenderPresent(renderer);
+}
+
+void Game::destroy() {
+	obstaculos.erase(std::remove_if(obstaculos.begin(), obstaculos.end(), [](const Cuadrado& o) {
+		bool temp = o.dstRect->x < -o.dstRect->w || o.dstRect->x > WINDOW_W + o.dstRect->w || o.dstRect->y > WINDOW_H + o.dstRect->h;
+		return o.disposable || temp;
+	}), obstaculos.end());
+	rupias.erase(std::remove_if(rupias.begin(), rupias.end(), [](const Cuadrado& o) {
+		bool temp = o.dstRect->x < -o.dstRect->w || o.dstRect->x > WINDOW_W + o.dstRect->w || o.dstRect->y > WINDOW_H + o.dstRect->h;
+		return o.disposable || temp;
+	}), rupias.end());
+	gallinas.erase(std::remove_if(gallinas.begin(), gallinas.end(), [](const Cuadrado& o) {
+		bool temp = o.dstRect->x < -o.dstRect->w || o.dstRect->x > WINDOW_W + o.dstRect->w || o.dstRect->y > WINDOW_H + o.dstRect->h;
+		return o.disposable || temp;
+	}), gallinas.end());
 }
 
 void Game::loop() {

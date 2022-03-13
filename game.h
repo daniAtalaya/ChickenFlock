@@ -20,7 +20,9 @@ class Game {
 		bool isOpen = false;
 		static SDL_Renderer* renderer;
 	private:
-		void things();
+		void init();
+		void assignImg();
+		void destroy();
 		void update();
 		void input();
 		void draw();
@@ -31,6 +33,7 @@ class Game {
 		Button botonPlay;
 		Button botonShop;
 		Cuadrado nivel;
+		Cuadrado horda;
 		Camera camera;
 		Player player;
 		SDL_Event event;

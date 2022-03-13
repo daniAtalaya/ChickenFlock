@@ -9,9 +9,11 @@ class Cuadrado {
 		SDL_Rect* srcRect;
 		Color color;
 		int sX = 5;
+		bool disposable;
 		int sY = 5; 
 		SDL_Texture* img;
 		void draw();
 		void drawHitbox();
 		void update(int, int);
+		bool checkCollision(SDL_Rect*);
 };

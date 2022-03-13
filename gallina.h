@@ -18,6 +18,6 @@ class Gallina : public Cuadrado {
 		}
 		void animateX() {
 			srcRect->x = spritesheet.frameW * index;
-			if (++index > spritesheet.maxF) index = 0;
+			if (++index > spritesheet.maxC) index = 0;
 		}
 };
