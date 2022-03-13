@@ -39,8 +39,8 @@ Game::Game() {
 	for (int i = 1; i <= 5; i++) {
 		Gallina* gallina = new Gallina();
 		gallina->tipus = R_NUM(1, player.gallinasDesbloqueadas);
-		gallina->img = images.get("gallina" + std::to_string(i));
 		gallina->dstRect = new SDL_Rect({ 500, 50 * i, 40, 40 });
+		gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
 		gallinas.push_back(gallina);
 	}
 	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -68,7 +68,7 @@ void Game::init() {
 	botonPlay.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
 	botonBack.dstRect = new SDL_Rect({ 10, 250, 100, 100 });
 	botonShop.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
-	botonExitShop.dstRect = new SDL_Rect({ 300, 765, 360, 70 });
+	botonExitShop.dstRect = new SDL_Rect({ 335, 650, 305, 65 });
 	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
 	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
 	SDL_QueryTexture(images.get("mapa3"), NULL, NULL, NULL, &nivel.dstRect->h);
@@ -159,9 +159,9 @@ bool Game::load() {
 	if (!images.load("pausaT", "pausaT.png")) return false;
 	if (!images.load("gallina1", "gallinaBlanca.png")) return false;
 	if (!images.load("gallina2", "gallinaMarron.png")) return false;
-	if (!images.load("gallina3", "gallinaOscura.png")) return false;
-	if (!images.load("gallina4", "gallinaGolden.png")) return false;
-	if (!images.load("gallina5", "gallinaAzul.png")) return false;
+	if (!images.load("gallina3", "gallinaAzul.png")) return false;
+	if (!images.load("gallina4", "gallinaOscura.png")) return false;
+	if (!images.load("gallina5", "gallinaGolden.png")) return false;
 	
 	Mix_PlayMusic(tracks.get("Intro"), 1);
 	return true;
@@ -356,6 +356,13 @@ void Game::update() {
 						player.money += pow(5, r->tipus-1);
 					}
 				}
+				for (Gallina* g : gallinas) {
+					//g->update(R_NUM(-1, 1), 1);
+					if (player.checkCollision(g->dstRect)) {
+						g->disposable = true;
+						player.damage();
+					}
+				}
 			}
 			break;
 		case GAMEOVER:
@@ -363,6 +370,10 @@ void Game::update() {
 		case GUANYAT:
 			break;
 		case TIENDA:
+			if (botonCompraBrown.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.brownComprada && player.money >= 30) {
+				player.money -= 30;
+				player.brownComprada = true;
+			}
 			break;
 		case PAUSA:
 			break;
@@ -416,6 +427,11 @@ void Game::draw() {
 				}
 			}
 			for (Rupia* r : rupias) r->draw();
+			for (Gallina* g : gallinas) {
+				g->draw();
+				if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) g->animateX();
+				if ((SDL_GetTicks() / 16) % 200 * g->spritesheet.maxC == 0 && !paused) g->animateY();
+			}
 			player.draw();
 			for (int i = 0; i < 3; i++) player.corazones[i].draw();
 			SDL_RenderCopy(renderer, images.get("rupia1"), NULL, new SDL_Rect({ WINDOW_W - 60, 90, 40, 40 }));
@@ -450,12 +466,12 @@ void Game::draw() {
 			botonSonido.draw();
 			botonExitShop.draw();
 			SDL_QueryTexture(images.get("popupTienda"), NULL, NULL, &w, &h);
-			SDL_RenderCopy(renderer, images.get("popupTienda"), NULL, new SDL_Rect({ WINDOW_W / 5 , 20, w - 100, h - 100 }));
+			SDL_RenderCopy(renderer, images.get("popupTienda"), NULL, new SDL_Rect({ WINDOW_W / 4 , 20, w - 100, h - 100 }));
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 32);
 			SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
 			if (loreTienda == 0) loreTienda = 1;
 			SDL_QueryTexture(images.get("tiendalore" + std::to_string(loreTienda)), NULL, NULL, &w, &h);
-			SDL_RenderCopy(renderer, images.get("tiendalore" + std::to_string(loreTienda)), NULL, new SDL_Rect({ WINDOW_W -280, 670, w , h }));
+			SDL_RenderCopy(renderer, images.get("tiendalore" + std::to_string(loreTienda)), NULL, new SDL_Rect({ WINDOW_W -280, 640, w , h }));
 			break;
 		case PAUSA:
 			camera.draw();

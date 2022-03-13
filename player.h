@@ -10,6 +10,10 @@ class Player : public Cuadrado {
 		int index = 0;
 		int vides = 3;
 		int money = 0;
+		bool brownComprada = false;
+		bool azulComprada = false;
+		bool darkComprada = false;
+		bool goldenComprada = false;
 		int gallinasDesbloqueadas = 1;
 		Corazon corazones[3];
 		Player() {

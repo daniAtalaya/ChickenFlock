@@ -15,6 +15,7 @@ class Gallina : public Cuadrado {
 		}
 		void init(SDL_Texture*);
 		void animateY() {
+			direccion = R_NUM(0, spritesheet.maxF);
 			srcRect->y = spritesheet.frameH * direccion;
 		}
 		void animateX() {

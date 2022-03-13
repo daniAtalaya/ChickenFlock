@@ -6,6 +6,6 @@ void Gallina::init(SDL_Texture* image) {
 	srcRect->w = spritesheet.frameW;
 	srcRect->x = srcRect->y = 0;
 	srcRect->h = spritesheet.frameH;
-	dstRect->w = 85;
-	dstRect->h = 85;
+	dstRect->w = 70;
+	dstRect->h = 70;
 }
