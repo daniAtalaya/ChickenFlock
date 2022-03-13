@@ -5,6 +5,7 @@
 #include "color.h"
 #include <fstream>
 #include <filesystem>
+
 Game::Game() {
 	INIT_R;
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -40,7 +41,13 @@ void Game::init() {
 	assignImg();
 	hitboxes.clear();
 	hitboxes.push_back(Cuadrado());
-	hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({400, 550, 220, 220});
+	hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({ 1, 1, 150, 8100});
+	paco.push_back(Cuadrado());
+	paco[paco.size() - 1].dstRect = new SDL_Rect({ 810, 1, 150, 8100 });
+	//hitboxes.push_back(Cuadrado());
+	//hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({ 150, 200, 210, 300 });
+	//hitboxes.push_back(Cuadrado());
+	//hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({ 810, 200, 210, 300 });
 	botonSonido.img = images.get("soundOn");
 	botonSonido.dstRect = new SDL_Rect({ 20, 20, 100, 100 });
 	botonPlay.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
@@ -65,7 +72,13 @@ void Game::init() {
 
 bool Game::load() {
 	//sfxs
-	if (!tracks.load("main_theme", "sample_ogg.ogg")) return false;
+	if (!tracks.load("Intro", "Intro Colibri Studios.ogg")) return false;
+	if (!tracks.load("Game Over", "Game Over.ogg")) return false;
+	if (!tracks.load("Gameplay", "Gameplay.ogg")) return false;
+	if (!tracks.load("Menu", "Menu.ogg")) return false;
+	if (!tracks.load("Tienda", "Tienda.ogg")) return false;
+	if (!tracks.load("sonido de start", "sonido de start.ogg")) return false;
+	if (!tracks.load("Multidud de gallinas", "Multidud de gallinas.ogg")) return false;
 	if (!images.load("soundOn", "soundOn.png")) return false;
 	if (!images.load("soundOff", "soundOff.png")) return false;
 	if (!images.load("mapa3", "mapa3.png")) return false;
@@ -161,7 +174,7 @@ void Game::input() {
 					) && escena == INICI) cambiaEscena(MENU);
 					if (event.key.keysym.sym == SDLK_t && escena == MENU) cambiaEscena(TIENDA);
 					if (event.key.keysym.sym == SDLK_q && escena == PAUSA) cambiaEscena(MENU);
-					if (event.key.keysym.sym == SDLK_h) player.daño();
+					if (event.key.keysym.sym == SDLK_h) player.daÃ±o();
 					if (event.key.keysym.sym == SDLK_F1) god = !god;
 					if (event.key.keysym.sym == SDLK_m) {
 						muted = !muted;
@@ -220,18 +233,22 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 		case INICI:
 			break;
 		case MENU:
+			Mix_PlayMusic(tracks.get("Menu"), -1);
 			break;
 		case LORE:
 			if (++loreShown > 13) loreShown = 1;
 			break;
 		case JOC:
+			Mix_PlayMusic(tracks.get("Gameplay"), -1);
 			paused = false;
 			break;
 		case GAMEOVER:
+			Mix_PlayMusic(tracks.get("Game Over"), 1);
 			break;
 		case GUANYAT:
 			break;
 		case TIENDA:
+			Mix_PlayMusic(tracks.get("Tienda"), -1);
 			break;
 		case PAUSA:
 			break;
@@ -269,8 +286,14 @@ void Game::update() {
 					player.update(1, 0);
 				}
 				if (player.checkCollision(horda.dstRect)) {
-					player.daño();
+					player.daÃ±o();
 					player.dstRect->y -= horda.dstRect->h + 10;
+				}
+				if (player.checkCollision(paco[paco.size() - 1].dstRect)) {
+					player.dstRect->x -= 10;
+				}
+				if (player.checkCollision(hitboxes[hitboxes.size() - 1].dstRect)) {
+					player.dstRect->x += 10;
 				}
 				if(camera.srcRect->y > 0) camera.update();
 				else {

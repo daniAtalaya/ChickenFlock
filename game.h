@@ -48,4 +48,5 @@ class Game {
 		std::vector<Gallina> gallinas;
 		std::vector<Cuadrado> obstaculos;
 		std::vector<Cuadrado> hitboxes;
+		std::vector<Cuadrado> paco;
 };
