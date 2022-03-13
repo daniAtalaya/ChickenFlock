@@ -4,8 +4,8 @@
 
 void Cuadrado::draw() {
 	SDL_SetRenderDrawColor(Game::renderer, color.r, color.g, color.b, color.a);
-	if(img == NULL) SDL_RenderFillRect(Game::renderer, dstRect);
-	else SDL_RenderCopy(Game::renderer, img, srcRect, dstRect);
+	//if(img == NULL) SDL_RenderFillRect(Game::renderer, dstRect);
+	if(img != NULL) SDL_RenderCopy(Game::renderer, img, srcRect, dstRect);
 	if (Game::god) drawHitbox();
 }
 

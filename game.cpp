@@ -37,12 +37,14 @@ void Game::assignImg() {
 
 void Game::init() {
 	assignImg();
+	hitboxes.push_back(Cuadrado());
+	hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({400, 550, 220, 220});
 	botonSonido.img = images.get("soundOn");
 	botonSonido.dstRect = new SDL_Rect({ 20, 20, 100, 100 });
 	botonPlay.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
 	botonShop.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
 	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
-	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 200 , 50, 50 });
+	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
 	SDL_QueryTexture(images.get("mapa3"), NULL, NULL, NULL, &nivel.dstRect->h);
 	camera.srcRect = new SDL_Rect({ 0, nivel.dstRect->h - WINDOW_H, WINDOW_W, WINDOW_H });
 	horda.dstRect = new SDL_Rect({ 130, WINDOW_H, 0, 0 });
@@ -84,6 +86,29 @@ bool Game::load() {
 	if (!images.load("linksad", "linksad.png")) return false;
 	if (!images.load("roca4", "roca4.png")) return false;
 	if (!images.load("arbol1", "arbol1.png")) return false;
+	if (!images.load("lore1", "lore1.png")) return false; 
+	if (!images.load("lore2", "lore2.png")) return false;
+	if (!images.load("lore3", "lore3.png")) return false;
+	if (!images.load("lore4", "lore4.png")) return false;
+	if (!images.load("lore5", "lore5.png")) return false;
+	if (!images.load("lore6", "lore6.png")) return false;
+	if (!images.load("lore7", "lore7.png")) return false;
+	if (!images.load("lore8", "lore8.png")) return false;
+	if (!images.load("lore9", "lore9.png")) return false;
+	if (!images.load("lore10", "lore10.png")) return false;
+	if (!images.load("lore11", "lore11.png")) return false;
+	if (!images.load("lore12", "lore12.png")) return false;
+	if (!images.load("lore13", "lore13.png")) return false; 
+	if (!images.load("n0", "0.png")) return false;
+	if (!images.load("n1", "1.png")) return false;
+	if (!images.load("n2", "2.png")) return false;
+	if (!images.load("n3", "3.png")) return false;
+	if (!images.load("n4", "4.png")) return false;
+	if (!images.load("n5", "5.png")) return false;
+	if (!images.load("n6", "6.png")) return false;
+	if (!images.load("n7", "7.png")) return false;
+	if (!images.load("n8", "8.png")) return false;
+	if (!images.load("n9", "9.png")) return false;
 	if (!images.load("arbol2", "arbol2.png")) return false;
 	if (!images.load("arbol3", "arbol3.png")) return false;
 	if (!images.load("arbol4", "arbol4.png")) return false;
@@ -165,16 +190,20 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 		case INICI:
 			break;
 		case MENU:
+			init();
 			break;
 		case LORE:
 			break;
 		case JOC:
 			break;
 		case GAMEOVER:
+			init();
 			break;
 		case GUANYAT:
+			init();
 			break;
 		case TIENDA:
+			init();
 			break;
 		case PAUSA:
 			break;
@@ -188,10 +217,10 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 		case MENU:
 			break;
 		case LORE:
+			if (++loreShown > 13) loreShown = 1;
 			break;
 		case JOC:
 			paused = false;
-			init();
 			break;
 		case GAMEOVER:
 			break;
@@ -259,7 +288,8 @@ void Game::draw() {
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
-	int w, h;
+	int w, h; 
+	std::string num, s;
 	switch (escena) {
 		case INICI:
 			SDL_QueryTexture(images.get("studio"), NULL, NULL, &w, &h);
@@ -276,11 +306,16 @@ void Game::draw() {
 			botonSonido.draw();
 			botonShop.draw();
 			SDL_QueryTexture(images.get("start"), NULL, NULL, &w, &h);
-			SDL_RenderCopy(renderer, images.get("start"), NULL, new SDL_Rect({ WINDOW_W - 100 - w / 3, 550, w *1/3, h * 4 / 10 }));
+			SDL_RenderCopy(renderer, images.get("start"), NULL, new SDL_Rect({ WINDOW_W - 100 - w / 3, (WINDOW_H / 2) - (h * 4 / 10 ) / 2, w *1/3, h * 4 / 10 }));
 			break;
 		case LORE:
 			camera.draw();
 			player.draw();
+			botonSonido.draw();
+			for (int i = 0; i < 3; i++) player.corazones[i].draw();
+			if (loreShown == 0) loreShown = 1;
+			SDL_QueryTexture(images.get("lore" + std::to_string(loreShown)), NULL, NULL, &w, &h);
+			SDL_RenderCopy(renderer, images.get("lore" + std::to_string(loreShown)), NULL, new SDL_Rect({(WINDOW_W / 2) - (w * 7 / 5) / 2, WINDOW_H - h - 50, w * 7 / 5, h * 12 / 10}));
 			break;
 		case JOC:
 			camera.sY = 2;
@@ -292,6 +327,21 @@ void Game::draw() {
 			horda.draw();
 			player.draw();
 			for (int i = 0; i < 3; i++) player.corazones[i].draw();
+			SDL_RenderCopy(renderer, images.get("rupia"), NULL, new SDL_Rect({ WINDOW_W - 60, 90, 40, 40 }));
+			num = std::to_string(player.money);
+			//std::cout << num;
+			for (int i = num.length() - 1; i >= 0; i--) {
+				s = 'n' << num[i];
+				std::cout << s;
+				SDL_RenderCopy(renderer, images.get(s), NULL, new SDL_Rect({WINDOW_W - 110 - i * 50, 90, 40, 40}));
+			}
+			std::cout << std::endl;
+			for (int i = 0; i < hitboxes.size(); i++)
+			{
+				hitboxes[i].draw();
+			}
+			//dstRect->x = WINDOW_W - 60 - i * 50;
+
 			break;
 		case GAMEOVER:
 			camera.sY = 0;

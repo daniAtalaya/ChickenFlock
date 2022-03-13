@@ -6,6 +6,7 @@ bool Game::god = false;
 bool Game::muted = false;
 bool Game::paused = false;
 Escena Game::escena = INICI;
+int Game::loreShown = 0;
 SDL_Renderer* Game::renderer = nullptr;
 
 int main(int argc, char* argv[]) {

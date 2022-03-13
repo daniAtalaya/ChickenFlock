@@ -16,6 +16,7 @@ class Game {
 		static bool god;
 		static bool muted;
 		static bool paused;
+		static int loreShown;
 		static Escena escena;
 		bool isOpen = false;
 		static SDL_Renderer* renderer;
@@ -39,10 +40,11 @@ class Game {
 		SDL_Event event;
 		SDL_Window* window;
 		const Uint8* keyboard;
-		Almacen<SDL_Texture*> images;
-		Almacen<Mix_Music*> tracks;
 		Almacen<Mix_Chunk*> sfxs;
-		std::vector<Cuadrado> obstaculos;
 		std::vector<Rupia> rupias;
+		Almacen<Mix_Music*> tracks;
+		Almacen<SDL_Texture*> images;
 		std::vector<Gallina> gallinas;
+		std::vector<Cuadrado> obstaculos;
+		std::vector<Cuadrado> hitboxes;
 };

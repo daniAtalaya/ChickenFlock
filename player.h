@@ -9,13 +9,16 @@ class Player : public Cuadrado {
 		int direccion = 1; 
 		int index = 0;
 		int vides = 3;
+		int money = 69;
 		Corazon corazones[3];
 		Player() {
 			Cuadrado::Cuadrado();
+			srcRect = new SDL_Rect();
+			srcRect->x = 0;
 			for (int i = 0; i < 3; i++) corazones[i] = Corazon(i);
 		}
 		void init(SDL_Texture*);
-		void update(int dx, int dy) { 
+		void update(int dx, int dy) {
 			Cuadrado::update(dx, dy);
 		}
 		void daño() {
