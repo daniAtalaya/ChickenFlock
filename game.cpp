@@ -17,6 +17,7 @@ Game::Game() {
 		WINDOW_W, WINDOW_H,
 		SDL_WINDOW_HIDDEN
 	);
+	SDL_SetWindowIcon(window, IMG_Load("icon.png"));
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) return;
 	if (Mix_Init(MIX_INIT_OGG) != MIX_INIT_OGG) return;
@@ -29,13 +30,6 @@ Game::Game() {
 	init();
 	SDL_ShowWindow(window);
 	SDL_GetMouseState(&mouse->x, &mouse->y);
-	/*for (int i = 1; i <= 3; i++) {
-		Rupia* rupia = new Rupia();
-		rupia->tipus = i;
-		rupia->img = images.get("rupia" + std::to_string(i));
-		rupia->dstRect = new SDL_Rect({ 500, 50 * i, 40, 40 });
-		rupias.push_back(rupia);
-	}*/
 	for (int i = 1; i <= 5; i++) {
 		Gallina* gallina = new Gallina();
 		gallina->tipus = R_NUM(1, player.gallinasDesbloqueadas);
@@ -217,6 +211,21 @@ void Game::input() {
 					if (event.key.keysym.sym == SDLK_p) {
 						pause();
 					}
+					if (escena == JOC && event.key.keysym.sym == SDLK_SPACE && (player.direccion == 1 || player.direccion == 3)) {
+						Cuadrado* flecha = new Cuadrado();
+						flecha->img = images.get("flecha");
+						if (player.direccion == 1) {
+							flecha->sX = 0;
+							flecha->sY = -5;
+						}
+						if (player.direccion == 3) {
+							flecha->sX = 0;
+							flecha->sY = 5;
+						}
+						SDL_Rect* origin = new SDL_Rect({ player.dstRect->x + 15, player.direccion == 3 ? (player.dstRect->y + player.dstRect->h + 5) : (player.dstRect->y - 5) , 30, 60 });
+						flecha->dstRect = origin;
+						flechas.push_back(flecha);
+					}
 				}
 				break;
 			case SDL_WINDOWEVENT:
@@ -274,6 +283,8 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			break;
 		case PAUSA:
 			break;
+		case CREDITS:
+			break;
 		default:
 			break;
 	}
@@ -308,6 +319,8 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			break;
 		case PAUSA:
 			break;
+		case CREDITS:
+			break;
 	}
 }
 
@@ -333,11 +346,10 @@ void Game::update() {
 			if (keyboard[SDL_SCANCODE_J]) camera.srcRect->y += camera.sY;
 			if (player.vides == 0) cambiaEscena(GAMEOVER);
 			if(!paused){
-				if (camera.srcRect->y > 0) { 
-					//camera.update();
-					std::cout << camera.srcRect->y << std::endl; 
-				} 
-				else {
+				if (camera.srcRect->y > 0) {
+					camera.update();
+					std::cout << "Y = " << camera.srcRect->y << std::endl;
+				} else {
 					std::cout << "FI DEL NIVELL!!" << std::endl;
 				}
 				if (keyboard[SDL_SCANCODE_W]) {
@@ -374,6 +386,16 @@ void Game::update() {
 						player.damage();
 					}
 				}
+				for (Cuadrado* f : flechas) {
+					f->update();
+					for (Gallina* g : gallinas) {
+						if (f->checkCollision(g->dstRect)) {
+							g->disposable = true;
+							f->disposable = true;
+							player.money += R_NUM(0, g->tipus * 2);
+						}
+					}
+				}
 			}
 			break;
 		case GAMEOVER:
@@ -399,6 +421,8 @@ void Game::update() {
 			}
 			break;
 		case PAUSA:
+			break;
+		case CREDITS:
 			break;
 	}
 }
@@ -468,6 +492,7 @@ void Game::draw() {
 				}
 			}
 			for (Rupia* r : rupias) r->draw();
+			for (Cuadrado* f : flechas) f->draw();
 			for (Gallina* g : gallinas) {
 				g->draw();
 				if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) g->animateX();
@@ -533,6 +558,8 @@ void Game::draw() {
 				SDL_RenderCopy(renderer, images.get("pausaT"), NULL, new SDL_Rect({ (WINDOW_W / 2) - 320 , WINDOW_H / 2 - h * 2 / 10, w * 1 / 3, h * 4 / 10 }));
 			}
 			break;
+		case CREDITS:
+			break;
 	}
 	SDL_RenderPresent(renderer);
 }
@@ -550,6 +577,10 @@ void Game::destroy() {
 		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
 		return o->disposable || temp;
 	}), gallinas.end());
+	flechas.erase(std::remove_if(flechas.begin(), flechas.end(), [](const Cuadrado* o) {
+		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y < -o->dstRect->h || o->dstRect->y > WINDOW_H + o->dstRect->h;
+		return o->disposable || temp;
+	}), flechas.end());
 }
 
 void Game::loop() {

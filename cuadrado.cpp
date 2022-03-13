@@ -13,6 +13,10 @@ void Cuadrado::update(int dx, int dy) {
 	dstRect->x += dx * sX;
 	dstRect->y += dy * sY;
 }
+void Cuadrado::update() {
+	dstRect->x += sX;
+	dstRect->y += sY;
+}
 void Cuadrado::drawHitbox() {
 	SDL_SetRenderDrawColor(Game::renderer, 192, 0, 0, 255);
 	SDL_RenderDrawRect(Game::renderer, dstRect);
