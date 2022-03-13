@@ -449,12 +449,12 @@ void Game::draw() {
 			botonSonido.draw();
 			botonExitShop.draw();
 			SDL_QueryTexture(images.get("popupTienda"), NULL, NULL, &w, &h);
-			SDL_RenderCopy(renderer, images.get("popupTienda"), NULL, new SDL_Rect({ WINDOW_W / 5 , 20, w - 100, h - 100 }));
+			SDL_RenderCopy(renderer, images.get("popupTienda"), NULL, new SDL_Rect({ WINDOW_W / 4 , 20, w - 100, h - 100 }));
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 32);
 			SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
 			if (loreTienda == 0) loreTienda = 1;
 			SDL_QueryTexture(images.get("tiendalore" + std::to_string(loreTienda)), NULL, NULL, &w, &h);
-			SDL_RenderCopy(renderer, images.get("tiendalore" + std::to_string(loreTienda)), NULL, new SDL_Rect({ WINDOW_W -280, 670, w , h }));
+			SDL_RenderCopy(renderer, images.get("tiendalore" + std::to_string(loreTienda)), NULL, new SDL_Rect({ WINDOW_W -280, 640, w , h }));
 			break;
 		case PAUSA:
 			camera.draw();
