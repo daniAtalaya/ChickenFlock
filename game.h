@@ -16,9 +16,10 @@ class Game {
 		static bool god;
 		static bool muted;
 		static bool paused;
-		int mouseX, mouseY;
+		SDL_Rect* mouse = new SDL_Rect({1, 1, 10, 10});
 		static Escena escena;
 		bool isOpen = false;
+		bool isClicking = false;
 		static SDL_Renderer* renderer;
 	private:
 		void init();
@@ -28,6 +29,8 @@ class Game {
 		void input();
 		void draw();
 		bool load();
+		void mute();
+		void pause();
 		bool hardMode = false;
 		void cambiaEscena(Escena);
 		bool showPausaText = true;

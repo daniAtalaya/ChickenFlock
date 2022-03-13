@@ -7,6 +7,7 @@ class Pajaro : public Cuadrado {
 		SpriteSheet spritesheet;
 		int index = 0;
 		int direccion = 1;
+		bool isPresent = false;
 		Pajaro() {
 			Cuadrado::Cuadrado();
 			srcRect = NULL;

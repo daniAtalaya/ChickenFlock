@@ -28,7 +28,7 @@ Game::Game() {
 	assignImg();
 	init();
 	SDL_ShowWindow(window);
-	SDL_GetMouseState(&mouseX, &mouseY);
+	SDL_GetMouseState(&mouse->x, &mouse->y);
 	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 }
 
@@ -159,6 +159,7 @@ void Game::input() {
 				break;
 			case SDL_KEYDOWN:
 				if (!event.key.repeat) {
+					if (event.key.keysym.sym == SDLK_q && (escena == PAUSA || escena == TIENDA)) cambiaEscena(MENU);
 					if ((
 						event.key.keysym.sym == SDLK_RETURN ||
 						event.key.keysym.sym == SDLK_SPACE
@@ -175,23 +176,15 @@ void Game::input() {
 						event.key.keysym.sym == SDLK_RETURN ||
 						event.key.keysym.sym == SDLK_SPACE
 					) && escena == INICI) cambiaEscena(MENU);
-					if (event.key.keysym.sym == SDLK_q && (escena == PAUSA || escena == TIENDA)) cambiaEscena(MENU);
 					if (event.key.keysym.sym == SDLK_t && escena == MENU) cambiaEscena(TIENDA);
-					if (event.key.keysym.sym == SDLK_h) player.damage();
+					//if (event.key.keysym.sym == SDLK_h) player.damage();
 					if (event.key.keysym.sym == SDLK_F1) god = !god;
 					if (event.key.keysym.sym == SDLK_F2) hardMode = !hardMode;
 					if (event.key.keysym.sym == SDLK_m) {
-						muted = !muted;
-						botonSonido.img = images.get(muted ? "soundOff" : "soundOn");
-						if(!paused) muted ? Mix_PauseMusic() : Mix_ResumeMusic();
+						mute();
 					}
 					if (event.key.keysym.sym == SDLK_p) {
-						if (escena == JOC || escena == PAUSA) {
-							paused = !paused;
-							cambiaEscena(paused ? PAUSA : JOC);
-							botonPlay.img = images.get(paused ? "pause" : "play");
-							if (!muted) paused ? Mix_PauseMusic() : Mix_ResumeMusic();
-						}
+						pause();
 					}
 				}
 				break;
@@ -203,11 +196,28 @@ void Game::input() {
 				if (event.window.event == SDL_WINDOWEVENT_LEAVE) paused = true;
 				break;
 			case SDL_MOUSEMOTION:
+				SDL_GetMouseState(&mouse->x, &mouse->y);
 				break;
-			case SDL_MOUSEBUTTONDOWN:
+			case SDL_MOUSEBUTTONUP:
+				isClicking = true;
 				break;
 		}
 	}
+}
+
+void Game::pause() {
+	if (escena == JOC || escena == PAUSA) {
+		paused = !paused;
+		cambiaEscena(paused ? PAUSA : JOC);
+		botonPlay.img = images.get(paused ? "pause" : "play");
+		if (!muted) paused ? Mix_PauseMusic() : Mix_ResumeMusic();
+	}
+}
+
+void Game::mute() {
+	muted = !muted;
+	botonSonido.img = images.get(muted ? "soundOff" : "soundOn");
+	if (!paused) muted ? Mix_PauseMusic() : Mix_ResumeMusic();
 }
 
 void Game::cambiaEscena(Escena nuevaEscena) {
@@ -265,14 +275,17 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			break;
 		case PAUSA:
 			break;
-		default:
-			break;
 	}
 }
 
 void Game::update() {
-	std::cout << mouseX << " - " << mouseY << std::endl;
-	if (keyboard[SDL_SCANCODE_ESCAPE]) isOpen = false;
+	if (isClicking) {
+		if (botonSonido.isClicked(mouse)) mute();
+		if (botonBack.isClicked(mouse) && (escena == PAUSA || escena == TIENDA)) cambiaEscena(MENU);
+		else if (botonShop.isClicked(mouse) && escena == MENU) cambiaEscena(TIENDA);
+		if (botonPlay.isClicked(mouse)) pause();
+		isClicking = false;
+	}
 	switch (escena) {
 		case INICI:
 			break;
