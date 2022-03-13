@@ -59,10 +59,10 @@ void Game::init() {
 	paredHitboxRight = Cuadrado();
 	paredHitboxLeft.dstRect = new SDL_Rect({ 1, 1, 150, 8100 });
 	paredHitboxRight.dstRect = new SDL_Rect({ 810, 1, 150, 8100 });
-	//hitboxes.push_back(Cuadrado());
-	//hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({ 150, 200, 210, 300 });
-	//hitboxes.push_back(Cuadrado());
-	//hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({ 810, 200, 210, 300 });
+	rioHitboxLeft = (Cuadrado());
+	rioHitboxLeft.dstRect = new SDL_Rect({ 150, 1, 210, 300 });
+	rioHitboxRight = (Cuadrado());
+	rioHitboxRight.dstRect = new SDL_Rect({ 600, 1, 210, 300 });
 	botonSonido.img = images.get("soundOn");
 	botonSonido.dstRect = new SDL_Rect({ 10, 20, 100, 100 });
 	botonPlay.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
@@ -73,6 +73,7 @@ void Game::init() {
 	botonCompraGolden.dstRect = new SDL_Rect({535, 540, 130, 40 });
 	botonCompraDark.dstRect = new SDL_Rect({ 320, 540, 130, 40 });
 	botonCompraBrown.dstRect = new SDL_Rect({ 540, 320, 130, 40 });
+	botonHardcore.dstRect = new SDL_Rect({ 310, 750, 330, 100 });
 	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
 	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
 	SDL_QueryTexture(images.get("mapa3"), NULL, NULL, NULL, &nivel.dstRect->h);
@@ -166,6 +167,7 @@ bool Game::load() {
 	if (!images.load("gallina3", "gallinaAzul.png")) return false;
 	if (!images.load("gallina4", "gallinaOscura.png")) return false;
 	if (!images.load("gallina5", "gallinaGolden.png")) return false;
+	if (!images.load("hardcore", "hardcore.png")) return false;
 	
 	Mix_PlayMusic(tracks.get("Intro"), 1);
 	return true;
@@ -327,9 +329,14 @@ void Game::update() {
 		case LORE:
 			break;
 		case JOC:
+			if (keyboard[SDL_SCANCODE_Y]) camera.update();
+			if (keyboard[SDL_SCANCODE_J]) camera.srcRect->y += camera.sY;
 			if (player.vides == 0) cambiaEscena(GAMEOVER);
 			if(!paused){
-				if (camera.srcRect->y > 0) camera.update();
+				if (camera.srcRect->y > 0) { 
+					//camera.update();
+					std::cout << camera.srcRect->y << std::endl; 
+				} 
 				else {
 					std::cout << "FI DEL NIVELL!!" << std::endl;
 				}
@@ -378,6 +385,18 @@ void Game::update() {
 				player.money -= 30;
 				player.brownComprada = true;
 			}
+			if (botonCompraAzul.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.azulComprada && player.money >= 70) {
+				player.money -= 70;
+				player.azulComprada = true;
+			}
+			if (botonCompraDark.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.darkComprada && player.money >= 100) {
+				player.money -= 100;
+				player.azulComprada = true;
+			}
+			if (botonCompraGolden.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.goldenComprada && player.money >= 150) {
+				player.money -= 150;
+				player.azulComprada = true;
+			}
 			break;
 		case PAUSA:
 			break;
@@ -405,8 +424,11 @@ void Game::draw() {
 			SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
 			botonSonido.draw();
 			botonShop.draw();
+			SDL_QueryTexture(images.get("hardcore"), NULL, NULL, &w, &h);
+			SDL_RenderCopy(renderer, images.get("hardcore"), NULL, new SDL_Rect({ WINDOW_W / 2 - w/2 , 750, w, h-15 }));
 			SDL_QueryTexture(images.get("start"), NULL, NULL, &w, &h);
 			SDL_RenderCopy(renderer, images.get("start"), NULL, new SDL_Rect({ WINDOW_W - 100 - w / 3, (WINDOW_H / 2) - (h * 4 / 10 ) / 2, w *1/3, h * 4 / 10 }));
+			botonHardcore.draw();
 			break;
 		case LORE:
 			camera.draw();
@@ -422,6 +444,21 @@ void Game::draw() {
 			camera.draw();
 			botonSonido.draw();
 			botonPlay.draw();
+			/*if (camera.srcRect->y == 5800)
+			{
+				rioHitboxLeft.draw();
+				rioHitboxRight.draw();
+			}*/
+			if (camera.srcRect->y <= 5768)
+			{
+				
+				rioHitboxLeft.draw();
+				rioHitboxLeft.sY = camera.sY;
+				rioHitboxLeft.update(0, 1);
+				rioHitboxRight.draw();
+				rioHitboxRight.sY = camera.sY;
+				rioHitboxRight.update(0, 1);
+			}
 			if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) player.animateX();
 			if (!paused) player.animateY();
 			horda.draw();

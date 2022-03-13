@@ -45,6 +45,7 @@ class Game {
 		Button botonCompraGolden;
 		Button botonCompraDark;
 		Button botonCompraBrown;
+		Button botonHardcore;
 		Cuadrado nivel;
 		Cuadrado horda;
 		Camera camera;
