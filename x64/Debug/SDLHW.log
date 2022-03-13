@@ -1,4 +1,18 @@
-﻿  game.cpp
-D:\C++\guerrila-war-SDL\game.cpp(11,2): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
-D:\C++\guerrila-war-SDL\game.cpp(387,4): warning C4267: 'inicializando': conversión de 'size_t' a 'int'; posible pérdida de datos
-  SDLHW.vcxproj -> D:\C++\guerrila-war-SDL\x64\Debug\SDLHW.exe
+﻿  almacen.cpp
+  avestruz.cpp
+  button.cpp
+  camera.cpp
+  color.cpp
+  corazon.cpp
+  cuadrado.cpp
+  gallina.cpp
+  main.cpp
+  game.cpp
+C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(11,2): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(388,4): warning C4267: 'inicializando': conversión de 'size_t' a 'int'; posible pérdida de datos
+  pajaro.cpp
+  player.cpp
+  rupia.cpp
+  spritesheet.cpp
+  Generando código...
+  SDLHW.vcxproj -> C:\Users\lapiz\OneDrive\Documentos\GitHub\x64\Debug\SDLHW.exe
