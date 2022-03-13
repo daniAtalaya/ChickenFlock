@@ -376,7 +376,7 @@ void Game::draw() {
 			if (!paused) player.animateY();
 			horda.draw();
 			if (hardMode) {
-				for (int i = 0; i < 2; i++) {
+				for (int i = 1; i < 3; i++) {
 					SDL_RenderCopy(renderer, images.get("horda"), NULL, new SDL_Rect({horda.dstRect->x, WINDOW_H - horda.dstRect->h * i, horda.dstRect->w, horda.dstRect->h}));
 				}
 			}
@@ -412,8 +412,7 @@ void Game::draw() {
 			botonBack.draw();
 			player.draw();
 			SDL_QueryTexture(images.get("popupTienda"), NULL, NULL, &w, &h);
-			SDL_RenderCopy(renderer, images.get("popupTienda"), NULL, new SDL_Rect({ WINDOW_W / 5 , 100, w , h }));
-		
+			SDL_RenderCopy(renderer, images.get("popupTienda"), NULL, new SDL_Rect({ WINDOW_W / 5 - 10, 40, w, h }));
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 32);
 			SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
 			botonSonido.draw();
