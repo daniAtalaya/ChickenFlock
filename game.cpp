@@ -69,6 +69,10 @@ void Game::init() {
 	botonBack.dstRect = new SDL_Rect({ 10, 250, 100, 100 });
 	botonShop.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
 	botonExitShop.dstRect = new SDL_Rect({ 335, 650, 305, 65 });
+	botonCompraAzul.dstRect = new SDL_Rect({535, 320, 130, 40 });
+	botonCompraGolden.dstRect = new SDL_Rect({535, 540, 130, 40 });
+	botonCompraDark.dstRect = new SDL_Rect({ 320, 540, 130, 40 });
+	botonCompraBrown.dstRect = new SDL_Rect({ 540, 320, 130, 40 });
 	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
 	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
 	SDL_QueryTexture(images.get("mapa3"), NULL, NULL, NULL, &nivel.dstRect->h);
@@ -444,10 +448,7 @@ void Game::draw() {
 		case TIENDA:
 			camera.sY = 0;
 			camera.draw();
-			botonBack.draw();
 			player.draw();
-			botonSonido.draw();
-			botonExitShop.draw();
 			SDL_QueryTexture(images.get("popupTienda"), NULL, NULL, &w, &h);
 			SDL_RenderCopy(renderer, images.get("popupTienda"), NULL, new SDL_Rect({ WINDOW_W / 4 , 20, w - 100, h - 100 }));
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 32);
@@ -455,6 +456,13 @@ void Game::draw() {
 			if (loreTienda == 0) loreTienda = 1;
 			SDL_QueryTexture(images.get("tiendalore" + std::to_string(loreTienda)), NULL, NULL, &w, &h);
 			SDL_RenderCopy(renderer, images.get("tiendalore" + std::to_string(loreTienda)), NULL, new SDL_Rect({ WINDOW_W -280, 640, w , h }));
+			botonExitShop.draw();
+			botonCompraAzul.draw();
+			botonCompraGolden.draw();
+			botonCompraDark.draw();
+			botonCompraBrown.draw();
+			botonBack.draw();
+			botonSonido.draw();
 			break;
 		case PAUSA:
 			camera.draw();
