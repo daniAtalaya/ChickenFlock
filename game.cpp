@@ -49,9 +49,9 @@ void Game::init() {
 	//hitboxes.push_back(Cuadrado());
 	//hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({ 810, 200, 210, 300 });
 	botonSonido.img = images.get("soundOn");
-	botonSonido.dstRect = new SDL_Rect({ 20, 20, 100, 100 });
+	botonSonido.dstRect = new SDL_Rect({ 10, 20, 100, 100 });
 	botonPlay.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
-	botonBack.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
+	botonBack.dstRect = new SDL_Rect({ 10, 250, 100, 100 });
 	botonShop.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
 	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
 	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
@@ -254,6 +254,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 		case GUANYAT:
 			break;
 		case TIENDA:
+			botonBack.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
 			Mix_PlayMusic(tracks.get("Tienda"), -1);
 			break;
 		case PAUSA:
