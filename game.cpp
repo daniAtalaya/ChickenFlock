@@ -25,21 +25,22 @@ Game::Game() {
 	SDL_RenderSetScale(renderer, 1, 1);
 	//for (const auto& entry : std::filesystem::directory_iterator("./sprites")) std::cout << entry.path() << std::endl;
 	isOpen = load();
+	assignImg();
 	init();
 	SDL_ShowWindow(window);
+	SDL_GetMouseState(&mouseX, &mouseY);
 	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 }
 
 void Game::assignImg() {
 	horda.img = images.get("horda");
 	camera.img = images.get("mapa3");
-	botonPlay.img = images.get("play");
 	botonBack.img = images.get("back");
 	botonShop.img = images.get("tienda");
 }
 
 void Game::init() {
-	assignImg();
+	botonPlay.img = images.get("play");
 	paredHitboxLeft = Cuadrado();
 	paredHitboxRight = Cuadrado();
 	paredHitboxLeft.dstRect = new SDL_Rect({ 1, 1, 150, 8100 });
@@ -161,10 +162,6 @@ void Game::input() {
 					if ((
 						event.key.keysym.sym == SDLK_RETURN ||
 						event.key.keysym.sym == SDLK_SPACE
-					) && escena == GAMEOVER) cambiaEscena(MENU);
-					if ((
-						event.key.keysym.sym == SDLK_RETURN ||
-						event.key.keysym.sym == SDLK_SPACE
 					) && escena == LORE) cambiaEscena(JOC);
 					if ((
 						event.key.keysym.sym == SDLK_RETURN ||
@@ -173,11 +170,16 @@ void Game::input() {
 					if ((
 						event.key.keysym.sym == SDLK_RETURN ||
 						event.key.keysym.sym == SDLK_SPACE
+					) && escena == GAMEOVER) cambiaEscena(MENU);
+					if ((
+						event.key.keysym.sym == SDLK_RETURN ||
+						event.key.keysym.sym == SDLK_SPACE
 					) && escena == INICI) cambiaEscena(MENU);
+					if (event.key.keysym.sym == SDLK_q && (escena == PAUSA || escena == TIENDA)) cambiaEscena(MENU);
 					if (event.key.keysym.sym == SDLK_t && escena == MENU) cambiaEscena(TIENDA);
-					if (event.key.keysym.sym == SDLK_q && escena == PAUSA) cambiaEscena(MENU);
 					if (event.key.keysym.sym == SDLK_h) player.damage();
 					if (event.key.keysym.sym == SDLK_F1) god = !god;
+					if (event.key.keysym.sym == SDLK_F2) hardMode = !hardMode;
 					if (event.key.keysym.sym == SDLK_m) {
 						muted = !muted;
 						botonSonido.img = images.get(muted ? "soundOff" : "soundOn");
@@ -209,6 +211,7 @@ void Game::input() {
 }
 
 void Game::cambiaEscena(Escena nuevaEscena) {
+	if (escena != LORE && escena != PAUSA) while (Mix_PlayingMusic()) Mix_HaltMusic();
 	switch (escena) {
 		case INICI:
 			break;
@@ -236,17 +239,21 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 	//if(escena == PAUSA && nuevaEscena == MENU)
 	escena = nuevaEscena;
 	switch (nuevaEscena) {
+		if (escena != LORE && escena != PAUSA) while (Mix_PlayingMusic()) Mix_HaltMusic();
 		case INICI:
 			break;
 		case MENU:
 			Mix_PlayMusic(tracks.get("Menu"), -1);
 			break;
 		case LORE:
+			Mix_PlayMusic(tracks.get("Gameplay"), -1);
 			if (++loreShown > 13) loreShown = 1;
 			break;
 		case JOC:
-			Mix_PlayMusic(tracks.get("Gameplay"), -1);
-			paused = false;
+			paused = false; 
+			if (hardMode) {
+				horda.dstRect->y = WINDOW_H - horda.dstRect->h * 3;
+			}
 			break;
 		case GAMEOVER:
 			Mix_PlayMusic(tracks.get("Game Over"), 1);
@@ -265,6 +272,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 }
 
 void Game::update() {
+	std::cout << mouseX << " - " << mouseY << std::endl;
 	if (keyboard[SDL_SCANCODE_ESCAPE]) isOpen = false;
 	switch (escena) {
 		case INICI:
@@ -318,7 +326,7 @@ void Game::draw() {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 	int w, h; 
-	std::string num;
+	std::string num, s;
 	switch (escena) {
 		case INICI:
 			SDL_QueryTexture(images.get("studio"), NULL, NULL, &w, &h);
@@ -354,12 +362,19 @@ void Game::draw() {
 			if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) player.animateX();
 			if (!paused) player.animateY();
 			horda.draw();
+			if (hardMode) {
+				for (int i = 0; i < 2; i++) {
+					SDL_RenderCopy(renderer, images.get("horda"), NULL, new SDL_Rect({horda.dstRect->x, WINDOW_H - horda.dstRect->h * i, horda.dstRect->w, horda.dstRect->h}));
+				}
+			}
 			player.draw();
 			for (int i = 0; i < 3; i++) player.corazones[i].draw();
 			SDL_RenderCopy(renderer, images.get("rupia"), NULL, new SDL_Rect({ WINDOW_W - 60, 90, 40, 40 }));
 			num = std::to_string(player.money);
 			for (int i = num.length() - 1; i >= 0; i--) {
-				SDL_RenderCopy(renderer, images.get("n" + num[i]), NULL, new SDL_Rect({WINDOW_W - 110 - i * 50, 90, 40, 40}));
+				s = "n";
+				s.append(1, num[i]);
+				SDL_RenderCopy(renderer, images.get(s), NULL, new SDL_Rect({WINDOW_W - 80 - ((int)num.length() - i) * 30, 88, 35, 40}));
 			}
 			paredHitboxLeft.draw();
 			paredHitboxRight.draw();
