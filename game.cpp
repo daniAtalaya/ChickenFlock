@@ -68,7 +68,7 @@ void Game::init() {
 	botonPlay.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
 	botonBack.dstRect = new SDL_Rect({ 10, 250, 100, 100 });
 	botonShop.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
-	botonExitShop.dstRect = new SDL_Rect({ 300, 765, 360, 70 });
+	botonExitShop.dstRect = new SDL_Rect({ 335, 650, 305, 65 });
 	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
 	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
 	SDL_QueryTexture(images.get("mapa3"), NULL, NULL, NULL, &nivel.dstRect->h);
