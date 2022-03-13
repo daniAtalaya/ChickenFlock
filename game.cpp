@@ -29,19 +29,22 @@ Game::Game() {
 }
 
 void Game::assignImg() {
+	horda.img = images.get("horda");
 	camera.img = images.get("mapa3");
 	botonPlay.img = images.get("play");
+	botonBack.img = images.get("back");
 	botonShop.img = images.get("tienda");
-	horda.img = images.get("horda");
 }
 
 void Game::init() {
 	assignImg();
+	hitboxes.clear();
 	hitboxes.push_back(Cuadrado());
 	hitboxes[hitboxes.size() - 1].dstRect = new SDL_Rect({400, 550, 220, 220});
 	botonSonido.img = images.get("soundOn");
 	botonSonido.dstRect = new SDL_Rect({ 20, 20, 100, 100 });
 	botonPlay.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
+	botonBack.dstRect = new SDL_Rect({ 20, 250, 100, 100 });
 	botonShop.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
 	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
 	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
@@ -78,14 +81,15 @@ bool Game::load() {
 	if (!images.load("horda", "horda.png")) return false;
 	if (!images.load("flecha", "flecha.png")) return false;
 	if (!images.load("start", "start.png")) return false;
+	if (!images.load("back", "back.png")) return false;
+	if (!images.load("gameoverT", "gameoverT.png")) return false;
+	if (!images.load("linksad", "linksad.png")) return false;
+	if (!images.load("arbol1", "arbol1.png")) return false;
 	if (!images.load("tienda", "tienda.png")) return false;
+	if (!images.load("roca4", "roca4.png")) return false;
 	if (!images.load("roca1", "roca1.png")) return false;
 	if (!images.load("roca2", "roca2.png")) return false;
 	if (!images.load("roca3", "roca3.png")) return false;
-	if (!images.load("gameoverT", "gameoverT.png")) return false;
-	if (!images.load("linksad", "linksad.png")) return false;
-	if (!images.load("roca4", "roca4.png")) return false;
-	if (!images.load("arbol1", "arbol1.png")) return false;
 	if (!images.load("lore1", "lore1.png")) return false; 
 	if (!images.load("lore2", "lore2.png")) return false;
 	if (!images.load("lore3", "lore3.png")) return false;
@@ -113,10 +117,10 @@ bool Game::load() {
 	if (!images.load("arbol3", "arbol3.png")) return false;
 	if (!images.load("arbol4", "arbol4.png")) return false;
 	if (!images.load("pausaT", "pausaT.png")) return false;
+	if (!images.load("gallinaAzul", "gallinaAzul.png")) return false;
 	if (!images.load("gallinaGolden", "gallinaGolden.png")) return false;
 	if (!images.load("gallinaMarron", "gallinaMarron.png")) return false;
 	if (!images.load("gallinaBlanca", "gallinaBlanca.png")) return false;
-	if (!images.load("gallinaAzul", "gallinaAzul.png")) return false;
 	if (!images.load("gallinaOscura", "gallinaOscura.png")) return false;
 	//Mix_PlayMusic(tracks.get("main_theme"), -1);
 	return true;
@@ -142,7 +146,7 @@ void Game::input() {
 					if ((
 						event.key.keysym.sym == SDLK_RETURN ||
 						event.key.keysym.sym == SDLK_SPACE
-						) && escena == GAMEOVER) cambiaEscena(MENU);
+					) && escena == GAMEOVER) cambiaEscena(MENU);
 					if ((
 						event.key.keysym.sym == SDLK_RETURN ||
 						event.key.keysym.sym == SDLK_SPACE
@@ -210,6 +214,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 		default:
 			break;
 	}
+	//if(escena == PAUSA && nuevaEscena == MENU)
 	escena = nuevaEscena;
 	switch (nuevaEscena) {
 		case INICI:
@@ -370,6 +375,7 @@ void Game::draw() {
 			SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
 			botonSonido.draw();
 			botonPlay.draw();
+			botonBack.draw();
 			for (int i = 0; i < 3; i++) player.corazones[i].draw();
 			if ((SDL_GetTicks() / 16) % 40 == 0) showPausaText = !showPausaText;
 			if (showPausaText) {

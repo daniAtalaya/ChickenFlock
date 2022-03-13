@@ -16,7 +16,6 @@ class Game {
 		static bool god;
 		static bool muted;
 		static bool paused;
-		static int loreShown;
 		static Escena escena;
 		bool isOpen = false;
 		static SDL_Renderer* renderer;
@@ -30,9 +29,11 @@ class Game {
 		bool load();
 		void cambiaEscena(Escena);
 		bool showPausaText = true;
-		Button botonSonido;
+		Button botonSonido; 
+		int loreShown = 0;
 		Button botonPlay;
 		Button botonShop;
+		Button botonBack;
 		Cuadrado nivel;
 		Cuadrado horda;
 		Camera camera;
