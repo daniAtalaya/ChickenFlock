@@ -58,6 +58,7 @@ class Game {
 		Almacen<SDL_Texture*> images;
 		std::vector<Gallina*> gallinas;
 		std::vector<Cuadrado*> obstaculos;
+		std::vector<Cuadrado*> flechas;
 		Cuadrado paredHitboxLeft;
 		Cuadrado paredHitboxRight;
 		Cuadrado rioHitboxLeft;
