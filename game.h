@@ -41,6 +41,10 @@ class Game {
 		Button botonShop;
 		Button botonBack;
 		Button botonExitShop;
+		Button botonCompraAzul;
+		Button botonCompraGolden;
+		Button botonCompraDark;
+		Button botonCompraBrown;
 		Cuadrado nivel;
 		Cuadrado horda;
 		Camera camera;

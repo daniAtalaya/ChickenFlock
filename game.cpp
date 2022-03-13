@@ -102,6 +102,7 @@ bool Game::load() {
 	if (!images.load("rupia1", "rupia1.png")) return false;
 	if (!images.load("rupia2", "rupia2.png")) return false;
 	if (!images.load("rupia3", "rupia3.png")) return false;
+	if (!images.load("rupia4", "rupia4.png")) return false;
 	if (!images.load("pajaro", "pajaro.png")) return false;
 	if (!images.load("corazon", "corazon.png")) return false;
 	if (!images.load("corazont", "corazont.png")) return false;
