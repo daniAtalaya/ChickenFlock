@@ -134,7 +134,6 @@ bool Game::load() {
 	if (!images.load("lore11", "lore11.png")) return false;
 	if (!images.load("lore12", "lore12.png")) return false;
 	if (!images.load("lore13", "lore13.png")) return false; 
-<<<<<<< Updated upstream
 	if (!images.load("tiendalore1", "Tiendalore_1.png")) return false;
 	if (!images.load("tiendalore2", "Tiendalore_2.png")) return false;
 	if (!images.load("tiendalore3", "Tiendalore_3.png")) return false;
@@ -143,7 +142,6 @@ bool Game::load() {
 	if (!images.load("tiendalore6", "Tiendalore_6.png")) return false;
 	if (!images.load("tiendalore7", "Tiendalore_7.png")) return false;
 	if (!images.load("tiendalore8", "Tiendalore_8.png")) return false;
-=======
 	if (!images.load("tiendalore1", "tiendalore_1.png")) return false;
 	if (!images.load("tiendalore2", "tiendalore_2.png")) return false;
 	if (!images.load("tiendalore3", "tiendalore_3.png")) return false;
@@ -152,7 +150,6 @@ bool Game::load() {
 	if (!images.load("tiendalore6", "tiendalore_6.png")) return false;
 	if (!images.load("tiendalore7", "tiendalore_7.png")) return false;
 	if (!images.load("tiendalore8", "tiendalore_8.png")) return false;
->>>>>>> Stashed changes
 	if (!images.load("n0", "0.png")) return false;
 	if (!images.load("n1", "1.png")) return false;
 	if (!images.load("n2", "2.png")) return false;
