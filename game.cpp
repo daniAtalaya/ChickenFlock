@@ -224,7 +224,7 @@ void Game::input() {
 					if (escena == JOC && event.key.keysym.sym == SDLK_SPACE && (player.direccion == 1 || player.direccion == 3)) {
 						Cuadrado* flecha = new Cuadrado();
 						flecha->img = images.get("flecha");
-						Mix_PlayChannel(-1, sfxs.get("disparoFlecha"), 0);
+						if (!muted) Mix_PlayChannel(-1, sfxs.get("disparoFlecha"), 0);
 						if (player.direccion == 1) {
 						
 							flecha->sX = 0;
@@ -271,11 +271,10 @@ void Game::pause() {
 void Game::mute() {
 	muted = !muted;
 	botonSonido.img = images.get(muted ? "soundOff" : "soundOn");
-	if (!paused) muted ? Mix_PauseMusic() : Mix_ResumeMusic();
+	muted ? Mix_PauseMusic() : Mix_ResumeMusic();
 }
 
 void Game::cambiaEscena(Escena nuevaEscena) {
-	if (escena != LORE && escena != PAUSA) while (Mix_PlayingMusic()) Mix_HaltMusic();
 	switch (escena) {
 		case INICI:
 			break;
@@ -330,12 +329,12 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			dinerotemporal = 0;
 			break;
 		case LORE:
-			Mix_PlayChannel(-1, sfxs.get("SStart"), 0);
+			if (!muted) Mix_PlayChannel(-1, sfxs.get("SStart"), 0);
 			if (++loreShown > 13) loreShown = 1;
 			break;
 		case JOC:
 			Mix_PlayMusic(tracks.get("Gameplay"), -1);
-			Mix_PlayChannel(-1, sfxs.get("MultitudG"), -1);
+			if (!muted) Mix_PlayChannel(-1, sfxs.get("MultitudG"), -1);
 			paused = false; 
 			if (hardMode) {
 				horda.dstRect->y = WINDOW_H - horda.dstRect->h * 3;
@@ -351,6 +350,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 		case TIENDA:
 			botonBack.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
 			Mix_PlayMusic(tracks.get("Tienda"), -1);
+			player.dstRect->y = WINDOW_H - 120;
 			if (++loreTienda > 8) loreTienda = 1; 
 			break;
 		case PAUSA:
@@ -411,7 +411,6 @@ void Game::update() {
 		}
 		isClicking = false;
 	}
-	bool shouldMove = true;
 	switch (escena) {
 		case INICI:
 			break;
@@ -424,7 +423,6 @@ void Game::update() {
 			//if (keyboard[SDL_SCANCODE_J]) camera.srcRect->y += camera.sY;
 			if (player.vides <= 0) cambiaEscena(GAMEOVER);
 			if(!paused){
-				if(endingReached) camera.sY = 0;
 				if (camera.srcRect->y > 0) {
 					camera.update();
 					std::cout << "Y = " << camera.srcRect->y << std::endl;
@@ -432,51 +430,42 @@ void Game::update() {
 					std::cout << "FI DEL NIVELL!!" << std::endl;
 					for (Gallina* g : gallinas) g->disposable = true;
 					for (Rupia* r : rupias) r->disposable = true;
-					endingReached = true;
 					horda.dstRect->h = 0;
 					player.money += dinerotemporal;
+					cambiaEscena(GUANYAT);
 
 				}
-				
-				for (Cuadrado* o : obstaculos) {
-					o->update();
-					if (player.checkCollision(o->dstRect)) {
-						shouldMove = false;
+				if (keyboard[SDL_SCANCODE_W]) {
+					player.direccion = 1;
+					//if (!player.checkCollision(rioHitboxRight.dstRect) && !player.checkCollision(rioHitboxLeft.dstRect)) {
+					player.update(0, -1);
+					//}
+				}
+				if (keyboard[SDL_SCANCODE_S]) {
+					player.direccion = 3;
+					//if (!player.checkCollision(rioHitboxRight.dstRect) && !player.checkCollision(rioHitboxLeft.dstRect)) {
+					player.update(0, 1);
+					//}
+				}
+				if (keyboard[SDL_SCANCODE_A]) {
+					player.direccion = 0;
+					if (!player.checkCollision(paredHitboxLeft.dstRect)) {
+						//if (!player.checkCollision(rioHitboxLeft.dstRect)) 
+						player.update(-1, 0);
 					}
 				}
-				if (shouldMove) {
-					if (keyboard[SDL_SCANCODE_W]) {
-						player.direccion = 1;
-						//if (!player.checkCollision(rioHitboxRight.dstRect) && !player.checkCollision(rioHitboxLeft.dstRect)) {
-						player.update(0, -1);
-						//}
-					}
-					if (keyboard[SDL_SCANCODE_S]) {
-						player.direccion = 3;
-						//if (!player.checkCollision(rioHitboxRight.dstRect) && !player.checkCollision(rioHitboxLeft.dstRect)) {
-						player.update(0, 1);
-						//}
-					}
-					if (keyboard[SDL_SCANCODE_A]) {
-						player.direccion = 0;
-						if (!player.checkCollision(paredHitboxLeft.dstRect)) {
-							//if (!player.checkCollision(rioHitboxLeft.dstRect)) 
-							player.update(-1, 0);
-						}
-					}
-					if (keyboard[SDL_SCANCODE_D]) {
-						player.direccion = 2;
-						if (!player.checkCollision(paredHitboxRight.dstRect)) {
-							//if (!player.checkCollision(rioHitboxRight.dstRect)) 
-							player.update(1, 0);
-						}
+				if (keyboard[SDL_SCANCODE_D]) {
+					player.direccion = 2;
+					if (!player.checkCollision(paredHitboxRight.dstRect)) {
+						//if (!player.checkCollision(rioHitboxRight.dstRect)) 
+						player.update(1, 0);
 					}
 				}
 				if (player.checkCollision(horda.dstRect)) {
 					player.damage();
 					player.dstRect->y -= horda.dstRect->h + 10;
 				}
-				if ((SDL_GetTicks() / 16) % 150 == 0 && !endingReached) for (int i = 0; i < R_NUM(2, 4); i++)
+				if ((SDL_GetTicks() / 16) % 150 == 0) for (int i = 0; i < R_NUM(2, 4); i++)
 				{
 					Rupia* rupia = new Rupia();
 					rupia->tipus = i;
@@ -484,20 +473,20 @@ void Game::update() {
 					rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-150, -50), 30, 30 });
 					rupias.push_back(rupia);
 				}
-				if((SDL_GetTicks() / 16) % 100 == 0 && !endingReached) for (int i = 1; i <= R_NUM(2, 4); i++) {
+				if((SDL_GetTicks() / 16) % 100 == 0) for (int i = 1; i <= R_NUM(2, 4); i++) {
 						Gallina* gallina = new Gallina();
 						gallina->tipus = R_NUM(1, player.gallinasDesbloqueadas);
 						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-150, -50), 40, 40 });
 						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
 						gallinas.push_back(gallina);
-				}if ((SDL_GetTicks() / 16) % 100 == 0 && !endingReached) for (int i = 1; i <= R_NUM(2, 4); i++) {
+				}if ((SDL_GetTicks() / 16) % 100 == 0) for (int i = 1; i <= R_NUM(2, 4); i++) {
 					Cuadrado* arbol = new Cuadrado();
 					arbol->sX = 0;
 					arbol->sY = camera.sY;
 					arbol->img = images.get("arbol" + std::to_string(R_NUM(1, 4)));
 					arbol->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), -50, 40, 40 });
 					obstaculos.push_back(arbol);
-				}if ((SDL_GetTicks() / 16) % 100 == 0 && !endingReached) for (int i = 1; i <= R_NUM(2, 4); i++) {
+				}if ((SDL_GetTicks() / 16) % 100 == 0) for (int i = 1; i <= R_NUM(2, 4); i++) {
 					Cuadrado* roca = new Cuadrado();
 					roca->sX = 0;
 					roca->sY = camera.sY;
@@ -509,7 +498,7 @@ void Game::update() {
 					r->update(0, 1);
 					if (player.checkCollision(r->dstRect)) {
 						r->disposable = true; 
-						Mix_PlayChannel(-1, sfxs.get("SMoneda"), 0);
+						if (!muted) Mix_PlayChannel(-1, sfxs.get("SMoneda"), 0);
 						dinerotemporal += 1 + 5 * (r->tipus - 1);
 					}
 				}
@@ -517,7 +506,7 @@ void Game::update() {
 					g->update(R_NUM(-1, 1), 1);
 					if (player.checkCollision(g->dstRect)) {
 						g->disposable = true;
-						player.damage();
+						if(!god) player.damage();
 					}
 				}
 				
@@ -525,7 +514,7 @@ void Game::update() {
 					f->update();
 					for (Gallina* g : gallinas) {
 						if (f->checkCollision(g->dstRect)) {
-							Mix_PlayChannel(-1, sfxs.get("muerteGallina"), 0);
+							if (!muted) Mix_PlayChannel(-1, sfxs.get("muerteGallina"), 0);
 							g->disposable = true;
 							f->disposable = true;
 							dinerotemporal += R_NUM(0, g->tipus * 2);
@@ -606,9 +595,6 @@ void Game::draw() {
 				g->draw();
 				if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) g->animateX();
 				if ((SDL_GetTicks() / 16) % 200 * g->spritesheet.maxC == 0 && !paused) g->animateY();
-			}
-			if (endingReached) {
-				avestruz.draw();
 			}
 			player.draw();
 			for (int i = 0; i < 3; i++) player.corazones[i].draw();

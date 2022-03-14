@@ -35,7 +35,6 @@ class Game {
 		bool hardMode = false;
 		void cambiaEscena(Escena);
 		bool showPausaText = true;
-		bool endingReached = false;
 		Button botonSonido; 
 		int loreShown = 0;
 		int loreTienda = 0;
