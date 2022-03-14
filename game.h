@@ -41,6 +41,7 @@ class Game {
 		int loreShown = 0;
 		int loreTienda = 0;
 		int dineroTemporal = 0;
+		int tipoGallinaTrasera=0;
 		Button botonPlay;
 		Button botonShop;
 		Button botonBack;

@@ -559,13 +559,47 @@ void Game::update() {
 						gallinas.push_back(gallina);
 					}
 				}
-				if ((SDL_GetTicks() / 16) % 300 == 0) for (int i = 1; i < 2; i++) {
+				if ((SDL_GetTicks() / 16) % 100 == 0) {
 					Gallina* gallina = new Gallina();
-					gallina->tipus = R_NUM(1, player.gallinasDesbloqueadas);
+					tipoGallinaTrasera = R_NUM(1, 5);
+					if (tipoGallinaTrasera==1) {
+					gallina->tipus = 1;
 					gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 });
 					gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
 					gallina->sY = -5;
 					gallinas.push_back(gallina);
+					}
+					if (player.brownComprada && tipoGallinaTrasera ==2) {
+						gallina->tipus = 2;
+						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 });
+						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+						gallina->sY = -5;
+						gallinas.push_back(gallina);
+					}
+					if (player.azulComprada && tipoGallinaTrasera == 3) {
+						gallina = new Gallina();
+						gallina->tipus = 3;
+						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 });
+						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+						gallina->sY = -5;
+						gallinas.push_back(gallina);
+					}
+					if (player.darkComprada && tipoGallinaTrasera == 4) {
+						gallina = new Gallina();
+						gallina->tipus = 4;
+						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 });
+						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+						gallina->sY = -5;
+						gallinas.push_back(gallina);
+					}
+					if (player.goldenComprada && tipoGallinaTrasera == 5) {
+						gallina = new Gallina();
+						gallina->tipus = 5;
+						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+						gallina->sY = -5;
+						gallinas.push_back(gallina);
+					}
 				}
 				if ((SDL_GetTicks() / 16) % 300 == 0) for (int i = 0; i <= R_NUM(0, 1); i++) {
 					Cuadrado* arbol = new Cuadrado();
