@@ -80,6 +80,12 @@ void Game::init() {
 
 bool Game::load() {
 	//sfxs
+	if (!sfxs.load("muerteGallina", "muerte gallina ex.wav")) return false;
+	if (!sfxs.load("disparoFlecha", "disparo flecha.wav")) return false;
+	if (!sfxs.load("SMoneda", "Sonido moneda.wav")) return false;
+	if (!sfxs.load("SStart", "sonido de start.wav")) return false;
+	if (!sfxs.load("MultitudG", "multitudG.wav")) return false;
+	if (!tracks.load("Victoria", "VICTORIA.ogg")) return false;
 	if (!tracks.load("Intro", "Intro Colibri Studios.ogg")) return false;
 	if (!tracks.load("Game Over", "Game Over.ogg")) return false;
 	if (!tracks.load("Gameplay", "Gameplay.ogg")) return false;
@@ -218,6 +224,7 @@ void Game::input() {
 					if (escena == JOC && event.key.keysym.sym == SDLK_SPACE && (player.direccion == 1 || player.direccion == 3)) {
 						Cuadrado* flecha = new Cuadrado();
 						flecha->img = images.get("flecha");
+						Mix_PlayChannel(-1, sfxs.get("disparoFlecha"), 0);
 						if (player.direccion == 1) {
 						
 							flecha->sX = 0;
@@ -318,14 +325,17 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 		case INICI:
 			break;
 		case MENU:
+			Mix_HaltChannel(-1);
 			Mix_PlayMusic(tracks.get("Menu"), -1);
 			dinerotemporal = 0;
 			break;
 		case LORE:
-			Mix_PlayMusic(tracks.get("Gameplay"), -1);
+			Mix_PlayChannel(-1, sfxs.get("SStart"), 0);
 			if (++loreShown > 13) loreShown = 1;
 			break;
 		case JOC:
+			Mix_PlayMusic(tracks.get("Gameplay"), -1);
+			Mix_PlayChannel(-1, sfxs.get("MultitudG"), -1);
 			paused = false; 
 			if (hardMode) {
 				horda.dstRect->y = WINDOW_H - horda.dstRect->h * 3;
@@ -336,6 +346,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			dinerotemporal = 0;
 			break;
 		case GUANYAT:
+			Mix_PlayMusic(tracks.get("Victoria"), 1);
 			break;
 		case TIENDA:
 			botonBack.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
@@ -370,27 +381,31 @@ void Game::update() {
 		if (escena == GAMEOVER) cambiaEscena(MENU);
 		if (botonPlay.isClicked(mouse)) pause();
 		if (escena == TIENDA) {
-			if (botonCompraBrown.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 6 && !player.brownComprada && player.money >= 30) {
+			if (botonCompraBrown.isClicked(mouse)) if (player.gallinasDesbloqueadas < 5 && !player.brownComprada && player.money >= 30) {
 				player.money -= 30;
 				player.brownComprada = true;
+				player.gallinasDesbloqueadas++;
 				botonCompraBrown.img = images.get("soldOut");
 			}
 			if (botonExitShop.isClicked(mouse)) {
 				cambiaEscena(MENU);
 			}
-			if (botonCompraAzul.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 6 && !player.azulComprada && player.money >= 70) {
+			if (botonCompraAzul.isClicked(mouse)) if (player.gallinasDesbloqueadas < 5 && !player.azulComprada && player.money >= 70) {
 				player.money -= 70;
 				player.azulComprada = true;
+				player.gallinasDesbloqueadas++;
 				botonCompraAzul.img = images.get("soldOut");
 			}
-			if (botonCompraDark.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 6 && !player.darkComprada && player.money >= 100) {
+			if (botonCompraDark.isClicked(mouse)) if (player.gallinasDesbloqueadas < 5 && !player.darkComprada && player.money >= 100) {
 				player.money -= 100;
-				player.azulComprada = true;
+				player.darkComprada = true;
+				player.gallinasDesbloqueadas++;
 				botonCompraDark.img = images.get("soldOut");
 			}
-			if (botonCompraGolden.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 6 && !player.goldenComprada && player.money >= 150) {
+			if (botonCompraGolden.isClicked(mouse)) if (player.gallinasDesbloqueadas < 5 && !player.goldenComprada && player.money >= 150) {
 				player.money -= 150;
-				player.azulComprada = true;
+				player.goldenComprada = true;
+				player.gallinasDesbloqueadas++;
 				botonCompraGolden.img = images.get("soldOut");
 			}
 		}
@@ -493,7 +508,8 @@ void Game::update() {
 				for (Rupia* r : rupias) {
 					r->update(0, 1);
 					if (player.checkCollision(r->dstRect)) {
-						r->disposable = true;
+						r->disposable = true; 
+						Mix_PlayChannel(-1, sfxs.get("SMoneda"), 0);
 						dinerotemporal += 1 + 5 * (r->tipus - 1);
 					}
 				}
@@ -509,6 +525,7 @@ void Game::update() {
 					f->update();
 					for (Gallina* g : gallinas) {
 						if (f->checkCollision(g->dstRect)) {
+							Mix_PlayChannel(-1, sfxs.get("muerteGallina"), 0);
 							g->disposable = true;
 							f->disposable = true;
 							dinerotemporal += R_NUM(0, g->tipus * 2);
