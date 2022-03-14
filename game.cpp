@@ -356,7 +356,6 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			}
 			break;
 		case GAMEOVER:
-			Mix_HaltChannel(-1);
 			Mix_PlayMusic(tracks.get("Game Over"), 1);
 			dineroTemporal = 0;
 			break;
