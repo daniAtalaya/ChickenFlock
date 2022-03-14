@@ -80,11 +80,11 @@ void Game::init() {
 
 bool Game::load() {
 	//sfxs
-	if (!sfxs.load("muerteGallina", "muerte gallina ex.wav")) return false;
-	if (!sfxs.load("disparoFlecha", "disparo flecha.wav")) return false;
-	if (!sfxs.load("SMoneda", "Sonido moneda.wav")) return false;
-	if (!sfxs.load("SStart", "sonido de start.wav")) return false;
+	if (!sfxs.load("muerteGallina", "muertegallinaex.wav")) return false;
+	if (!sfxs.load("disparoFlecha", "disparoflecha.wav")) return false;
+	if (!sfxs.load("SMoneda", "Sonidomoneda.wav")) return false;
 	if (!sfxs.load("MultitudG", "multitudG.wav")) return false;
+	if (!sfxs.load("SStart", "sonidostart.wav")) return false;
 	if (!tracks.load("Victoria", "VICTORIA.ogg")) return false;
 	if (!tracks.load("Intro", "Intro Colibri Studios.ogg")) return false;
 	if (!tracks.load("Game Over", "Game Over.ogg")) return false;
@@ -92,7 +92,7 @@ bool Game::load() {
 	if (!tracks.load("Menu", "Menu.ogg")) return false;
 	if (!tracks.load("Tienda", "Tienda.ogg")) return false;
 	if (!tracks.load("sonido de start", "sonido de start.ogg")) return false;
-	if (!tracks.load("Multidud de gallinas", "Multidud de gallinas.ogg")) return false;
+	//if (!tracks.load("Multidud de gallinas", "Multidud de gallinas.ogg")) return false;
 	if (!images.load("soundOn", "soundOn.png")) return false;
 	if (!images.load("soundOff", "soundOff.png")) return false;
 	if (!images.load("mapa3", "mapa3.png")) return false;
