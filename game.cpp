@@ -155,6 +155,7 @@ bool Game::load() {
 	if (!images.load("gallina4", "gallinaOscura.png")) return false;
 	if (!images.load("gallina5", "gallinaGolden.png")) return false;
 	if (!images.load("hardcore", "hardcore.png")) return false;
+	if (!images.load("winner", "winner.png")) return false;
 	
 	Mix_PlayMusic(tracks.get("Intro"), 1);
 	return true;
@@ -205,6 +206,7 @@ void Game::input() {
 					if (event.key.keysym.sym == SDLK_p) {
 						pause();
 					}
+					if (event.key.keysym.sym == SDLK_b) cambiaEscena(GUANYAT);
 					if (escena == JOC && event.key.keysym.sym == SDLK_SPACE && (player.direccion == 1 || player.direccion == 3)) {
 						Cuadrado* flecha = new Cuadrado();
 						flecha->img = images.get("flecha");
@@ -537,6 +539,13 @@ void Game::draw() {
 			SDL_RenderCopy(renderer, images.get("linksad"), NULL, new SDL_Rect({ (WINDOW_W / 2) - 200, (WINDOW_H / 2), 350, 350 }));
 			break;
 		case GUANYAT:
+			camera.sY = 0;
+			camera.draw();
+			player.draw();
+			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
+			SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
+			SDL_QueryTexture(images.get("winner"), NULL, NULL, &w, &h);
+			SDL_RenderCopy(renderer, images.get("winner"), NULL, new SDL_Rect({ WINDOW_W / 2 - w/2, WINDOW_H / 2 - h/2, w, h }));
 			break;
 		case TIENDA:
 			camera.sY = 0;
