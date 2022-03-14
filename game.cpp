@@ -103,6 +103,7 @@ bool Game::load() {
 	if (!images.load("studio", "studio.png")) return false;
 	if (!images.load("horda", "horda.png")) return false;
 	if (!images.load("flecha", "flecha.png")) return false;
+	if (!images.load("flechab", "flecha_b.png")) return false;
 	if (!images.load("start", "start.png")) return false;
 	if (!images.load("back", "back.png")) return false;
 	if (!images.load("gameoverT", "gameoverT.png")) return false;
@@ -211,10 +212,13 @@ void Game::input() {
 						Cuadrado* flecha = new Cuadrado();
 						flecha->img = images.get("flecha");
 						if (player.direccion == 1) {
+						
 							flecha->sX = 0;
 							flecha->sY = -5;
 						}
 						if (player.direccion == 3) {
+
+							flecha->img = images.get("flechab");
 							flecha->sX = 0;
 							flecha->sY = 5;
 						}
@@ -370,6 +374,7 @@ void Game::update() {
 				} else {
 					std::cout << "FI DEL NIVELL!!" << std::endl;
 					horda.dstRect->h = 0;
+					player.money += dinerotemporal;
 
 				}
 				if (keyboard[SDL_SCANCODE_W]) {
@@ -411,7 +416,7 @@ void Game::update() {
 					r->update(R_NUM(-1, 1), 1);
 					if (player.checkCollision(r->dstRect)) {
 						r->disposable = true;
-						player.money += 1 + 5 * (r->tipus - 1);
+						dinerotemporal += 1 + 5 * (r->tipus - 1);
 					}
 				}
 				for (Gallina* g : gallinas) {
@@ -427,7 +432,7 @@ void Game::update() {
 						if (f->checkCollision(g->dstRect)) {
 							g->disposable = true;
 							f->disposable = true;
-							player.money += R_NUM(0, g->tipus * 2);
+							dinerotemporal += R_NUM(0, g->tipus * 2);
 						}
 					}
 				}
@@ -517,7 +522,7 @@ void Game::draw() {
 			player.draw();
 			for (int i = 0; i < 3; i++) player.corazones[i].draw();
 			SDL_RenderCopy(renderer, images.get("rupia1"), NULL, new SDL_Rect({ WINDOW_W - 60, 90, 40, 40 }));
-			num = std::to_string(player.money);
+			num = std::to_string(dinerotemporal);
 			for (int i = num.length() - 1; i >= 0; i--) {
 				s = "n";
 				s.append(1, num[i]);

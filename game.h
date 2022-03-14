@@ -37,6 +37,7 @@ class Game {
 		Button botonSonido; 
 		int loreShown = 0;
 		int loreTienda = 0;
+		int dinerotemporal = 0;
 		Button botonPlay;
 		Button botonShop;
 		Button botonBack;
