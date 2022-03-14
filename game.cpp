@@ -90,11 +90,14 @@ void Game::init() {
 
 bool Game::load() {
 	//sfxs
+	if (!sfxs.load("dañoGallina", "DanoContraGallina.wav")) return false;
+	if (!sfxs.load("dañoQueja", "Danoqueja.wav")) return false;
 	if (!sfxs.load("muerteGallina", "muertegallinaex.wav")) return false;
 	if (!sfxs.load("disparoFlecha", "disparoflecha.wav")) return false;
 	if (!sfxs.load("SMoneda", "Sonidomoneda.wav")) return false;
 	if (!sfxs.load("MultitudG", "multitudG.wav")) return false;
 	if (!sfxs.load("SStart", "sonidostart.wav")) return false;
+	if (!tracks.load("Creditos", "Creditos.ogg")) return false;
 	if (!tracks.load("Victoria", "VICTORIA.ogg")) return false;
 	if (!tracks.load("Intro", "Intro Colibri Studios.ogg")) return false;
 	if (!tracks.load("Game Over", "Game Over.ogg")) return false;
@@ -357,6 +360,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			dineroTemporal = 0;
 			break;
 		case GUANYAT:
+			Mix_HaltChannel(-1);
 			Mix_PlayMusic(tracks.get("Victoria"), 1);
 			break;
 		case TIENDA:
@@ -366,8 +370,11 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			if (++loreTienda > 9) loreTienda = 1; 
 			break;
 		case PAUSA:
+			Mix_HaltChannel(-1);
 			break;
 		case CREDITS:
+			Mix_HaltChannel(-1);
+			Mix_PlayMusic(tracks.get("Creditos"), 1);
 			break;
 	}
 }
@@ -498,6 +505,7 @@ void Game::update() {
 				if (player.checkCollision(horda.dstRect)) {
 					player.damage();
 					player.dstRect->y -= horda.dstRect->h + 10;
+					if (!muted) Mix_PlayChannel(-1, sfxs.get("dañoGallina"), 0);
 				}
 				if ((SDL_GetTicks() / 16) % 200 == 0) for (int i = 0; i < 2; i++) {
 					Rupia* rupia = new Rupia();
@@ -591,12 +599,14 @@ void Game::update() {
 					g->update();
 					if (player.checkCollision(g->dstRect)) {
 						g->disposable = true;
+						if (!muted) Mix_PlayChannel(-1, sfxs.get("dañoGallina"), 0);
 						if(!god) player.damage();
 					}
 				}
 				for (Cuadrado* r : rocas) {
 					r->update();
 					if (player.checkCollision(r->dstRect)) {
+						if (!muted) Mix_PlayChannel(-1, sfxs.get("dañoQueja"), 0);
 						cambiaEscena(GAMEOVER);
 						dineroTemporal = 0;
 					}
@@ -604,6 +614,7 @@ void Game::update() {
 				for (Cuadrado* a : arboles) {
 					a->update();
 					if (player.checkCollision(a->dstRect)) {
+						if (!muted) Mix_PlayChannel(-1, sfxs.get("dañoQueja"), 0);
 						cambiaEscena(GAMEOVER);
 						dineroTemporal = 0;
 					}
