@@ -40,6 +40,7 @@ void Game::assignImg() {
 	botonShop.img = images.get("tienda");
 	botonHardcore.img = images.get("hardcore");
 	botonCreditos.img = images.get("creditosBoton");
+	creditos.img = images.get("creditos");
 }
 
 void Game::init() {
@@ -64,10 +65,12 @@ void Game::init() {
 	botonCompraBrown.dstRect = new SDL_Rect({ 320, 320, 130, 40 });
 	botonHardcore.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 410, 750, 330, 100 });
 	botonCreditos.dstRect = new SDL_Rect({ WINDOW_W - 410, 750, 330, 100 });
+	creditos.dstRect = new SDL_Rect({ 0, (WINDOW_H * 15 / 10), WINDOW_W, WINDOW_H });
+	creditos.sY = 3;
 	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
 	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
 	SDL_QueryTexture(images.get("mapa3"), NULL, NULL, NULL, &nivel.dstRect->h);
-	camera.srcRect = new SDL_Rect({ 0, nivel.dstRect->h - WINDOW_H, WINDOW_W, WINDOW_H });
+	camera.srcRect = new SDL_Rect({ 75, nivel.dstRect->h - WINDOW_H, WINDOW_W - 150, WINDOW_H * 16 / 10 });
 	horda.dstRect = new SDL_Rect({ 130, WINDOW_H, 0, 0 });
 	player.init(images.get("link"));
 	SDL_QueryTexture(images.get("horda"), NULL, NULL, &horda.dstRect->w, &horda.dstRect->h);
@@ -215,14 +218,13 @@ void Game::input() {
 					if ((
 						event.key.keysym.sym == SDLK_RETURN ||
 						event.key.keysym.sym == SDLK_SPACE
-						) && escena == GUANYAT) cambiaEscena(MENU);
+						) && escena == GUANYAT) cambiaEscena(CREDITS);
 					if (event.key.keysym.sym == SDLK_t && escena == MENU) cambiaEscena(TIENDA);
-					//if (event.key.keysym.sym == SDLK_h) player.damage();
+					if (event.key.keysym.sym == SDLK_h) camera.srcRect->y = 100;
 					if (event.key.keysym.sym == SDLK_F1) god = !god;
 					if (event.key.keysym.sym == SDLK_m) {
 						mute();
 					}
-					if (event.key.keysym.sym == SDLK_b) cambiaEscena(GUANYAT);
 					if (event.key.keysym.sym == SDLK_p) {
 						pause();
 					}
@@ -231,12 +233,10 @@ void Game::input() {
 						flecha->img = images.get("flecha");
 						if (!muted) Mix_PlayChannel(-1, sfxs.get("disparoFlecha"), 0);
 						if (player.direccion == 1) {
-						
 							flecha->sX = 0;
 							flecha->sY = -5;
 						}
 						if (player.direccion == 3) {
-
 							flecha->img = images.get("flechab");
 							flecha->sX = 0;
 							flecha->sY = 6;
@@ -383,7 +383,7 @@ void Game::update() {
 			!botonSonido.isClicked(mouse) &&
 			!botonHardcore.isClicked(mouse)
 			) cambiaEscena(LORE);
-		if (escena == GUANYAT) cambiaEscena(MENU);
+		if (escena == GUANYAT) cambiaEscena(CREDITS);
 		if (escena == GAMEOVER) cambiaEscena(MENU);
 		if (botonPlay.isClicked(mouse)) pause();
 		if (escena == TIENDA) {
@@ -561,6 +561,7 @@ void Game::update() {
 		case PAUSA:
 			break;
 		case CREDITS:
+			creditos.update(0, -1);
 			break;
 	}
 }
@@ -710,6 +711,7 @@ void Game::draw() {
 			}
 			break;
 		case CREDITS:
+			creditos.draw();
 			break;
 	}
 	SDL_RenderPresent(renderer);

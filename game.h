@@ -67,6 +67,7 @@ class Game {
 		std::vector<Cuadrado*> flechas;
 		Cuadrado paredHitboxLeft;
 		Cuadrado paredHitboxRight;
+		Cuadrado creditos;
 		//Cuadrado rioHitboxLeft;
 		//Cuadrado rioHitboxRight;
 };
