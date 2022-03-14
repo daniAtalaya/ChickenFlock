@@ -14,6 +14,7 @@ bool Almacen<Mix_Music*>::load(std::string name, std::string filename) {
 template <>
 bool Almacen<Mix_Chunk*>::load(std::string name, std::string filename) {
 	mapa[name] = Mix_LoadWAV(filename.c_str());
+	//std::cout << SDL_GetError() << std::endl;
 	return mapa[name] != NULL;
 }
 template <>

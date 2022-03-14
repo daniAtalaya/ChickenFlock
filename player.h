@@ -9,7 +9,7 @@ class Player : public Cuadrado {
 		int direccion = 1; 
 		int index = 0;
 		int vides = 3;
-		int money = 0;
+		int money = 500;
 		bool brownComprada = false;
 		bool azulComprada = false;
 		bool darkComprada = false;

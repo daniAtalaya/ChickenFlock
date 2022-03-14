@@ -38,6 +38,7 @@ void Game::assignImg() {
 	camera.img = images.get("mapa3");
 	botonBack.img = images.get("back");
 	botonShop.img = images.get("tienda");
+	botonHardcore.img = images.get("hardcore");
 }
 
 void Game::init() {
@@ -46,10 +47,10 @@ void Game::init() {
 	paredHitboxRight = Cuadrado();
 	paredHitboxLeft.dstRect = new SDL_Rect({ 1, 1, 150, 8100 });
 	paredHitboxRight.dstRect = new SDL_Rect({ 810, 1, 150, 8100 });
-	rioHitboxLeft = (Cuadrado());
-	rioHitboxLeft.dstRect = new SDL_Rect({ 150, -300, 210, 300 });
-	rioHitboxRight = (Cuadrado());
-	rioHitboxRight.dstRect = new SDL_Rect({ 600, -300, 210, 300 });
+	//rioHitboxLeft = Cuadrado();
+	//rioHitboxLeft.dstRect = new SDL_Rect({ 150, -300, 210, 300 });
+	//rioHitboxRight = Cuadrado();
+	//rioHitboxRight.dstRect = new SDL_Rect({ 600, -300, 210, 300 });
 	botonSonido.img = images.get("soundOn");
 	botonSonido.dstRect = new SDL_Rect({ 10, 20, 100, 100 });
 	botonPlay.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
@@ -89,6 +90,10 @@ bool Game::load() {
 	if (!images.load("soundOn", "soundOn.png")) return false;
 	if (!images.load("soundOff", "soundOff.png")) return false;
 	if (!images.load("mapa3", "mapa3.png")) return false;
+	if (!images.load("play", "play.png")) return false;
+	if (!images.load("continuara", "continuara.png")) return false;
+	if (!images.load("soldOut", "soldOut.png")) return false;
+	if (!images.load("creditos", "creditos.png")) return false;
 	if (!images.load("play", "play.png")) return false;
 	if (!images.load("link", "link.png")) return false;
 	if (!images.load("rupia1", "rupia1.png")) return false;
@@ -171,7 +176,7 @@ Game::~Game(){
 }
 
 void Game::input() {
-	while (SDL_PollEvent(&event) > 0) {
+	while (SDL_PollEvent(&event) != 0) {
 		switch (event.type) {
 			case SDL_QUIT:
 				isOpen = false;
@@ -194,11 +199,14 @@ void Game::input() {
 					if ((
 						event.key.keysym.sym == SDLK_RETURN ||
 						event.key.keysym.sym == SDLK_SPACE
-					) && escena == INICI) cambiaEscena(MENU);
+					) && escena == INICI) cambiaEscena(MENU);;
+					if ((
+						event.key.keysym.sym == SDLK_RETURN ||
+						event.key.keysym.sym == SDLK_SPACE
+						) && escena == GUANYAT) cambiaEscena(MENU);
 					if (event.key.keysym.sym == SDLK_t && escena == MENU) cambiaEscena(TIENDA);
 					//if (event.key.keysym.sym == SDLK_h) player.damage();
 					if (event.key.keysym.sym == SDLK_F1) god = !god;
-					if (event.key.keysym.sym == SDLK_F2) hardMode = !hardMode;
 					if (event.key.keysym.sym == SDLK_m) {
 						mute();
 					}
@@ -206,7 +214,6 @@ void Game::input() {
 					if (event.key.keysym.sym == SDLK_p) {
 						pause();
 					}
-					if (event.key.keysym.sym == SDLK_b) cambiaEscena(GUANYAT);
 					if (escena == JOC && event.key.keysym.sym == SDLK_SPACE && (player.direccion == 1 || player.direccion == 3)) {
 						Cuadrado* flecha = new Cuadrado();
 						flecha->img = images.get("flecha");
@@ -267,28 +274,40 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 		case LORE:
 			break;
 		case JOC:
+			if (nuevaEscena != PAUSA) {
+				for (Gallina* g : gallinas) g->disposable = true;
+				for (Rupia* r : rupias) r->disposable = true;
+				for (Cuadrado* f : flechas) f->disposable = true;
+				for (Cuadrado* o : obstaculos) o->disposable = true;
+			}
 			break;
 		case GAMEOVER:
+			hardMode = false;
 			init();
 			break;
 		case GUANYAT:
+			hardMode = false;
 			init();
 			break;
 		case TIENDA:
 			init();
 			break;
 		case PAUSA:
+			if (nuevaEscena != JOC) {
+				for (Gallina* g : gallinas) g->disposable = true;
+				for (Rupia* r : rupias) r->disposable = true;
+				for (Cuadrado* f : flechas) f->disposable = true;
+				for (Cuadrado* o : obstaculos) o->disposable = true;
+			}
 			break;
 		case CREDITS:
+			hardMode = false;
 			break;
 		default:
 			break;
 	}
-	//if(escena == PAUSA && nuevaEscena == MENU)
-	if (escena != PAUSA) {
-		rupias.clear();
-		gallinas.clear();
-	}
+	
+	if(escena == PAUSA && nuevaEscena == MENU) hardMode = false;
 	escena = nuevaEscena;
 	switch (nuevaEscena) {
 		if (escena != LORE && escena != PAUSA) while (Mix_PlayingMusic()) Mix_HaltMusic();
@@ -329,29 +348,49 @@ void Game::update() {
 	if (keyboard[SDL_SCANCODE_ESCAPE]) isOpen = false;
 	if (isClicking) {
 		if (botonSonido.isClicked(mouse)) mute();
+		else if (escena == LORE) cambiaEscena(JOC);
 		if (botonBack.isClicked(mouse) && (escena == PAUSA || escena == TIENDA)) cambiaEscena(MENU);
 		else if (botonShop.isClicked(mouse) && escena == MENU) cambiaEscena(TIENDA);
+		if (botonHardcore.isClicked(mouse) && escena == MENU && !hardMode) {
+			hardMode = !hardMode;
+		}
+		if (
+			escena == MENU &&
+			!botonShop.isClicked(mouse) &&
+			!botonSonido.isClicked(mouse) &&
+			!botonHardcore.isClicked(mouse)
+			) cambiaEscena(LORE);
+		if (escena == GUANYAT) cambiaEscena(MENU);
+		if (escena == GAMEOVER) cambiaEscena(MENU);
 		if (botonPlay.isClicked(mouse)) pause();
 		if (escena == TIENDA) {
-			if (botonCompraBrown.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.brownComprada && player.money >= 30) {
+			if (botonCompraBrown.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 6 && !player.brownComprada && player.money >= 30) {
 				player.money -= 30;
 				player.brownComprada = true;
+				botonCompraBrown.img = images.get("soldOut");
 			}
-			if (botonCompraAzul.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.azulComprada && player.money >= 70) {
+			if (botonExitShop.isClicked(mouse)) {
+				cambiaEscena(MENU);
+			}
+			if (botonCompraAzul.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 6 && !player.azulComprada && player.money >= 70) {
 				player.money -= 70;
 				player.azulComprada = true;
+				botonCompraAzul.img = images.get("soldOut");
 			}
-			if (botonCompraDark.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.darkComprada && player.money >= 100) {
+			if (botonCompraDark.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 6 && !player.darkComprada && player.money >= 100) {
 				player.money -= 100;
 				player.azulComprada = true;
+				botonCompraDark.img = images.get("soldOut");
 			}
-			if (botonCompraGolden.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.goldenComprada && player.money >= 150) {
+			if (botonCompraGolden.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 6 && !player.goldenComprada && player.money >= 150) {
 				player.money -= 150;
 				player.azulComprada = true;
+				botonCompraGolden.img = images.get("soldOut");
 			}
 		}
 		isClicking = false;
 	}
+	bool shouldMove = true;
 	switch (escena) {
 		case INICI:
 			break;
@@ -360,55 +399,95 @@ void Game::update() {
 		case LORE:
 			break;
 		case JOC:
-			if (keyboard[SDL_SCANCODE_Y]) camera.update();
-			if (keyboard[SDL_SCANCODE_J]) camera.srcRect->y += camera.sY;
+			//if (keyboard[SDL_SCANCODE_Y]) camera.update();
+			//if (keyboard[SDL_SCANCODE_J]) camera.srcRect->y += camera.sY;
 			if (player.vides <= 0) cambiaEscena(GAMEOVER);
 			if(!paused){
+				if(endingReached) camera.sY = 0;
 				if (camera.srcRect->y > 0) {
 					camera.update();
 					std::cout << "Y = " << camera.srcRect->y << std::endl;
-				} else {
+				} else if(camera.sY != 0) {
 					std::cout << "FI DEL NIVELL!!" << std::endl;
+					for (Gallina* g : gallinas) g->disposable = true;
+					for (Rupia* r : rupias) r->disposable = true;
+					endingReached = true;
 					horda.dstRect->h = 0;
+					avestruz = Avestruz();
+					avestruz.init(images.get("avestruz"));
+					avestruz.dstRect = new SDL_Rect({ WINDOW_W / 2 - 62, 500, 125, 125 });
 
 				}
-				if (keyboard[SDL_SCANCODE_W]) {
-					player.direccion = 1;
-					if (!player.checkCollision(paredHitboxLeft.dstRect) && !player.checkCollision(paredHitboxRight.dstRect)) player.update(0, -1);
+				
+				for (Cuadrado* o : obstaculos) {
+					o->update();
+					if (player.checkCollision(o->dstRect)) {
+						shouldMove = false;
+					}
 				}
-				if (keyboard[SDL_SCANCODE_S]) {
-					player.direccion = 3;
-					if (!player.checkCollision(paredHitboxLeft.dstRect) && !player.checkCollision(paredHitboxRight.dstRect)) player.update(0, 1);
-				}
-				if (keyboard[SDL_SCANCODE_A]) {
-					player.direccion = 0;
-					if (!player.checkCollision(paredHitboxLeft.dstRect) && !player.checkCollision(paredHitboxRight.dstRect)) player.update(-1, 0);
-				}
-				if (keyboard[SDL_SCANCODE_D]) {
-					player.direccion = 2;
-					if (!player.checkCollision(paredHitboxLeft.dstRect) && !player.checkCollision(paredHitboxRight.dstRect)) player.update(1, 0);
+				if (shouldMove) {
+					if (keyboard[SDL_SCANCODE_W]) {
+						player.direccion = 1;
+						//if (!player.checkCollision(rioHitboxRight.dstRect) && !player.checkCollision(rioHitboxLeft.dstRect)) {
+						player.update(0, -1);
+						//}
+					}
+					if (keyboard[SDL_SCANCODE_S]) {
+						player.direccion = 3;
+						//if (!player.checkCollision(rioHitboxRight.dstRect) && !player.checkCollision(rioHitboxLeft.dstRect)) {
+						player.update(0, 1);
+						//}
+					}
+					if (keyboard[SDL_SCANCODE_A]) {
+						player.direccion = 0;
+						if (!player.checkCollision(paredHitboxLeft.dstRect)) {
+							//if (!player.checkCollision(rioHitboxLeft.dstRect)) 
+							player.update(-1, 0);
+						}
+					}
+					if (keyboard[SDL_SCANCODE_D]) {
+						player.direccion = 2;
+						if (!player.checkCollision(paredHitboxRight.dstRect)) {
+							//if (!player.checkCollision(rioHitboxRight.dstRect)) 
+							player.update(1, 0);
+						}
+					}
 				}
 				if (player.checkCollision(horda.dstRect)) {
 					player.damage();
 					player.dstRect->y -= horda.dstRect->h + 10;
 				}
-				if ((SDL_GetTicks() / 16) % 150 == 0) for (int i = 0; i < R_NUM(2, 4); i++)
+				if ((SDL_GetTicks() / 16) % 150 == 0 && !endingReached) for (int i = 0; i < R_NUM(2, 4); i++)
 				{
 					Rupia* rupia = new Rupia();
 					rupia->tipus = i;
 					rupia->img = images.get("rupia" + std::to_string(i));
-					rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-150, -50), 50, 50 });
+					rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-150, -50), 30, 30 });
 					rupias.push_back(rupia);
 				}
-				if((SDL_GetTicks() / 16) % 100 == 0) for (int i = 1; i <= R_NUM(2, 4); i++) {
+				if((SDL_GetTicks() / 16) % 100 == 0 && !endingReached) for (int i = 1; i <= R_NUM(2, 4); i++) {
 						Gallina* gallina = new Gallina();
 						gallina->tipus = R_NUM(1, player.gallinasDesbloqueadas);
 						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-150, -50), 40, 40 });
 						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
 						gallinas.push_back(gallina);
+				}if ((SDL_GetTicks() / 16) % 100 == 0 && !endingReached) for (int i = 1; i <= R_NUM(2, 4); i++) {
+					Cuadrado* arbol = new Cuadrado();
+					arbol->sX = 0;
+					arbol->sY = camera.sY;
+					arbol->img = images.get("arbol" + std::to_string(R_NUM(1, 4)));
+					arbol->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), -50, 40, 40 });
+					obstaculos.push_back(arbol);
+				}if ((SDL_GetTicks() / 16) % 100 == 0 && !endingReached) for (int i = 1; i <= R_NUM(2, 4); i++) {
+					Cuadrado* roca = new Cuadrado();
+					roca->sX = 0;
+					roca->sY = camera.sY;
+					roca->img = images.get("roca" + std::to_string(R_NUM(1, 4)));
+					roca->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), -150, 40, 40 });
+					obstaculos.push_back(roca);
 				}
 				for (Rupia* r : rupias) {
-					r->update(R_NUM(-1, 1), 1);
+					r->update(0, 1);
 					if (player.checkCollision(r->dstRect)) {
 						r->disposable = true;
 						player.money += 1 + 5 * (r->tipus - 1);
@@ -421,6 +500,7 @@ void Game::update() {
 						player.damage();
 					}
 				}
+				
 				for (Cuadrado* f : flechas) {
 					f->update();
 					for (Gallina* g : gallinas) {
@@ -467,11 +547,9 @@ void Game::draw() {
 			SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
 			botonSonido.draw();
 			botonShop.draw();
-			SDL_QueryTexture(images.get("hardcore"), NULL, NULL, &w, &h);
-			SDL_RenderCopy(renderer, images.get("hardcore"), NULL, new SDL_Rect({ WINDOW_W / 2 - w/2 , 750, w, h-15 }));
 			SDL_QueryTexture(images.get("start"), NULL, NULL, &w, &h);
 			SDL_RenderCopy(renderer, images.get("start"), NULL, new SDL_Rect({ WINDOW_W - 100 - w / 3, (WINDOW_H / 2) - (h * 4 / 10 ) / 2, w *1/3, h * 4 / 10 }));
-			botonHardcore.draw();
+			if(!hardMode) botonHardcore.draw();
 			break;
 		case LORE:
 			camera.draw();
@@ -487,7 +565,7 @@ void Game::draw() {
 			camera.draw();
 			botonSonido.draw();
 			botonPlay.draw();
-			if (camera.srcRect->y <= 6046)
+			/*if (camera.srcRect->y <= 6046)
 			{
 				rioHitboxLeft.draw();
 				rioHitboxLeft.update(0, 1);
@@ -498,21 +576,18 @@ void Game::draw() {
 			{
 				rioHitboxLeft.sY = camera.sY;
 				rioHitboxRight.sY = camera.sY;
-			}
+			}*/
 			if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) player.animateX();
 			if (!paused) player.animateY();
-			horda.draw();
-			if (hardMode) {
-				for (int i = 1; i < 3; i++) {
-					SDL_RenderCopy(renderer, images.get("horda"), NULL, new SDL_Rect({horda.dstRect->x, WINDOW_H - horda.dstRect->h * i, horda.dstRect->w, horda.dstRect->h}));
-				}
-			}
 			for (Rupia* r : rupias) r->draw();
-			for (Cuadrado* f : flechas) f->draw();
+			for (Cuadrado* o : obstaculos) o->draw();
 			for (Gallina* g : gallinas) {
 				g->draw();
 				if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) g->animateX();
 				if ((SDL_GetTicks() / 16) % 200 * g->spritesheet.maxC == 0 && !paused) g->animateY();
+			}
+			if (endingReached) {
+				avestruz.draw();
 			}
 			player.draw();
 			for (int i = 0; i < 3; i++) player.corazones[i].draw();
@@ -523,6 +598,13 @@ void Game::draw() {
 				s.append(1, num[i]);
 				SDL_RenderCopy(renderer, images.get(s), NULL, new SDL_Rect({WINDOW_W - 80 - ((int)num.length() - i) * 30, 88, 35, 40}));
 			}
+			horda.draw();
+			if (hardMode) {
+				for (int i = 1; i < 3; i++) {
+					SDL_RenderCopy(renderer, images.get("horda"), NULL, new SDL_Rect({ horda.dstRect->x, WINDOW_H - horda.dstRect->h * i, horda.dstRect->w, horda.dstRect->h }));
+				}
+			}
+			for (Cuadrado* f : flechas) f->draw();
 			paredHitboxLeft.draw();
 			paredHitboxRight.draw();
 			//dstRect->x = WINDOW_W - 60 - i * 50;

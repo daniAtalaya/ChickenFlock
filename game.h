@@ -7,7 +7,8 @@
 #include "gallina.h"
 #include "rupia.h"
 #include "enums.h"
-#include "rupia.h"
+#include "pajaro.h"
+#include "avestruz.h"
 class Game {
 	public:
 		Game();
@@ -34,6 +35,7 @@ class Game {
 		bool hardMode = false;
 		void cambiaEscena(Escena);
 		bool showPausaText = true;
+		bool endingReached = false;
 		Button botonSonido; 
 		int loreShown = 0;
 		int loreTienda = 0;
@@ -48,12 +50,14 @@ class Game {
 		Button botonHardcore;
 		Cuadrado nivel;
 		Cuadrado horda;
+		Pajaro pajaro;
 		Camera camera;
 		Player player;
 		SDL_Event event;
 		SDL_Window* window;
 		const Uint8* keyboard;
 		Almacen<Mix_Chunk*> sfxs;
+		Avestruz avestruz;
 		std::vector<Rupia*> rupias;
 		Almacen<Mix_Music*> tracks;
 		Almacen<SDL_Texture*> images;
@@ -62,6 +66,6 @@ class Game {
 		std::vector<Cuadrado*> flechas;
 		Cuadrado paredHitboxLeft;
 		Cuadrado paredHitboxRight;
-		Cuadrado rioHitboxLeft;
-		Cuadrado rioHitboxRight;
+		//Cuadrado rioHitboxLeft;
+		//Cuadrado rioHitboxRight;
 };
