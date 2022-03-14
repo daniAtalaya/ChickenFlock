@@ -91,7 +91,7 @@ bool Game::load() {
 	if (!tracks.load("Gameplay", "Gameplay.ogg")) return false;
 	if (!tracks.load("Menu", "Menu.ogg")) return false;
 	if (!tracks.load("Tienda", "Tienda.ogg")) return false;
-	if (!tracks.load("sonido de start", "sonido de start.ogg")) return false;
+	if (!tracks.load("sonido de start", "sonidostart.ogg")) return false;
 	//if (!tracks.load("Multidud de gallinas", "Multidud de gallinas.ogg")) return false;
 	if (!images.load("soundOn", "soundOn.png")) return false;
 	if (!images.load("soundOff", "soundOff.png")) return false;
