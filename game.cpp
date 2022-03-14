@@ -283,6 +283,10 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			break;
 	}
 	//if(escena == PAUSA && nuevaEscena == MENU)
+	if (escena != PAUSA) {
+		rupias.clear();
+		gallinas.clear();
+	}
 	escena = nuevaEscena;
 	switch (nuevaEscena) {
 		if (escena != LORE && escena != PAUSA) while (Mix_PlayingMusic()) Mix_HaltMusic();
@@ -394,10 +398,10 @@ void Game::update() {
 					rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-150, -50), 50, 50 });
 					rupias.push_back(rupia);
 				}
-				if((SDL_GetTicks() / 16) % 100 == 0) for (int i = 1; i <= R_NUM(3, 5); i++) {
+				if((SDL_GetTicks() / 16) % 100 == 0) for (int i = 1; i <= R_NUM(2, 4); i++) {
 						Gallina* gallina = new Gallina();
 						gallina->tipus = R_NUM(1, player.gallinasDesbloqueadas);
-						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), 40, 40 });
+						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-150, -50), 40, 40 });
 						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
 						gallinas.push_back(gallina);
 				}
