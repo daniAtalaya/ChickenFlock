@@ -10,6 +10,7 @@ class Player : public Cuadrado {
 		int index = 0;
 		int vides = 3;
 		int money = 11500;
+		int dX, dY;
 		bool brownComprada = false;
 		bool azulComprada = false;
 		bool darkComprada = false;
@@ -23,8 +24,8 @@ class Player : public Cuadrado {
 			for (int i = 0; i < 3; i++) corazones[i] = Corazon(i);
 		}
 		void init(SDL_Texture*);
-		void update(int dx, int dy) {
-			Cuadrado::update(dx, dy);
+		void update() {
+			Cuadrado::update(dX, dY);
 		}
 		void damage() {
 			if (vides-- > 0) {

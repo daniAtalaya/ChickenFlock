@@ -8,6 +8,10 @@ class Gallina : public Cuadrado {
 		int index = 0;
 		int tipus = 1;
 		int direccion = 1;
+		void update() {
+			dstRect->x += R_NUM(-5, 5);
+			dstRect->y += sY;
+		}
 		Gallina() {
 			Cuadrado::Cuadrado();
 			srcRect = NULL;

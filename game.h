@@ -48,6 +48,7 @@ class Game {
 		Button botonCompraDark;
 		Button botonCompraBrown;
 		Button botonHardcore;
+		Button botonCreditos;
 		Cuadrado nivel;
 		Cuadrado horda;
 		Pajaro pajaro;

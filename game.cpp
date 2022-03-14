@@ -39,6 +39,7 @@ void Game::assignImg() {
 	botonBack.img = images.get("back");
 	botonShop.img = images.get("tienda");
 	botonHardcore.img = images.get("hardcore");
+	botonCreditos.img = images.get("creditosBoton");
 }
 
 void Game::init() {
@@ -61,7 +62,8 @@ void Game::init() {
 	botonCompraGolden.dstRect = new SDL_Rect({535, 540, 130, 40 });
 	botonCompraDark.dstRect = new SDL_Rect({ 320, 540, 130, 40 });
 	botonCompraBrown.dstRect = new SDL_Rect({ 320, 320, 130, 40 });
-	botonHardcore.dstRect = new SDL_Rect({ 310, 750, 330, 100 });
+	botonHardcore.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 410, 750, 330, 100 });
+	botonCreditos.dstRect = new SDL_Rect({ WINDOW_W - 410, 750, 330, 100 });
 	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
 	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
 	SDL_QueryTexture(images.get("mapa3"), NULL, NULL, NULL, &nivel.dstRect->h);
@@ -168,6 +170,9 @@ bool Game::load() {
 	if (!images.load("gallina5", "gallinaGolden.png")) return false;
 	if (!images.load("hardcore", "hardcore.png")) return false;
 	if (!images.load("winner", "winner.png")) return false;
+	if (!images.load("tituloCockFlock", "tituloCockFlock.png")) return false;
+	if (!images.load("creditosBoton", "creditosBoton.png")) return false;
+
 	
 	Mix_PlayMusic(tracks.get("Intro"), 1);
 	return true;
@@ -366,6 +371,7 @@ void Game::update() {
 	if (isClicking) {
 		if (botonSonido.isClicked(mouse)) mute();
 		else if (escena == LORE) cambiaEscena(JOC);
+		if (botonCreditos.isClicked(mouse) && escena == MENU) cambiaEscena(CREDITS);
 		if (botonBack.isClicked(mouse) && (escena == PAUSA || escena == TIENDA)) cambiaEscena(MENU);
 		else if (botonShop.isClicked(mouse) && escena == MENU) cambiaEscena(TIENDA);
 		if (botonHardcore.isClicked(mouse) && escena == MENU && !hardMode) {
@@ -425,9 +431,7 @@ void Game::update() {
 			if(!paused){
 				if (camera.srcRect->y > 0) {
 					camera.update();
-					std::cout << "Y = " << camera.srcRect->y << std::endl;
 				} else if(camera.sY != 0) {
-					std::cout << "FI DEL NIVELL!!" << std::endl;
 					for (Gallina* g : gallinas) g->disposable = true;
 					for (Rupia* r : rupias) r->disposable = true;
 					horda.dstRect->h = 0;
@@ -435,41 +439,49 @@ void Game::update() {
 					cambiaEscena(GUANYAT);
 
 				}
+
+				//if (!player.checkCollision(rioHitboxRight.dstRect) && !player.checkCollision(rioHitboxLeft.dstRect)) 
 				if (keyboard[SDL_SCANCODE_W]) {
 					player.direccion = 1;
-					//if (!player.checkCollision(rioHitboxRight.dstRect) && !player.checkCollision(rioHitboxLeft.dstRect)) {
-					player.update(0, -1);
-					//}
+					player.dX = 0;
+					player.dY = -1;
 				}
 				if (keyboard[SDL_SCANCODE_S]) {
 					player.direccion = 3;
-					//if (!player.checkCollision(rioHitboxRight.dstRect) && !player.checkCollision(rioHitboxLeft.dstRect)) {
-					player.update(0, 1);
-					//}
+					player.dX = 0;
+					player.dY = 1;
 				}
 				if (keyboard[SDL_SCANCODE_A]) {
 					player.direccion = 0;
-					if (!player.checkCollision(paredHitboxLeft.dstRect)) {
-						//if (!player.checkCollision(rioHitboxLeft.dstRect)) 
-						player.update(-1, 0);
-					}
+					player.dX = -1;
+					player.dY = 0;
 				}
 				if (keyboard[SDL_SCANCODE_D]) {
 					player.direccion = 2;
-					if (!player.checkCollision(paredHitboxRight.dstRect)) {
-						//if (!player.checkCollision(rioHitboxRight.dstRect)) 
-						player.update(1, 0);
+					player.dX = 1;
+					player.dY = 0;
+				}
+				if (!player.checkCollision(paredHitboxRight.dstRect) && !player.checkCollision(paredHitboxLeft.dstRect)) {
+					for (Cuadrado* c : obstaculos) {
+						if (player.direccion == 1) {
+							//ARRIBA
+
+						}
+						if (player.direccion == 3) {
+							//ABAJO
+
+						}
 					}
+					player.update();
 				}
 				if (player.checkCollision(horda.dstRect)) {
 					player.damage();
 					player.dstRect->y -= horda.dstRect->h + 10;
 				}
-				if ((SDL_GetTicks() / 16) % 150 == 0) for (int i = 0; i < R_NUM(2, 4); i++)
-				{
+				if ((SDL_GetTicks() / 16) % 150 == 0) for (int i = 0; i < 4; i++) {
 					Rupia* rupia = new Rupia();
-					rupia->tipus = i;
-					rupia->img = images.get("rupia" + std::to_string(i));
+					rupia->tipus = i+1;
+					rupia->img = images.get("rupia" + std::to_string(rupia->tipus));
 					rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-150, -50), 30, 30 });
 					rupias.push_back(rupia);
 				}
@@ -479,14 +491,25 @@ void Game::update() {
 						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-150, -50), 40, 40 });
 						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
 						gallinas.push_back(gallina);
-				}if ((SDL_GetTicks() / 16) % 100 == 0) for (int i = 1; i <= R_NUM(2, 4); i++) {
+
+				}
+				if ((SDL_GetTicks() / 16) % 300 == 0) for (int i = 1; i < 2; i++) {
+					Gallina* gallina = new Gallina();
+					gallina->tipus = R_NUM(1, player.gallinasDesbloqueadas);
+					gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 });
+					gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+					gallina->sY = -5;
+					gallinas.push_back(gallina);
+				}
+				if ((SDL_GetTicks() / 16) % 100 == 0) for (int i = 1; i <= R_NUM(2, 4); i++) {
 					Cuadrado* arbol = new Cuadrado();
 					arbol->sX = 0;
 					arbol->sY = camera.sY;
 					arbol->img = images.get("arbol" + std::to_string(R_NUM(1, 4)));
 					arbol->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), -50, 40, 40 });
 					obstaculos.push_back(arbol);
-				}if ((SDL_GetTicks() / 16) % 100 == 0) for (int i = 1; i <= R_NUM(2, 4); i++) {
+				}
+				if ((SDL_GetTicks() / 16) % 100 == 0) for (int i = 1; i <= R_NUM(2, 4); i++) {
 					Cuadrado* roca = new Cuadrado();
 					roca->sX = 0;
 					roca->sY = camera.sY;
@@ -503,13 +526,19 @@ void Game::update() {
 					}
 				}
 				for (Gallina* g : gallinas) {
-					g->update(R_NUM(-1, 1), 1);
+					g->update();
 					if (player.checkCollision(g->dstRect)) {
 						g->disposable = true;
 						if(!god) player.damage();
 					}
 				}
-				
+				for (Cuadrado* o : obstaculos) {
+					o->update();
+					if (player.checkCollision(o->dstRect)) {
+						cambiaEscena(GAMEOVER);
+						dinerotemporal = 0;
+					}
+				}
 				for (Cuadrado* f : flechas) {
 					f->update();
 					for (Gallina* g : gallinas) {
@@ -559,6 +588,9 @@ void Game::draw() {
 			botonShop.draw();
 			SDL_QueryTexture(images.get("start"), NULL, NULL, &w, &h);
 			SDL_RenderCopy(renderer, images.get("start"), NULL, new SDL_Rect({ WINDOW_W - 100 - w / 3, (WINDOW_H / 2) - (h * 4 / 10 ) / 2, w *1/3, h * 4 / 10 }));
+			SDL_QueryTexture(images.get("tituloCockFlock"), NULL, NULL, &w, &h);
+			SDL_RenderCopy(renderer, images.get("tituloCockFlock"), NULL, new SDL_Rect({ (WINDOW_W / 2) - 160, 50, w/2, h/2 }));
+			botonCreditos.draw();
 			if(!hardMode) botonHardcore.draw();
 			break;
 		case LORE:
@@ -597,6 +629,8 @@ void Game::draw() {
 				if ((SDL_GetTicks() / 16) % 200 * g->spritesheet.maxC == 0 && !paused) g->animateY();
 			}
 			player.draw();
+			paredHitboxLeft.draw();
+			paredHitboxRight.draw();
 			for (int i = 0; i < 3; i++) player.corazones[i].draw();
 			SDL_RenderCopy(renderer, images.get("rupia1"), NULL, new SDL_Rect({ WINDOW_W - 60, 90, 40, 40 }));
 			num = std::to_string(dinerotemporal);
@@ -612,8 +646,6 @@ void Game::draw() {
 				}
 			}
 			for (Cuadrado* f : flechas) f->draw();
-			paredHitboxLeft.draw();
-			paredHitboxRight.draw();
 			//dstRect->x = WINDOW_W - 60 - i * 50;
 
 			break;
