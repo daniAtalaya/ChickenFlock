@@ -2,4 +2,6 @@
 C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(11,2): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
 C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(379,41): warning C4244: '+=': conversión de 'double' a 'int'; posible pérdida de datos
 C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(502,4): warning C4267: 'inicializando': conversión de 'size_t' a 'int'; posible pérdida de datos
+  pajaro.cpp
+  Generando código...
   SDLHW.vcxproj -> C:\Users\lapiz\OneDrive\Documentos\GitHub\x64\Debug\SDLHW.exe
