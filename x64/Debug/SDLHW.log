@@ -2,6 +2,6 @@
   game.cpp
   The contents of <filesystem> are available only with C++17 or later.
 C:\Users\joseti1.TR12-AL\Documents\dfsf\colbri-studios-GuerrillaWar\game.cpp(11,2): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\joseti1.TR12-AL\Documents\dfsf\colbri-studios-GuerrillaWar\game.cpp(526,4): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\joseti1.TR12-AL\Documents\dfsf\colbri-studios-GuerrillaWar\game.cpp(575,4): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\joseti1.TR12-AL\Documents\dfsf\colbri-studios-GuerrillaWar\game.cpp(528,4): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\joseti1.TR12-AL\Documents\dfsf\colbri-studios-GuerrillaWar\game.cpp(577,4): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
   SDLHW.vcxproj -> C:\Users\joseti1.TR12-AL\Documents\dfsf\colbri-studios-GuerrillaWar\x64\Debug\SDLHW.exe

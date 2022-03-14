@@ -220,7 +220,7 @@ void Game::input() {
 
 							flecha->img = images.get("flechab");
 							flecha->sX = 0;
-							flecha->sY = 5;
+							flecha->sY = 6;
 						}
 						SDL_Rect* origin = new SDL_Rect({ player.dstRect->x + 15, player.direccion == 3 ? (player.dstRect->y + player.dstRect->h + 5) : (player.dstRect->y - 5) , 30, 60 });
 						flecha->dstRect = origin;
@@ -300,6 +300,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			break;
 		case MENU:
 			Mix_PlayMusic(tracks.get("Menu"), -1);
+			dinerotemporal = 0;
 			break;
 		case LORE:
 			Mix_PlayMusic(tracks.get("Gameplay"), -1);
@@ -313,6 +314,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			break;
 		case GAMEOVER:
 			Mix_PlayMusic(tracks.get("Game Over"), 1);
+			dinerotemporal = 0;
 			break;
 		case GUANYAT:
 			break;
