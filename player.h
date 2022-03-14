@@ -9,8 +9,7 @@ class Player : public Cuadrado {
 		int direccion = 1; 
 		int index = 0;
 		int vides = 3;
-		int money = 11500;
-		int dX, dY;
+		int money = 500;
 		bool brownComprada = false;
 		bool azulComprada = false;
 		bool darkComprada = false;
@@ -24,9 +23,6 @@ class Player : public Cuadrado {
 			for (int i = 0; i < 3; i++) corazones[i] = Corazon(i);
 		}
 		void init(SDL_Texture*);
-		void update() {
-			Cuadrado::update(dX, dY);
-		}
 		void damage() {
 			if (vides-- > 0) {
 				corazones[vides].img = corazones[vides].dead;

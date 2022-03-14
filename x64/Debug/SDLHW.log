@@ -1,7 +1,7 @@
 ﻿cl : command line warning D9002: ignoring unknown option '/std:c++20'
   game.cpp
   The contents of <filesystem> are available only with C++17 or later.
-D:\C++\guerrila-war-SDL\game.cpp(11,2): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-D:\C++\guerrila-war-SDL\game.cpp(637,4): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-D:\C++\guerrila-war-SDL\game.cpp(691,4): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\C++\guerrila-war-SDL\game.cpp(12,2): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+D:\C++\guerrila-war-SDL\game.cpp(725,4): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\C++\guerrila-war-SDL\game.cpp(779,4): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
   SDLHW.vcxproj -> D:\C++\guerrila-war-SDL\x64\Debug\SDLHW.exe

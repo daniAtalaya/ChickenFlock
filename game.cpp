@@ -7,6 +7,7 @@
 #include <sstream>
 #define SSTR( x ) dynamic_cast< std::ostringstream & >( \
             ( std::ostringstream() << std::dec << x ) ).str()
+
 Game::Game() {
 	INIT_R;
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -65,13 +66,16 @@ void Game::init() {
 	botonCompraBrown.dstRect = new SDL_Rect({ 320, 320, 130, 40 });
 	botonHardcore.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 410, 750, 330, 100 });
 	botonCreditos.dstRect = new SDL_Rect({ WINDOW_W - 410, 750, 330, 100 });
-	creditos.dstRect = new SDL_Rect({ 0, (WINDOW_H * 15 / 10), WINDOW_W, WINDOW_H });
+	creditos.dstRect = new SDL_Rect({ 75, (WINDOW_H * 15 / 10), WINDOW_W - 150, WINDOW_H * 16 / 10 });
 	creditos.sY = 3;
 	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
 	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
 	SDL_QueryTexture(images.get("mapa3"), NULL, NULL, NULL, &nivel.dstRect->h);
-	camera.srcRect = new SDL_Rect({ 75, nivel.dstRect->h - WINDOW_H, WINDOW_W - 150, WINDOW_H * 16 / 10 });
+	camera.srcRect = new SDL_Rect({ 0, nivel.dstRect->h - WINDOW_H, WINDOW_W, WINDOW_H});
 	horda.dstRect = new SDL_Rect({ 130, WINDOW_H, 0, 0 });
+	continuara.img = images.get("continuara");
+	continuara.dstRect = new SDL_Rect({ 75, (WINDOW_H * 15 / 10), WINDOW_W - 150, WINDOW_H * 16 / 10 });
+	SDL_QueryTexture(images.get("continuara"), NULL, NULL, NULL, &continuara.dstRect->h);
 	player.init(images.get("link"));
 	SDL_QueryTexture(images.get("horda"), NULL, NULL, &horda.dstRect->w, &horda.dstRect->h);
 	horda.dstRect->y = WINDOW_H - horda.dstRect->h;
@@ -175,7 +179,6 @@ bool Game::load() {
 	if (!images.load("winner", "winner.png")) return false;
 	if (!images.load("tituloCockFlock", "tituloCockFlock.png")) return false;
 	if (!images.load("creditosBoton", "creditosBoton.png")) return false;
-
 	
 	Mix_PlayMusic(tracks.get("Intro"), 1);
 	return true;
@@ -280,6 +283,8 @@ void Game::mute() {
 }
 
 void Game::cambiaEscena(Escena nuevaEscena) {
+	ostrichShown = true;
+	creditsShown = false;
 	switch (escena) {
 		case INICI:
 			break;
@@ -293,7 +298,8 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 				for (Gallina* g : gallinas) g->disposable = true;
 				for (Rupia* r : rupias) r->disposable = true;
 				for (Cuadrado* f : flechas) f->disposable = true;
-				for (Cuadrado* o : obstaculos) o->disposable = true;
+				for (Cuadrado* r : rocas) r->disposable = true;
+				for (Cuadrado* a : arboles) a->disposable = true;
 			}
 			break;
 		case GAMEOVER:
@@ -312,7 +318,8 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 				for (Gallina* g : gallinas) g->disposable = true;
 				for (Rupia* r : rupias) r->disposable = true;
 				for (Cuadrado* f : flechas) f->disposable = true;
-				for (Cuadrado* o : obstaculos) o->disposable = true;
+				for (Cuadrado* r : rocas) r->disposable = true;
+				for (Cuadrado* a : arboles) a->disposable = true;
 			}
 			break;
 		case CREDITS:
@@ -331,7 +338,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 		case MENU:
 			Mix_HaltChannel(-1);
 			Mix_PlayMusic(tracks.get("Menu"), -1);
-			dinerotemporal = 0;
+			dineroTemporal = 0;
 			break;
 		case LORE:
 			if (!muted) Mix_PlayChannel(-1, sfxs.get("SStart"), 0);
@@ -347,7 +354,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			break;
 		case GAMEOVER:
 			Mix_PlayMusic(tracks.get("Game Over"), 1);
-			dinerotemporal = 0;
+			dineroTemporal = 0;
 			break;
 		case GUANYAT:
 			Mix_PlayMusic(tracks.get("Victoria"), 1);
@@ -435,63 +442,113 @@ void Game::update() {
 					for (Gallina* g : gallinas) g->disposable = true;
 					for (Rupia* r : rupias) r->disposable = true;
 					horda.dstRect->h = 0;
-					player.money += dinerotemporal;
+					player.money += dineroTemporal;
 					cambiaEscena(GUANYAT);
 
 				}
 
 				//if (!player.checkCollision(rioHitboxRight.dstRect) && !player.checkCollision(rioHitboxLeft.dstRect)) 
-				if (keyboard[SDL_SCANCODE_W]) {
-					player.direccion = 1;
-					player.dX = 0;
-					player.dY = -1;
-				}
-				if (keyboard[SDL_SCANCODE_S]) {
-					player.direccion = 3;
-					player.dX = 0;
-					player.dY = 1;
-				}
-				if (keyboard[SDL_SCANCODE_A]) {
-					player.direccion = 0;
-					player.dX = -1;
-					player.dY = 0;
-				}
-				if (keyboard[SDL_SCANCODE_D]) {
-					player.direccion = 2;
-					player.dX = 1;
-					player.dY = 0;
-				}
-				if (!player.checkCollision(paredHitboxRight.dstRect) && !player.checkCollision(paredHitboxLeft.dstRect)) {
-					for (Cuadrado* c : obstaculos) {
-						if (player.direccion == 1) {
-							//ARRIBA
-
-						}
-						if (player.direccion == 3) {
-							//ABAJO
-
-						}
+				if (true) {
+					if (keyboard[SDL_SCANCODE_W]) {
+						player.direccion = 1;
+						player.update(0, -1);
 					}
-					player.update();
+					if (keyboard[SDL_SCANCODE_S]) {
+						player.direccion = 3;
+						player.update(0, 1);
+					}
+					if (keyboard[SDL_SCANCODE_A]) {
+						player.direccion = 0;
+						if(!player.checkCollision(paredHitboxLeft.dstRect)) player.update(-1, 0);
+					}
+					if (keyboard[SDL_SCANCODE_D]) {
+						player.direccion = 2;
+						if (!player.checkCollision(paredHitboxRight.dstRect)) player.update(1, 0);
+					}
+					/*for (Cuadrado* o : obstaculos) {
+						if(player.checkCollision(o->dstRect)){
+							if (player.dstRect->x + player.dstRect->w > o->dstRect->x && player.dstRect->x < o->dstRect->x + o->dstRect->w) {
+								if (player.direccion == 1) {
+									//ARRIBA
+									player.dY == 0;
+									break;
+								}
+								if (player.direccion == 3) {
+									//ABAJO
+									player.dY == 0;
+									player.dstRect->y -= camera.sY;
+									break;
+								}
+							}
+							if (player.dstRect->y > + player.dstRect->h > o->dstRect->y && player.dstRect->y < o->dstRect->y + o->dstRect->h) {
+								if (player.direccion == 0) {
+									//IZQUIERDA
+									player.dX == 0;
+									break;
+								}
+								if (player.direccion == 2) {
+									//DERECHA
+									player.dX == 0;
+									break;
+								}
+							}
+						}
+					}*/
 				}
 				if (player.checkCollision(horda.dstRect)) {
 					player.damage();
 					player.dstRect->y -= horda.dstRect->h + 10;
 				}
-				if ((SDL_GetTicks() / 16) % 150 == 0) for (int i = 0; i < 4; i++) {
+				if ((SDL_GetTicks() / 16) % 200 == 0) for (int i = 0; i < 2; i++) {
 					Rupia* rupia = new Rupia();
-					rupia->tipus = i+1;
+					rupia->tipus = 1;
+					rupia->valor = 1;
 					rupia->img = images.get("rupia" + std::to_string(rupia->tipus));
-					rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-150, -50), 30, 30 });
+					rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 55, 55 });
 					rupias.push_back(rupia);
 				}
-				if((SDL_GetTicks() / 16) % 100 == 0) for (int i = 1; i <= R_NUM(2, 4); i++) {
-						Gallina* gallina = new Gallina();
-						gallina->tipus = R_NUM(1, player.gallinasDesbloqueadas);
-						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-150, -50), 40, 40 });
+				if ((SDL_GetTicks() / 16) % 350 == 0) for (int i = 0; i < 1; i++) {
+					Rupia* rupia = new Rupia();
+					rupia->tipus = R_NUM(2, 4);
+					rupia->valor = 3;
+					rupia->img = images.get("rupia" + std::to_string(rupia->tipus));
+					rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 55, 55 });
+					rupias.push_back(rupia);
+				}
+				if ((SDL_GetTicks() / 16) % 150 == 0) {
+					Gallina* gallina = new Gallina();
+					gallina->tipus = 1;
+					gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+					gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+					gallinas.push_back(gallina);
+					gallina = new Gallina();
+					if (player.brownComprada) {
+						gallina->tipus = 2;
+						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
 						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
 						gallinas.push_back(gallina);
-
+					}
+					if (player.azulComprada) {
+						gallina = new Gallina();
+						gallina->tipus = 3;
+						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+						gallinas.push_back(gallina);
+					}
+					if (player.darkComprada) {
+						gallina = new Gallina();
+						gallina->tipus = 4;
+						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+						gallinas.push_back(gallina);
+					}
+					if (player.goldenComprada) {
+						gallina = new Gallina();
+						gallina->tipus = 5;
+						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+						gallinas.push_back(gallina);
+					}
 				}
 				if ((SDL_GetTicks() / 16) % 300 == 0) for (int i = 1; i < 2; i++) {
 					Gallina* gallina = new Gallina();
@@ -501,28 +558,33 @@ void Game::update() {
 					gallina->sY = -5;
 					gallinas.push_back(gallina);
 				}
-				if ((SDL_GetTicks() / 16) % 100 == 0) for (int i = 1; i <= R_NUM(2, 4); i++) {
+				if ((SDL_GetTicks() / 16) % 300 == 0) for (int i = 0; i <= R_NUM(0, 1); i++) {
 					Cuadrado* arbol = new Cuadrado();
 					arbol->sX = 0;
 					arbol->sY = camera.sY;
 					arbol->img = images.get("arbol" + std::to_string(R_NUM(1, 4)));
-					arbol->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), -50, 40, 40 });
-					obstaculos.push_back(arbol);
+					arbol->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), -150 * R_NUM(1, 3), 40, 40 });
+					SDL_QueryTexture(arbol->img, NULL, NULL, &arbol->dstRect->w, &arbol->dstRect->h);
+					arbol->dstRect->w *= (35 / 10);
+					arbol->dstRect->h *= (35 / 10);
+					arboles.push_back(arbol);
 				}
-				if ((SDL_GetTicks() / 16) % 100 == 0) for (int i = 1; i <= R_NUM(2, 4); i++) {
+				if ((SDL_GetTicks() / 16) % 250 == 0) for (int i = 0; i <= R_NUM(1, 2); i++) {
 					Cuadrado* roca = new Cuadrado();
 					roca->sX = 0;
 					roca->sY = camera.sY;
 					roca->img = images.get("roca" + std::to_string(R_NUM(1, 4)));
-					roca->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), -150, 40, 40 });
-					obstaculos.push_back(roca);
+					roca->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-450, -150), 40, 40 });
+					roca->dstRect->x *= (15 / 10);
+					roca->dstRect->y *= (15 / 10);
+					rocas.push_back(roca);
 				}
 				for (Rupia* r : rupias) {
 					r->update(0, 1);
 					if (player.checkCollision(r->dstRect)) {
 						r->disposable = true; 
 						if (!muted) Mix_PlayChannel(-1, sfxs.get("SMoneda"), 0);
-						dinerotemporal += 1 + 5 * (r->tipus - 1);
+						dineroTemporal += r->valor;
 					}
 				}
 				for (Gallina* g : gallinas) {
@@ -532,11 +594,18 @@ void Game::update() {
 						if(!god) player.damage();
 					}
 				}
-				for (Cuadrado* o : obstaculos) {
-					o->update();
-					if (player.checkCollision(o->dstRect)) {
+				for (Cuadrado* r : rocas) {
+					r->update();
+					if (player.checkCollision(r->dstRect)) {
 						cambiaEscena(GAMEOVER);
-						dinerotemporal = 0;
+						dineroTemporal = 0;
+					}
+				}
+				for (Cuadrado* a : arboles) {
+					a->update();
+					if (player.checkCollision(a->dstRect)) {
+						cambiaEscena(GAMEOVER);
+						dineroTemporal = 0;
 					}
 				}
 				for (Cuadrado* f : flechas) {
@@ -546,7 +615,7 @@ void Game::update() {
 							if (!muted) Mix_PlayChannel(-1, sfxs.get("muerteGallina"), 0);
 							g->disposable = true;
 							f->disposable = true;
-							dinerotemporal += R_NUM(0, g->tipus * 2);
+							dineroTemporal += R_NUM(0, g->tipus * 2);
 						}
 					}
 				}
@@ -561,7 +630,24 @@ void Game::update() {
 		case PAUSA:
 			break;
 		case CREDITS:
-			creditos.update(0, -1);
+			if (!creditsShown) {
+				creditos.update(0, -1);
+				if (creditos.dstRect->y < -creditos.dstRect->h) {
+					creditsShown = true;
+				}
+			}
+			if (!ostrichShown && creditsShown) {
+				//avestruz.update(0, -1);
+				//if (avestruz.dstRect->y < -avestruz.dstRect->h) {
+					ostrichShown = true;
+				//}
+			}
+			if (ostrichShown && creditsShown) {
+				continuara.update(0, -1);
+				if (continuara.dstRect->y < -continuara.dstRect->h) {
+					cambiaEscena(MENU);
+				}
+			}
 			break;
 	}
 }
@@ -623,7 +709,8 @@ void Game::draw() {
 			if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) player.animateX();
 			if (!paused) player.animateY();
 			for (Rupia* r : rupias) r->draw();
-			for (Cuadrado* o : obstaculos) o->draw();
+			for (Cuadrado* r : rocas) r->draw();
+			for (Cuadrado* a : arboles) a->draw();
 			for (Gallina* g : gallinas) {
 				g->draw();
 				if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) g->animateX();
@@ -634,7 +721,7 @@ void Game::draw() {
 			paredHitboxRight.draw();
 			for (int i = 0; i < 3; i++) player.corazones[i].draw();
 			SDL_RenderCopy(renderer, images.get("rupia1"), NULL, new SDL_Rect({ WINDOW_W - 60, 90, 40, 40 }));
-			num = std::to_string(dinerotemporal);
+			num = std::to_string(dineroTemporal);
 			for (int i = num.length() - 1; i >= 0; i--) {
 				s = "n";
 				s.append(1, num[i]);
@@ -712,16 +799,21 @@ void Game::draw() {
 			break;
 		case CREDITS:
 			creditos.draw();
+			continuara.draw();
 			break;
 	}
 	SDL_RenderPresent(renderer);
 }
 
 void Game::destroy() {
-	obstaculos.erase(std::remove_if(obstaculos.begin(), obstaculos.end(), [](const Cuadrado* o) {
+	arboles.erase(std::remove_if(arboles.begin(), arboles.end(), [](const Cuadrado* o) {
 		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
 		return o->disposable || temp;
-	}), obstaculos.end());
+	}), arboles.end());
+	rocas.erase(std::remove_if(rocas.begin(), rocas.end(), [](const Cuadrado* o) {
+		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
+		return o->disposable || temp;
+	}), rocas.end());
 	rupias.erase(std::remove_if(rupias.begin(), rupias.end(), [](const Cuadrado* o) {
 		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
 		return o->disposable || temp;
