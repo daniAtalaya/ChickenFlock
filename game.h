@@ -19,6 +19,7 @@ class Game {
 		static bool paused;
 		SDL_Rect* mouse = new SDL_Rect({1, 1, 10, 10});
 		static Escena escena;
+		int partidesJugades = 0;
 		bool isOpen = false;
 		bool isClicking = false;
 		static SDL_Renderer* renderer;
@@ -61,7 +62,7 @@ class Game {
 		SDL_Window* window;
 		const Uint8* keyboard;
 		Almacen<Mix_Chunk*> sfxs;
-		//Avestruz avestruz;
+		Avestruz avestruz;
 		std::vector<Rupia*> rupias;
 		Almacen<Mix_Music*> tracks;
 		Almacen<SDL_Texture*> images;
@@ -73,7 +74,6 @@ class Game {
 		Cuadrado paredHitboxRight;
 		Cuadrado creditos;
 		Cuadrado continuara;
-		Cuadrado avestruz;
 		//Avestruz avestruz;
 		//Cuadrado rioHitboxLeft;
 		//Cuadrado rioHitboxRight;

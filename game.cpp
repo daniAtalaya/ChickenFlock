@@ -67,16 +67,18 @@ void Game::init() {
 	botonHardcore.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 410, 750, 330, 100 });
 	botonCreditos.dstRect = new SDL_Rect({ WINDOW_W - 410, 750, 330, 100 });
 	creditos.dstRect = new SDL_Rect({ 75, (WINDOW_H * 15 / 10), WINDOW_W - 150, WINDOW_H * 16 / 10 });
-	creditos.sY = 3;
+	creditos.sY = 2;
 	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
 	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
 	SDL_QueryTexture(images.get("mapa3"), NULL, NULL, NULL, &nivel.dstRect->h);
 	camera.srcRect = new SDL_Rect({ 0, nivel.dstRect->h - WINDOW_H, WINDOW_W, WINDOW_H});
 	horda.dstRect = new SDL_Rect({ 130, WINDOW_H, 0, 0 });
 	continuara.img = images.get("continuara");
-	continuara.dstRect = new SDL_Rect({ WINDOW_H/2 -350, (WINDOW_H * 15 / 10), 250*3 , 200*3 });
-	avestruz.img = images.get("avestruz");
-	avestruz.dstRect = new SDL_Rect({ WINDOW_H / 2 - 350, (WINDOW_H * 15 / 10), 200, 200 });
+	continuara.sY = 6;
+	avestruz.sY = 1;
+	continuara.dstRect = new SDL_Rect({ WINDOW_H/2 -325, (WINDOW_H * 15 / 10), 700 , 450 });
+	avestruz.init(images.get("avestruz"));
+	avestruz.dstRect = new SDL_Rect({ WINDOW_H / 2 - 100, (WINDOW_H * 15 / 10), 200, 200 });
 	player.init(images.get("link"));
 	SDL_QueryTexture(images.get("horda"), NULL, NULL, &horda.dstRect->w, &horda.dstRect->h);
 	horda.dstRect->y = WINDOW_H - horda.dstRect->h;
@@ -229,7 +231,6 @@ void Game::input() {
 						event.key.keysym.sym == SDLK_SPACE
 						) && escena == GUANYAT) cambiaEscena(CREDITS);
 					if (event.key.keysym.sym == SDLK_t && escena == MENU) cambiaEscena(TIENDA);
-					if (event.key.keysym.sym == SDLK_h) camera.srcRect->y = 100;
 					if (event.key.keysym.sym == SDLK_F1) god = !god;
 					if (event.key.keysym.sym == SDLK_m) {
 						mute();
@@ -332,8 +333,9 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 		default:
 			break;
 	}
-	
-	if(escena == PAUSA && nuevaEscena == MENU) hardMode = false;
+	if (escena == MENU && nuevaEscena == LORE) partidesJugades++;
+	//std::cout << partidesJugades << std::endl;
+	if (escena == PAUSA && nuevaEscena == MENU) hardMode = false;
 	escena = nuevaEscena;
 	switch (nuevaEscena) {
 		if (escena != LORE && escena != PAUSA) while (Mix_PlayingMusic()) Mix_HaltMusic();
@@ -691,6 +693,8 @@ void Game::update() {
 			if (ostrichShown && creditsShown) {
 				continuara.update(0, -1);
 				if (continuara.dstRect->y < -continuara.dstRect->h) {
+					creditsShown = false;
+					ostrichShown = false;
 					cambiaEscena(MENU);
 				}
 			}
@@ -762,6 +766,7 @@ void Game::draw() {
 				if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) g->animateX();
 				if ((SDL_GetTicks() / 16) % 200 * g->spritesheet.maxC == 0 && !paused) g->animateY();
 			}
+			if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) pajaro.animateX();
 			player.draw();
 			paredHitboxLeft.draw();
 			paredHitboxRight.draw();
@@ -780,8 +785,7 @@ void Game::draw() {
 				}
 			}
 			for (Cuadrado* f : flechas) f->draw();
-			//dstRect->x = WINDOW_W - 60 - i * 50;
-
+			
 			break;
 		case GAMEOVER:
 			camera.sY = 0;
@@ -845,34 +849,45 @@ void Game::draw() {
 			break;
 		case CREDITS:
 			creditos.draw();
-			continuara.draw();
 			avestruz.draw();
+			if ((SDL_GetTicks() / 16) % 20 == 0) avestruz.animateX();
+			continuara.draw();
 			break;
 	}
 	SDL_RenderPresent(renderer);
 }
 
 void Game::destroy() {
+	//std::cout << "Arboles antes: " + arboles.size() << std::endl;
 	arboles.erase(std::remove_if(arboles.begin(), arboles.end(), [](const Cuadrado* o) {
 		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
 		return o->disposable || temp;
 	}), arboles.end());
+	//std::cout << "Arboles despues: " + arboles.size() << std::endl;
+	//std::cout << "Rocas antes: " + rocas.size() << std::endl;
 	rocas.erase(std::remove_if(rocas.begin(), rocas.end(), [](const Cuadrado* o) {
 		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
 		return o->disposable || temp;
 	}), rocas.end());
+	//std::cout << "Rocas despues: " + rocas.size() << std::endl;
+	//std::cout << "Rupias antes: " + rupias.size() << std::endl;
 	rupias.erase(std::remove_if(rupias.begin(), rupias.end(), [](const Cuadrado* o) {
 		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
 		return o->disposable || temp;
 	}), rupias.end());
+	//std::cout << "Rupias despues: " + rupias.size() << std::endl;
+	//std::cout << "Gallinas antes: " + gallinas.size() << std::endl;
 	gallinas.erase(std::remove_if(gallinas.begin(), gallinas.end(), [](const Cuadrado* o) {
 		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
 		return o->disposable || temp;
 	}), gallinas.end());
+	//std::cout << "Gallinas despues: " + gallinas.size() << std::endl;
+	//std::cout << "Flechas antes: " + flechas.size() << std::endl;
 	flechas.erase(std::remove_if(flechas.begin(), flechas.end(), [](const Cuadrado* o) {
 		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y < -o->dstRect->h || o->dstRect->y > WINDOW_H + o->dstRect->h;
 		return o->disposable || temp;
 	}), flechas.end());
+	//std::cout << "Flechas despues: " + flechas.size() << std::endl;
 }
 
 void Game::loop() {
