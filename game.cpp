@@ -160,6 +160,7 @@ bool Game::load() {
 	if (!images.load("tiendalore6", "Tiendalore_6.png")) return false;
 	if (!images.load("tiendalore7", "Tiendalore_7.png")) return false;
 	if (!images.load("tiendalore8", "Tiendalore_8.png")) return false;
+	if (!images.load("tiendalore9", "Tiendalore_9.png")) return false;
 	if (!images.load("n0", "0.png")) return false;
 	if (!images.load("n1", "1.png")) return false;
 	if (!images.load("n2", "2.png")) return false;

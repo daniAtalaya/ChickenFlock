@@ -1,5 +1,5 @@
 ﻿  game.cpp
 C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(12,2): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
-C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(725,4): warning C4267: 'inicializando': conversión de 'size_t' a 'int'; posible pérdida de datos
-C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(779,4): warning C4267: 'inicializando': conversión de 'size_t' a 'int'; posible pérdida de datos
+C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(737,4): warning C4267: 'inicializando': conversión de 'size_t' a 'int'; posible pérdida de datos
+C:\Users\lapiz\OneDrive\Documentos\GitHub\game.cpp(791,4): warning C4267: 'inicializando': conversión de 'size_t' a 'int'; posible pérdida de datos
   SDLHW.vcxproj -> C:\Users\lapiz\OneDrive\Documentos\GitHub\x64\Debug\SDLHW.exe
