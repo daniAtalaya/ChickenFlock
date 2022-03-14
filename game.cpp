@@ -600,7 +600,7 @@ void Game::update() {
 					g->update();
 					if (player.checkCollision(g->dstRect)) {
 						g->disposable = true;
-						if (!muted) Mix_PlayChannel(-1, sfxs.get("dañoQueja"), 0);
+						if (!muted) Mix_PlayChannel(-1, sfxs.get("dañoGallina"), 0);
 						if(!god) player.damage();
 					}
 				}
