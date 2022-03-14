@@ -108,6 +108,7 @@ bool Game::load() {
 	if (!images.load("studio", "studio.png")) return false;
 	if (!images.load("horda", "horda.png")) return false;
 	if (!images.load("flecha", "flecha.png")) return false;
+	if (!images.load("flechab", "flecha_b.png")) return false;
 	if (!images.load("start", "start.png")) return false;
 	if (!images.load("back", "back.png")) return false;
 	if (!images.load("gameoverT", "gameoverT.png")) return false;
@@ -218,12 +219,15 @@ void Game::input() {
 						Cuadrado* flecha = new Cuadrado();
 						flecha->img = images.get("flecha");
 						if (player.direccion == 1) {
+						
 							flecha->sX = 0;
 							flecha->sY = -5;
 						}
 						if (player.direccion == 3) {
+
+							flecha->img = images.get("flechab");
 							flecha->sX = 0;
-							flecha->sY = 5;
+							flecha->sY = 6;
 						}
 						SDL_Rect* origin = new SDL_Rect({ player.dstRect->x + 15, player.direccion == 3 ? (player.dstRect->y + player.dstRect->h + 5) : (player.dstRect->y - 5) , 30, 60 });
 						flecha->dstRect = origin;
@@ -315,6 +319,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			break;
 		case MENU:
 			Mix_PlayMusic(tracks.get("Menu"), -1);
+			dinerotemporal = 0;
 			break;
 		case LORE:
 			Mix_PlayMusic(tracks.get("Gameplay"), -1);
@@ -328,6 +333,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			break;
 		case GAMEOVER:
 			Mix_PlayMusic(tracks.get("Game Over"), 1);
+			dinerotemporal = 0;
 			break;
 		case GUANYAT:
 			break;
@@ -413,9 +419,7 @@ void Game::update() {
 					for (Rupia* r : rupias) r->disposable = true;
 					endingReached = true;
 					horda.dstRect->h = 0;
-					avestruz = Avestruz();
-					avestruz.init(images.get("avestruz"));
-					avestruz.dstRect = new SDL_Rect({ WINDOW_W / 2 - 62, 500, 125, 125 });
+					player.money += dinerotemporal;
 
 				}
 				
@@ -490,7 +494,7 @@ void Game::update() {
 					r->update(0, 1);
 					if (player.checkCollision(r->dstRect)) {
 						r->disposable = true;
-						player.money += 1 + 5 * (r->tipus - 1);
+						dinerotemporal += 1 + 5 * (r->tipus - 1);
 					}
 				}
 				for (Gallina* g : gallinas) {
@@ -507,7 +511,7 @@ void Game::update() {
 						if (f->checkCollision(g->dstRect)) {
 							g->disposable = true;
 							f->disposable = true;
-							player.money += R_NUM(0, g->tipus * 2);
+							dinerotemporal += R_NUM(0, g->tipus * 2);
 						}
 					}
 				}
@@ -592,7 +596,7 @@ void Game::draw() {
 			player.draw();
 			for (int i = 0; i < 3; i++) player.corazones[i].draw();
 			SDL_RenderCopy(renderer, images.get("rupia1"), NULL, new SDL_Rect({ WINDOW_W - 60, 90, 40, 40 }));
-			num = std::to_string(player.money);
+			num = std::to_string(dinerotemporal);
 			for (int i = num.length() - 1; i >= 0; i--) {
 				s = "n";
 				s.append(1, num[i]);
