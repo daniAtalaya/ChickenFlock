@@ -54,9 +54,9 @@ void Game::init() {
 	paredHitboxLeft.dstRect = new SDL_Rect({ 1, 1, 150, 8100 });
 	paredHitboxRight.dstRect = new SDL_Rect({ 810, 1, 150, 8100 });
 	rioHitboxLeft = (Cuadrado());
-	rioHitboxLeft.dstRect = new SDL_Rect({ 150, 1, 210, 300 });
+	rioHitboxLeft.dstRect = new SDL_Rect({ 150, -300, 210, 300 });
 	rioHitboxRight = (Cuadrado());
-	rioHitboxRight.dstRect = new SDL_Rect({ 600, 1, 210, 300 });
+	rioHitboxRight.dstRect = new SDL_Rect({ 600, -300, 210, 300 });
 	botonSonido.img = images.get("soundOn");
 	botonSonido.dstRect = new SDL_Rect({ 10, 20, 100, 100 });
 	botonPlay.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
@@ -66,7 +66,7 @@ void Game::init() {
 	botonCompraAzul.dstRect = new SDL_Rect({535, 320, 130, 40 });
 	botonCompraGolden.dstRect = new SDL_Rect({535, 540, 130, 40 });
 	botonCompraDark.dstRect = new SDL_Rect({ 320, 540, 130, 40 });
-	botonCompraBrown.dstRect = new SDL_Rect({ 540, 320, 130, 40 });
+	botonCompraBrown.dstRect = new SDL_Rect({ 320, 320, 130, 40 });
 	botonHardcore.dstRect = new SDL_Rect({ 310, 750, 330, 100 });
 	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
 	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
@@ -134,7 +134,6 @@ bool Game::load() {
 	if (!images.load("lore11", "lore11.png")) return false;
 	if (!images.load("lore12", "lore12.png")) return false;
 	if (!images.load("lore13", "lore13.png")) return false; 
-<<<<<<< Updated upstream
 	if (!images.load("tiendalore1", "Tiendalore_1.png")) return false;
 	if (!images.load("tiendalore2", "Tiendalore_2.png")) return false;
 	if (!images.load("tiendalore3", "Tiendalore_3.png")) return false;
@@ -143,16 +142,6 @@ bool Game::load() {
 	if (!images.load("tiendalore6", "Tiendalore_6.png")) return false;
 	if (!images.load("tiendalore7", "Tiendalore_7.png")) return false;
 	if (!images.load("tiendalore8", "Tiendalore_8.png")) return false;
-=======
-	if (!images.load("tiendalore1", "tiendalore_1.png")) return false;
-	if (!images.load("tiendalore2", "tiendalore_2.png")) return false;
-	if (!images.load("tiendalore3", "tiendalore_3.png")) return false;
-	if (!images.load("tiendalore4", "tiendalore_4.png")) return false;
-	if (!images.load("tiendalore5", "tiendalore_5.png")) return false;
-	if (!images.load("tiendalore6", "tiendalore_6.png")) return false;
-	if (!images.load("tiendalore7", "tiendalore_7.png")) return false;
-	if (!images.load("tiendalore8", "tiendalore_8.png")) return false;
->>>>>>> Stashed changes
 	if (!images.load("n0", "0.png")) return false;
 	if (!images.load("n1", "1.png")) return false;
 	if (!images.load("n2", "2.png")) return false;
@@ -479,20 +468,17 @@ void Game::draw() {
 			camera.draw();
 			botonSonido.draw();
 			botonPlay.draw();
-			/*if (camera.srcRect->y == 5800)
+			if (camera.srcRect->y <= 6046)
 			{
 				rioHitboxLeft.draw();
-				rioHitboxRight.draw();
-			}*/
-			if (camera.srcRect->y <= 5768)
-			{
-				
-				rioHitboxLeft.draw();
-				rioHitboxLeft.sY = camera.sY;
 				rioHitboxLeft.update(0, 1);
 				rioHitboxRight.draw();
-				rioHitboxRight.sY = camera.sY;
 				rioHitboxRight.update(0, 1);
+			}
+			if (camera.srcRect->y <= 6030)
+			{
+				rioHitboxLeft.sY = camera.sY;
+				rioHitboxRight.sY = camera.sY;
 			}
 			if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) player.animateX();
 			if (!paused) player.animateY();
