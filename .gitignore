@@ -24,9 +24,11 @@
 *.la
 *.a
 
+*.pdb
 # Executables
 *.exe
 *.out
 *.app
 
 .vs/
+*.ilk

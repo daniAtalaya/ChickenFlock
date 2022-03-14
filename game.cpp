@@ -30,13 +30,6 @@ Game::Game() {
 	init();
 	SDL_ShowWindow(window);
 	SDL_GetMouseState(&mouse->x, &mouse->y);
-	for (int i = 1; i <= 5; i++) {
-		Gallina* gallina = new Gallina();
-		gallina->tipus = R_NUM(1, player.gallinasDesbloqueadas);
-		gallina->dstRect = new SDL_Rect({ 500, 50 * i, 40, 40 });
-		gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
-		gallinas.push_back(gallina);
-	}
 	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 }
 
@@ -209,6 +202,7 @@ void Game::input() {
 					if (event.key.keysym.sym == SDLK_m) {
 						mute();
 					}
+					if (event.key.keysym.sym == SDLK_b) cambiaEscena(GUANYAT);
 					if (event.key.keysym.sym == SDLK_p) {
 						pause();
 					}
@@ -334,6 +328,24 @@ void Game::update() {
 		if (botonBack.isClicked(mouse) && (escena == PAUSA || escena == TIENDA)) cambiaEscena(MENU);
 		else if (botonShop.isClicked(mouse) && escena == MENU) cambiaEscena(TIENDA);
 		if (botonPlay.isClicked(mouse)) pause();
+		if (escena == TIENDA) {
+			if (botonCompraBrown.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.brownComprada && player.money >= 30) {
+				player.money -= 30;
+				player.brownComprada = true;
+			}
+			if (botonCompraAzul.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.azulComprada && player.money >= 70) {
+				player.money -= 70;
+				player.azulComprada = true;
+			}
+			if (botonCompraDark.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.darkComprada && player.money >= 100) {
+				player.money -= 100;
+				player.azulComprada = true;
+			}
+			if (botonCompraGolden.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.goldenComprada && player.money >= 150) {
+				player.money -= 150;
+				player.azulComprada = true;
+			}
+		}
 		isClicking = false;
 	}
 	switch (escena) {
@@ -346,43 +358,60 @@ void Game::update() {
 		case JOC:
 			if (keyboard[SDL_SCANCODE_Y]) camera.update();
 			if (keyboard[SDL_SCANCODE_J]) camera.srcRect->y += camera.sY;
-			if (player.vides == 0) cambiaEscena(GAMEOVER);
+			if (player.vides <= 0) cambiaEscena(GAMEOVER);
 			if(!paused){
 				if (camera.srcRect->y > 0) {
 					camera.update();
 					std::cout << "Y = " << camera.srcRect->y << std::endl;
 				} else {
 					std::cout << "FI DEL NIVELL!!" << std::endl;
+					horda.dstRect->h = 0;
+
 				}
 				if (keyboard[SDL_SCANCODE_W]) {
 					player.direccion = 1;
-					player.update(0, -1);
+					if (!player.checkCollision(paredHitboxLeft.dstRect) && !player.checkCollision(paredHitboxRight.dstRect)) player.update(0, -1);
 				}
 				if (keyboard[SDL_SCANCODE_S]) {
 					player.direccion = 3;
-					player.update(0, 1);
+					if (!player.checkCollision(paredHitboxLeft.dstRect) && !player.checkCollision(paredHitboxRight.dstRect)) player.update(0, 1);
 				}
 				if (keyboard[SDL_SCANCODE_A]) {
 					player.direccion = 0;
-					if (!player.checkCollision(paredHitboxLeft.dstRect)) player.update(-1, 0);
+					if (!player.checkCollision(paredHitboxLeft.dstRect) && !player.checkCollision(paredHitboxRight.dstRect)) player.update(-1, 0);
 				}
 				if (keyboard[SDL_SCANCODE_D]) {
 					player.direccion = 2;
-					if(!player.checkCollision(paredHitboxRight.dstRect)) player.update(1, 0);
+					if (!player.checkCollision(paredHitboxLeft.dstRect) && !player.checkCollision(paredHitboxRight.dstRect)) player.update(1, 0);
 				}
 				if (player.checkCollision(horda.dstRect)) {
 					player.damage();
 					player.dstRect->y -= horda.dstRect->h + 10;
 				}
+				if ((SDL_GetTicks() / 16) % 150 == 0) for (int i = 0; i < R_NUM(2, 4); i++)
+				{
+					Rupia* rupia = new Rupia();
+					rupia->tipus = i;
+					rupia->img = images.get("rupia" + std::to_string(i));
+					rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-150, -50), 50, 50 });
+					rupias.push_back(rupia);
+				}
+				if((SDL_GetTicks() / 16) % 100 == 0) for (int i = 1; i <= R_NUM(3, 5); i++) {
+						Gallina* gallina = new Gallina();
+						gallina->tipus = R_NUM(1, player.gallinasDesbloqueadas);
+						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), 40, 40 });
+						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+						gallinas.push_back(gallina);
+				}
 				for (Rupia* r : rupias) {
 					r->update(R_NUM(-1, 1), 1);
 					if (player.checkCollision(r->dstRect)) {
 						r->disposable = true;
-						player.money += pow(5, r->tipus-1);
+						player.money += 1 + 5 * (r->tipus - 1);
 					}
 				}
 				for (Gallina* g : gallinas) {
-					//g->update(R_NUM(-1, 1), 1);
+					g->update(R_NUM(-1, 1), 1);
 					if (player.checkCollision(g->dstRect)) {
 						g->disposable = true;
 						player.damage();
@@ -405,22 +434,6 @@ void Game::update() {
 		case GUANYAT:
 			break;
 		case TIENDA:
-			if (botonCompraBrown.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.brownComprada && player.money >= 30) {
-				player.money -= 30;
-				player.brownComprada = true;
-			}
-			if (botonCompraAzul.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.azulComprada && player.money >= 70) {
-				player.money -= 70;
-				player.azulComprada = true;
-			}
-			if (botonCompraDark.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.darkComprada && player.money >= 100) {
-				player.money -= 100;
-				player.azulComprada = true;
-			}
-			if (botonCompraGolden.isClicked(mouse)) if (player.gallinasDesbloqueadas <= 5 && !player.goldenComprada && player.money >= 150) {
-				player.money -= 150;
-				player.azulComprada = true;
-			}
 			break;
 		case PAUSA:
 			break;
@@ -548,6 +561,13 @@ void Game::draw() {
 			botonCompraBrown.draw();
 			botonBack.draw();
 			botonSonido.draw();
+			SDL_RenderCopy(renderer, images.get("rupia1"), NULL, new SDL_Rect({ WINDOW_W - 60, 90, 40, 40 }));
+			num = std::to_string(player.money);
+			for (int i = num.length() - 1; i >= 0; i--) {
+				s = "n";
+				s.append(1, num[i]);
+				SDL_RenderCopy(renderer, images.get(s), NULL, new SDL_Rect({ WINDOW_W - 80 - ((int)num.length() - i) * 30, 88, 35, 40 }));
+			}
 			break;
 		case PAUSA:
 			camera.draw();
