@@ -74,8 +74,9 @@ void Game::init() {
 	camera.srcRect = new SDL_Rect({ 0, nivel.dstRect->h - WINDOW_H, WINDOW_W, WINDOW_H});
 	horda.dstRect = new SDL_Rect({ 130, WINDOW_H, 0, 0 });
 	continuara.img = images.get("continuara");
-	continuara.dstRect = new SDL_Rect({ 75, (WINDOW_H * 15 / 10), WINDOW_W - 150, WINDOW_H * 16 / 10 });
-	SDL_QueryTexture(images.get("continuara"), NULL, NULL, NULL, &continuara.dstRect->h);
+	continuara.dstRect = new SDL_Rect({ WINDOW_H/2 -350, (WINDOW_H * 15 / 10), 250*3 , 200*3 });
+	avestruz.img = images.get("avestruz");
+	avestruz.dstRect = new SDL_Rect({ WINDOW_H / 2 - 350, (WINDOW_H * 15 / 10), 200, 200 });
 	player.init(images.get("link"));
 	SDL_QueryTexture(images.get("horda"), NULL, NULL, &horda.dstRect->w, &horda.dstRect->h);
 	horda.dstRect->y = WINDOW_H - horda.dstRect->h;
@@ -179,6 +180,7 @@ bool Game::load() {
 	if (!images.load("winner", "winner.png")) return false;
 	if (!images.load("tituloCockFlock", "tituloCockFlock.png")) return false;
 	if (!images.load("creditosBoton", "creditosBoton.png")) return false;
+	if (!images.load("avestruz", "avestruz.png")) return false;
 	
 	Mix_PlayMusic(tracks.get("Intro"), 1);
 	return true;
@@ -283,8 +285,6 @@ void Game::mute() {
 }
 
 void Game::cambiaEscena(Escena nuevaEscena) {
-	ostrichShown = true;
-	creditsShown = false;
 	switch (escena) {
 		case INICI:
 			break;
@@ -363,7 +363,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			botonBack.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
 			Mix_PlayMusic(tracks.get("Tienda"), -1);
 			player.dstRect->y = WINDOW_H - 120;
-			if (++loreTienda > 8) loreTienda = 1; 
+			if (++loreTienda > 9) loreTienda = 1; 
 			break;
 		case PAUSA:
 			break;
@@ -637,10 +637,10 @@ void Game::update() {
 				}
 			}
 			if (!ostrichShown && creditsShown) {
-				//avestruz.update(0, -1);
-				//if (avestruz.dstRect->y < -avestruz.dstRect->h) {
+				avestruz.update(0, -1);
+				if (avestruz.dstRect->y < -avestruz.dstRect->h) {
 					ostrichShown = true;
-				//}
+				}
 			}
 			if (ostrichShown && creditsShown) {
 				continuara.update(0, -1);
@@ -800,6 +800,7 @@ void Game::draw() {
 		case CREDITS:
 			creditos.draw();
 			continuara.draw();
+			avestruz.draw();
 			break;
 	}
 	SDL_RenderPresent(renderer);

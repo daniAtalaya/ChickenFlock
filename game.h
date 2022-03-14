@@ -60,7 +60,7 @@ class Game {
 		SDL_Window* window;
 		const Uint8* keyboard;
 		Almacen<Mix_Chunk*> sfxs;
-		Avestruz avestruz;
+		//Avestruz avestruz;
 		std::vector<Rupia*> rupias;
 		Almacen<Mix_Music*> tracks;
 		Almacen<SDL_Texture*> images;
@@ -72,6 +72,7 @@ class Game {
 		Cuadrado paredHitboxRight;
 		Cuadrado creditos;
 		Cuadrado continuara;
+		Cuadrado avestruz;
 		//Avestruz avestruz;
 		//Cuadrado rioHitboxLeft;
 		//Cuadrado rioHitboxRight;
