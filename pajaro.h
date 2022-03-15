@@ -10,7 +10,7 @@ class Pajaro : public Cuadrado {
 		bool isPresent = false;
 		Pajaro() {
 			Cuadrado::Cuadrado();
-			srcRect = NULL;
+			srcRect = new SDL_Rect();
 			dstRect = new SDL_Rect();
 		}
 		void init(SDL_Texture*);

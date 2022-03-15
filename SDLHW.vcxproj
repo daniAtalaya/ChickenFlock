@@ -157,6 +157,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="pajaro.cpp" />
+    <ClCompile Include="perro.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="rupia.cpp" />
     <ClCompile Include="spritesheet.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="general.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="pajaro.h" />
+    <ClInclude Include="perro.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="rupia.h" />
     <ClInclude Include="spritesheet.h" />

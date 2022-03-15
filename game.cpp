@@ -75,9 +75,15 @@ void Game::init() {
 	horda.dstRect = new SDL_Rect({ 130, WINDOW_H, 0, 0 });
 	continuara.img = images.get("continuara");
 	continuara.sY = 6;
+	pajaro.init(images.get("pajaro"));
+	pajaro.dstRect = new SDL_Rect({-200, R_NUM(0, WINDOW_H - 200), 70, 100 });
+	pajaro.sX = 8;
+	pajaro.sY = R_NUM(-4, 4);
 	avestruz.sY = 1;
 	continuara.dstRect = new SDL_Rect({ WINDOW_H/2 -325, (WINDOW_H * 15 / 10), 700 , 450 });
 	avestruz.init(images.get("avestruz"));
+	mascota.init(images.get("mascota"));
+	mascota.dstRect = new SDL_Rect({ (WINDOW_W / 2) + 150, 75, 200, 200});
 	avestruz.dstRect = new SDL_Rect({ WINDOW_H / 2 - 100, (WINDOW_H * 15 / 10), 200, 200 });
 	player.init(images.get("link"));
 	SDL_QueryTexture(images.get("horda"), NULL, NULL, &horda.dstRect->w, &horda.dstRect->h);
@@ -122,6 +128,7 @@ bool Game::load() {
 	if (!images.load("rupia3", "rupia3.png")) return false;
 	if (!images.load("rupia4", "rupia4.png")) return false;
 	if (!images.load("pajaro", "pajaro.png")) return false;
+	if (!images.load("mascota", "mascota.png")) return false;
 	if (!images.load("corazon", "corazon.png")) return false;
 	if (!images.load("corazont", "corazont.png")) return false;
 	if (!images.load("enter", "press_enter.png")) return false;
@@ -388,18 +395,16 @@ void Game::update() {
 	if (isClicking) {
 		if (botonSonido.isClicked(mouse)) mute();
 		else if (escena == LORE) cambiaEscena(JOC);
+		if (escena == JOC && partidesJugades % 2 == 0 && pajaro.checkCollision(mouse)) pajaro.dstRect->h = 0;
 		if (botonCreditos.isClicked(mouse) && escena == MENU) cambiaEscena(CREDITS);
 		if (botonBack.isClicked(mouse) && (escena == PAUSA || escena == TIENDA)) cambiaEscena(MENU);
 		else if (botonShop.isClicked(mouse) && escena == MENU) cambiaEscena(TIENDA);
-		if (botonHardcore.isClicked(mouse) && escena == MENU && !hardMode) {
-			hardMode = !hardMode;
-		}
-		if (
-			escena == MENU &&
+		if (botonHardcore.isClicked(mouse) && escena == MENU && !hardMode) hardMode = !hardMode;
+		if (escena == MENU &&
 			!botonShop.isClicked(mouse) &&
 			!botonSonido.isClicked(mouse) &&
 			!botonHardcore.isClicked(mouse)
-			) cambiaEscena(LORE);
+		) cambiaEscena(LORE);
 		if (escena == GUANYAT) cambiaEscena(CREDITS);
 		if (escena == GAMEOVER) cambiaEscena(MENU);
 		if (botonPlay.isClicked(mouse)) pause();
@@ -454,7 +459,6 @@ void Game::update() {
 					horda.dstRect->h = 0;
 					player.money += dineroTemporal;
 					cambiaEscena(GUANYAT);
-
 				}
 
 				//if (!player.checkCollision(rioHitboxRight.dstRect) && !player.checkCollision(rioHitboxLeft.dstRect)) 
@@ -505,124 +509,139 @@ void Game::update() {
 						}
 					}*/
 				}
+				if (partidesJugades % 2 == 0) {
+					pajaro.update();
+					if (pajaro.dstRect->x > WINDOW_W) {
+						pajaro.sX = -8;
+						pajaro.sY = R_NUM(-4, 4);
+						pajaro.dstRect->y = R_NUM(0, WINDOW_H - 200);
+					}
+					if (pajaro.dstRect->x < -pajaro.dstRect->w) {
+						pajaro.sX = 8;
+						pajaro.sY = R_NUM(-4, 4);
+						pajaro.dstRect->y = R_NUM(0, WINDOW_H - 200);
+					}
+				}
 				if (player.checkCollision(horda.dstRect)) {
 					player.damage();
 					player.dstRect->y -= horda.dstRect->h + 10;
 					if (!muted) Mix_PlayChannel(-1, sfxs.get("dañoGallina"), 0);
 				}
-				if ((SDL_GetTicks() / 16) % 200 == 0) for (int i = 0; i < 2; i++) {
-					Rupia* rupia = new Rupia();
-					rupia->tipus = 1;
-					rupia->valor = 1;
-					rupia->img = images.get("rupia" + std::to_string(rupia->tipus));
-					rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 55, 55 });
-					rupias.push_back(rupia);
-				}
-				if ((SDL_GetTicks() / 16) % 350 == 0) for (int i = 0; i < 1; i++) {
-					Rupia* rupia = new Rupia();
-					rupia->tipus = R_NUM(2, 4);
-					rupia->valor = 3;
-					rupia->img = images.get("rupia" + std::to_string(rupia->tipus));
-					rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 55, 55 });
-					rupias.push_back(rupia);
-				}
-				if ((SDL_GetTicks() / 16) % 150 == 0) {
-					Gallina* gallina = new Gallina();
-					gallina->tipus = 1;
-					gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
-					gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
-					gallinas.push_back(gallina);
-					gallina = new Gallina();
-					if (player.brownComprada) {
-						gallina->tipus = 2;
+				if (camera.srcRect->y > 900) {
+					if ((SDL_GetTicks() / 16) % 200 == 0) for (int i = 0; i < 2; i++) {
+						Rupia* rupia = new Rupia();
+						rupia->tipus = 1;
+						rupia->valor = 1;
+						rupia->img = images.get("rupia" + std::to_string(rupia->tipus));
+						rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 55, 55 });
+						rupias.push_back(rupia);
+					}
+					if ((SDL_GetTicks() / 16) % 350 == 0) for (int i = 0; i < 1; i++) {
+						Rupia* rupia = new Rupia();
+						rupia->tipus = R_NUM(2, 4);
+						rupia->valor = 3;
+						rupia->img = images.get("rupia" + std::to_string(rupia->tipus));
+						rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 55, 55 });
+						rupias.push_back(rupia);
+					}
+					if ((SDL_GetTicks() / 16) % 150 == 0) {
+						Gallina* gallina = new Gallina();
+						gallina->tipus = 1;
 						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
 						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
 						gallinas.push_back(gallina);
-					}
-					if (player.azulComprada) {
 						gallina = new Gallina();
-						gallina->tipus = 3;
-						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
-						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
-						gallinas.push_back(gallina);
+						if (player.brownComprada) {
+							gallina->tipus = 2;
+							gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+							gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+							gallinas.push_back(gallina);
+						}
+						if (player.azulComprada) {
+							gallina = new Gallina();
+							gallina->tipus = 3;
+							gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+							gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+							gallinas.push_back(gallina);
+						}
+						if (player.darkComprada) {
+							gallina = new Gallina();
+							gallina->tipus = 4;
+							gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+							gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+							gallinas.push_back(gallina);
+						}
+						if (player.goldenComprada) {
+							gallina = new Gallina();
+							gallina->tipus = 5;
+							gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+							gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+							gallinas.push_back(gallina);
+						}
 					}
-					if (player.darkComprada) {
-						gallina = new Gallina();
-						gallina->tipus = 4;
-						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
-						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
-						gallinas.push_back(gallina);
+					if ((SDL_GetTicks() / 16) % 100 == 0) {
+						Gallina* gallina = new Gallina();
+						tipoGallinaTrasera = R_NUM(1, 5);
+						if (tipoGallinaTrasera == 1) {
+							gallina->tipus = 1;
+							gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 });
+							gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+							gallina->sY = -5;
+							gallinas.push_back(gallina);
+						}
+						if (player.brownComprada && tipoGallinaTrasera == 2) {
+							gallina->tipus = 2;
+							gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 });
+							gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+							gallina->sY = -5;
+							gallinas.push_back(gallina);
+						}
+						if (player.azulComprada && tipoGallinaTrasera == 3) {
+							gallina = new Gallina();
+							gallina->tipus = 3;
+							gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 });
+							gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+							gallina->sY = -5;
+							gallinas.push_back(gallina);
+						}
+						if (player.darkComprada && tipoGallinaTrasera == 4) {
+							gallina = new Gallina();
+							gallina->tipus = 4;
+							gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 });
+							gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+							gallina->sY = -5;
+							gallinas.push_back(gallina);
+						}
+						if (player.goldenComprada && tipoGallinaTrasera == 5) {
+							gallina = new Gallina();
+							gallina->tipus = 5;
+							gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+							gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
+							gallina->sY = -5;
+							gallinas.push_back(gallina);
+						}
 					}
-					if (player.goldenComprada) {
-						gallina = new Gallina();
-						gallina->tipus = 5;
-						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
-						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
-						gallinas.push_back(gallina);
+					if ((SDL_GetTicks() / 16) % 300 == 0) for (int i = 0; i <= R_NUM(0, 1); i++) {
+						Cuadrado* arbol = new Cuadrado();
+						arbol->sX = 0;
+						arbol->sY = camera.sY;
+						arbol->img = images.get("arbol" + std::to_string(R_NUM(1, 4)));
+						arbol->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), -150 * R_NUM(1, 3), 40, 40 });
+						SDL_QueryTexture(arbol->img, NULL, NULL, &arbol->dstRect->w, &arbol->dstRect->h);
+						arbol->dstRect->w *= (35 / 10);
+						arbol->dstRect->h *= (35 / 10);
+						arboles.push_back(arbol);
 					}
-				}
-				if ((SDL_GetTicks() / 16) % 100 == 0) {
-					Gallina* gallina = new Gallina();
-					tipoGallinaTrasera = R_NUM(1, 5);
-					if (tipoGallinaTrasera==1) {
-					gallina->tipus = 1;
-					gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 });
-					gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
-					gallina->sY = -5;
-					gallinas.push_back(gallina);
+					if ((SDL_GetTicks() / 16) % 250 == 0) for (int i = 0; i <= R_NUM(0, 2); i++) {
+						Cuadrado* roca = new Cuadrado();
+						roca->sX = 0;
+						roca->sY = camera.sY;
+						roca->img = images.get("roca" + std::to_string(R_NUM(1, 4)));
+						roca->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-450, -150), 40, 40 });
+						roca->dstRect->x *= (15 / 10);
+						roca->dstRect->y *= (15 / 10);
+						rocas.push_back(roca);
 					}
-					if (player.brownComprada && tipoGallinaTrasera ==2) {
-						gallina->tipus = 2;
-						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 });
-						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
-						gallina->sY = -5;
-						gallinas.push_back(gallina);
-					}
-					if (player.azulComprada && tipoGallinaTrasera == 3) {
-						gallina = new Gallina();
-						gallina->tipus = 3;
-						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 });
-						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
-						gallina->sY = -5;
-						gallinas.push_back(gallina);
-					}
-					if (player.darkComprada && tipoGallinaTrasera == 4) {
-						gallina = new Gallina();
-						gallina->tipus = 4;
-						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 });
-						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
-						gallina->sY = -5;
-						gallinas.push_back(gallina);
-					}
-					if (player.goldenComprada && tipoGallinaTrasera == 5) {
-						gallina = new Gallina();
-						gallina->tipus = 5;
-						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
-						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
-						gallina->sY = -5;
-						gallinas.push_back(gallina);
-					}
-				}
-				if ((SDL_GetTicks() / 16) % 300 == 0) for (int i = 0; i <= R_NUM(0, 1); i++) {
-					Cuadrado* arbol = new Cuadrado();
-					arbol->sX = 0;
-					arbol->sY = camera.sY;
-					arbol->img = images.get("arbol" + std::to_string(R_NUM(1, 4)));
-					arbol->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), -150 * R_NUM(1, 3), 40, 40 });
-					SDL_QueryTexture(arbol->img, NULL, NULL, &arbol->dstRect->w, &arbol->dstRect->h);
-					arbol->dstRect->w *= (35 / 10);
-					arbol->dstRect->h *= (35 / 10);
-					arboles.push_back(arbol);
-				}
-				if ((SDL_GetTicks() / 16) % 250 == 0) for (int i = 0; i <= R_NUM(1, 2); i++) {
-					Cuadrado* roca = new Cuadrado();
-					roca->sX = 0;
-					roca->sY = camera.sY;
-					roca->img = images.get("roca" + std::to_string(R_NUM(1, 4)));
-					roca->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-450, -150), 40, 40 });
-					roca->dstRect->x *= (15 / 10);
-					roca->dstRect->y *= (15 / 10);
-					rocas.push_back(roca);
 				}
 				for (Rupia* r : rupias) {
 					r->update(0, 1);
@@ -644,15 +663,15 @@ void Game::update() {
 					r->update();
 					if (player.checkCollision(r->dstRect)) {
 						if (!muted) Mix_PlayChannel(-1, sfxs.get("dañoQueja"), 0);
-						cambiaEscena(GAMEOVER);
+						if(!hardMode) cambiaEscena(GAMEOVER);
 						dineroTemporal = 0;
 					}
 				}
 				for (Cuadrado* a : arboles) {
 					a->update();
-					if (player.checkCollision(a->dstRect)) {
+					if (player.checkCollision(a->dstRect) && !hardMode) {
 						if (!muted) Mix_PlayChannel(-1, sfxs.get("dañoQueja"), 0);
-						cambiaEscena(GAMEOVER);
+						if(!hardMode) cambiaEscena(GAMEOVER);
 						dineroTemporal = 0;
 					}
 				}
@@ -729,6 +748,11 @@ void Game::draw() {
 			SDL_RenderCopy(renderer, images.get("tituloCockFlock"), NULL, new SDL_Rect({ (WINDOW_W / 2) - 160, 50, w/2, h/2 }));
 			botonCreditos.draw();
 			if(!hardMode) botonHardcore.draw();
+			if (player.gallinasDesbloqueadas == 5) {
+				mascota.draw();
+				if ((SDL_GetTicks() / 16) % 20 == 0) mascota.animateX();
+				if ((SDL_GetTicks() / 16) % (100 * mascota.spritesheet.maxC) == 0 && !paused) mascota.animateY();
+			}
 			break;
 		case LORE:
 			camera.draw();
@@ -785,7 +809,10 @@ void Game::draw() {
 				}
 			}
 			for (Cuadrado* f : flechas) f->draw();
-			
+			if (partidesJugades % 2 == 0) {
+				pajaro.draw();
+				if ((SDL_GetTicks() / 16) % 20 == 0) pajaro.animateX();
+			}
 			break;
 		case GAMEOVER:
 			camera.sY = 0;

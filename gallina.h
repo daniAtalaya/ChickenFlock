@@ -14,7 +14,7 @@ class Gallina : public Cuadrado {
 		}
 		Gallina() {
 			Cuadrado::Cuadrado();
-			srcRect = NULL;
+			srcRect = new SDL_Rect();
 			dstRect = new SDL_Rect();
 		}
 		void init(SDL_Texture*);

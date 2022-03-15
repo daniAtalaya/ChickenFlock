@@ -9,6 +9,7 @@
 #include "enums.h"
 #include "pajaro.h"
 #include "avestruz.h"
+#include "perro.h"
 class Game {
 	public:
 		Game();
@@ -56,6 +57,7 @@ class Game {
 		Cuadrado nivel;
 		Cuadrado horda;
 		Pajaro pajaro;
+		Perro mascota;
 		Camera camera;
 		Player player;
 		SDL_Event event;

@@ -57,6 +57,9 @@
     <ClCompile Include="pajaro.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="perro.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -102,6 +105,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pajaro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="perro.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

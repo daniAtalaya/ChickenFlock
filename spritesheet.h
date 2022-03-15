@@ -1,7 +1,6 @@
 #pragma once
 #include "general.h"
-class SpriteSheet
-{
+class SpriteSheet {
 	public:
 		int frameW, frameH;
 		int textureW, textureH;
@@ -10,6 +9,5 @@ class SpriteSheet
 		int maxF;
 		SpriteSheet() {};
 		void setSpritesheet(SDL_Texture* img, int mF, int mC);
-		
 };
 
