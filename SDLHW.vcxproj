@@ -147,23 +147,27 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="almacen.cpp" />
+    <ClCompile Include="arbol.cpp" />
     <ClCompile Include="avestruz.cpp" />
     <ClCompile Include="button.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="color.cpp" />
     <ClCompile Include="corazon.cpp" />
     <ClCompile Include="cuadrado.cpp" />
+    <ClCompile Include="flecha.cpp" />
     <ClCompile Include="gallina.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="pajaro.cpp" />
     <ClCompile Include="perro.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="roca.cpp" />
     <ClCompile Include="rupia.cpp" />
     <ClCompile Include="spritesheet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="almacen.h" />
+    <ClInclude Include="arbol.h" />
     <ClInclude Include="avestruz.h" />
     <ClInclude Include="button.h" />
     <ClInclude Include="camera.h" />
@@ -171,12 +175,14 @@
     <ClInclude Include="corazon.h" />
     <ClInclude Include="cuadrado.h" />
     <ClInclude Include="enums.h" />
+    <ClInclude Include="flecha.h" />
     <ClInclude Include="gallina.h" />
     <ClInclude Include="general.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="pajaro.h" />
     <ClInclude Include="perro.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="roca.h" />
     <ClInclude Include="rupia.h" />
     <ClInclude Include="spritesheet.h" />
   </ItemGroup>

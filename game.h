@@ -10,6 +10,9 @@
 #include "pajaro.h"
 #include "avestruz.h"
 #include "perro.h"
+#include "arbol.h"
+#include "roca.h"
+#include "flecha.h"
 class Game {
 	public:
 		Game();
@@ -69,9 +72,9 @@ class Game {
 		Almacen<Mix_Music*> tracks;
 		Almacen<SDL_Texture*> images;
 		std::vector<Gallina*> gallinas;
-		std::vector<Cuadrado*> arboles;
-		std::vector<Cuadrado*> rocas;
-		std::vector<Cuadrado*> flechas;
+		std::vector<Arbol*> arboles;
+		std::vector<Roca*> rocas;
+		std::vector<Flecha*> flechas;
 		Cuadrado paredHitboxLeft;
 		Cuadrado paredHitboxRight;
 		Cuadrado creditos;

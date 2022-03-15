@@ -60,6 +60,15 @@
     <ClCompile Include="perro.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="arbol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="roca.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="flecha.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -108,6 +117,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="perro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="arbol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="roca.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="flecha.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

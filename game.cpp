@@ -246,7 +246,7 @@ void Game::input() {
 						pause();
 					}
 					if (escena == JOC && event.key.keysym.sym == SDLK_SPACE && (player.direccion == 1 || player.direccion == 3)) {
-						Cuadrado* flecha = new Cuadrado();
+						Flecha* flecha = new Flecha();
 						flecha->img = images.get("flecha");
 						if (!muted) Mix_PlayChannel(-1, sfxs.get("disparoFlecha"), 0);
 						if (player.direccion == 1) {
@@ -309,9 +309,9 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			if (nuevaEscena != PAUSA) {
 				for (Gallina* g : gallinas) g->disposable = true;
 				for (Rupia* r : rupias) r->disposable = true;
-				for (Cuadrado* f : flechas) f->disposable = true;
-				for (Cuadrado* r : rocas) r->disposable = true;
-				for (Cuadrado* a : arboles) a->disposable = true;
+				for (Flecha* f : flechas) f->disposable = true;
+				for (Roca* r : rocas) r->disposable = true;
+				for (Arbol* a : arboles) a->disposable = true;
 			}
 			break;
 		case GAMEOVER:
@@ -329,9 +329,9 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 			if (nuevaEscena != JOC) {
 				for (Gallina* g : gallinas) g->disposable = true;
 				for (Rupia* r : rupias) r->disposable = true;
-				for (Cuadrado* f : flechas) f->disposable = true;
-				for (Cuadrado* r : rocas) r->disposable = true;
-				for (Cuadrado* a : arboles) a->disposable = true;
+				for (Flecha* f : flechas) f->disposable = true;
+				for (Roca* r : rocas) r->disposable = true;
+				for (Arbol* a : arboles) a->disposable = true;
 			}
 			break;
 		case CREDITS:
@@ -395,7 +395,10 @@ void Game::update() {
 	if (isClicking) {
 		if (botonSonido.isClicked(mouse)) mute();
 		else if (escena == LORE) cambiaEscena(JOC);
-		if (escena == JOC && partidesJugades % 2 == 0 && pajaro.checkCollision(mouse)) pajaro.dstRect->h = 0;
+		if (escena == JOC && partidesJugades % 2 == 0 && pajaro.checkCollision(mouse)) {
+			pajaro.dstRect->h = 0;
+			dineroTemporal += 5;
+		}
 		if (botonCreditos.isClicked(mouse) && escena == MENU) cambiaEscena(CREDITS);
 		if (botonBack.isClicked(mouse) && (escena == PAUSA || escena == TIENDA)) cambiaEscena(MENU);
 		else if (botonShop.isClicked(mouse) && escena == MENU) cambiaEscena(TIENDA);
@@ -450,7 +453,7 @@ void Game::update() {
 			//if (keyboard[SDL_SCANCODE_Y]) camera.update();
 			//if (keyboard[SDL_SCANCODE_J]) camera.srcRect->y += camera.sY;
 			if (player.vides <= 0) cambiaEscena(GAMEOVER);
-			if(!paused){
+			if (!paused){
 				if (camera.srcRect->y > 0) {
 					camera.update();
 				} else if(camera.sY != 0) {
@@ -528,7 +531,7 @@ void Game::update() {
 					if (!muted) Mix_PlayChannel(-1, sfxs.get("dañoGallina"), 0);
 				}
 				if (camera.srcRect->y > 900) {
-					if ((SDL_GetTicks() / 16) % 200 == 0) for (int i = 0; i < 2; i++) {
+					if ((SDL_GetTicks() / 16) % 300 == 0) for (int i = 0; i < 2; i++) {
 						Rupia* rupia = new Rupia();
 						rupia->tipus = 1;
 						rupia->valor = 1;
@@ -536,10 +539,10 @@ void Game::update() {
 						rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 55, 55 });
 						rupias.push_back(rupia);
 					}
-					if ((SDL_GetTicks() / 16) % 350 == 0) for (int i = 0; i < 1; i++) {
+					if ((SDL_GetTicks() / 16) % 450 == 0) for (int i = 0; i < 1; i++) {
 						Rupia* rupia = new Rupia();
 						rupia->tipus = R_NUM(2, 4);
-						rupia->valor = 3;
+						rupia->valor = 2;
 						rupia->img = images.get("rupia" + std::to_string(rupia->tipus));
 						rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 55, 55 });
 						rupias.push_back(rupia);
@@ -622,7 +625,7 @@ void Game::update() {
 						}
 					}
 					if ((SDL_GetTicks() / 16) % 300 == 0) for (int i = 0; i <= R_NUM(0, 1); i++) {
-						Cuadrado* arbol = new Cuadrado();
+						Arbol* arbol = new Arbol();
 						arbol->sX = 0;
 						arbol->sY = camera.sY;
 						arbol->img = images.get("arbol" + std::to_string(R_NUM(1, 4)));
@@ -632,8 +635,8 @@ void Game::update() {
 						arbol->dstRect->h *= (35 / 10);
 						arboles.push_back(arbol);
 					}
-					if ((SDL_GetTicks() / 16) % 250 == 0) for (int i = 0; i <= R_NUM(0, 2); i++) {
-						Cuadrado* roca = new Cuadrado();
+					if ((SDL_GetTicks() / 16) % 250 == 0) for (int i = 0; i <= R_NUM(0, 1); i++) {
+						Roca* roca = new Roca();
 						roca->sX = 0;
 						roca->sY = camera.sY;
 						roca->img = images.get("roca" + std::to_string(R_NUM(1, 4)));
@@ -659,7 +662,7 @@ void Game::update() {
 						if(!god) player.damage();
 					}
 				}
-				for (Cuadrado* r : rocas) {
+				for (Roca* r : rocas) {
 					r->update();
 					if (player.checkCollision(r->dstRect)) {
 						if (!muted) Mix_PlayChannel(-1, sfxs.get("dañoQueja"), 0);
@@ -667,7 +670,7 @@ void Game::update() {
 						dineroTemporal = 0;
 					}
 				}
-				for (Cuadrado* a : arboles) {
+				for (Arbol* a : arboles) {
 					a->update();
 					if (player.checkCollision(a->dstRect) && !hardMode) {
 						if (!muted) Mix_PlayChannel(-1, sfxs.get("dañoQueja"), 0);
@@ -675,7 +678,7 @@ void Game::update() {
 						dineroTemporal = 0;
 					}
 				}
-				for (Cuadrado* f : flechas) {
+				for (Flecha* f : flechas) {
 					f->update();
 					for (Gallina* g : gallinas) {
 						if (f->checkCollision(g->dstRect)) {
@@ -783,8 +786,8 @@ void Game::draw() {
 			if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) player.animateX();
 			if (!paused) player.animateY();
 			for (Rupia* r : rupias) r->draw();
-			for (Cuadrado* r : rocas) r->draw();
-			for (Cuadrado* a : arboles) a->draw();
+			for (Roca* r : rocas) r->draw();
+			for (Arbol* a : arboles) a->draw();
 			for (Gallina* g : gallinas) {
 				g->draw();
 				if ((SDL_GetTicks() / 16) % 20 == 0 && !paused) g->animateX();
@@ -808,7 +811,7 @@ void Game::draw() {
 					SDL_RenderCopy(renderer, images.get("horda"), NULL, new SDL_Rect({ horda.dstRect->x, WINDOW_H - horda.dstRect->h * i, horda.dstRect->w, horda.dstRect->h }));
 				}
 			}
-			for (Cuadrado* f : flechas) f->draw();
+			for (Flecha* f : flechas) f->draw();
 			if (partidesJugades % 2 == 0) {
 				pajaro.draw();
 				if ((SDL_GetTicks() / 16) % 20 == 0) pajaro.animateX();
