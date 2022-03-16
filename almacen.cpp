@@ -4,19 +4,16 @@
 template <>
 bool Almacen<SDL_Texture*>::load(std::string name, std::string filename) {
 	mapa[name] = SDL_CreateTextureFromSurface(Game::renderer, IMG_Load(filename.c_str()));
-	//std::cout << name << " --- " << filename << " --- " << SDL_GetError() << std::endl;
 	return mapa[name] != NULL;
 }
 template <>
 bool Almacen<Mix_Music*>::load(std::string name, std::string filename) {
 	mapa[name] = Mix_LoadMUS(filename.c_str());
-	//std::cout << name << " --- " << filename << " --- " << SDL_GetError() << std::endl;
 	return mapa[name] != NULL;
 }
 template <>
 bool Almacen<Mix_Chunk*>::load(std::string name, std::string filename) {
 	mapa[name] = Mix_LoadWAV(filename.c_str());
-	//std::cout << name << " --- " << filename << " --- " << SDL_GetError() << std::endl;
 	return mapa[name] != NULL;
 }
 template <>

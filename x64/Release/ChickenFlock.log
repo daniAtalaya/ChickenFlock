@@ -1,0 +1,27 @@
+﻿  almacen.cpp
+  arbol.cpp
+  avestruz.cpp
+  button.cpp
+  camera.cpp
+  color.cpp
+  corazon.cpp
+  cuadrado.cpp
+  flecha.cpp
+  gallina.cpp
+  main.cpp
+  game.cpp
+D:\C++\ChickenFlock\game.cpp(12,2): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+D:\C++\ChickenFlock\game.cpp(775,3): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\C++\ChickenFlock\game.cpp(831,3): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  pajaro.cpp
+  perro.cpp
+  player.cpp
+  roca.cpp
+  rupia.cpp
+  spritesheet.cpp
+LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 802 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  ChickenFlock.vcxproj -> D:\C++\ChickenFlock\x64\Release\ChickenFlock.exe

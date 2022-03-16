@@ -1,6 +1,0 @@
-E:\C++\SDLHW\x64\Debug\SDLHW.exe
-E:\C++\SDLHW\guerrila-war-SDL\x64\Debug\SDLHW.exe
-D:\C++\SDLHW\guerrila-war-SDL\x64\Debug\SDLHW.exe
-D:\C++\guerrila-war-SDL\x64\Debug\SDLHW.exe
-C:\Users\lapiz\OneDrive\Documentos\GitHub\x64\Debug\SDLHW.exe
-C:\Users\joseti1.TR12-AL\Documents\dfsf\colbri-studios-GuerrillaWar\x64\Debug\SDLHW.exe

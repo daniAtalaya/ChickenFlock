@@ -32,8 +32,7 @@
 
 .vs/
 *.ilk
-x64/Debug/vc142.idb
-x64/Debug/SDLHW.pdb
-x64/Debug/SDLHW.pdb
+x64/Debug/
+Wiki/
 *.pdb
 *.pdb
