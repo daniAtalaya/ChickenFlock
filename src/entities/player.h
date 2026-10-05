@@ -24,9 +24,9 @@ class Player : public Cuadrado {
 		}
 		void init(SDL_Texture*);
 		void damage() {
-			if (vides-- > 0) {
-				corazones[vides].img = corazones[vides].dead;
-			}
+			if (vides <= 0) return;
+			--vides;
+			corazones[vides].img = corazones[vides].dead;
 		}
 		void animateY(){
 			srcRect->y = spritesheet.frameH * direccion;
@@ -36,4 +36,3 @@ class Player : public Cuadrado {
 			if (++index >= spritesheet.maxC) index = 0;
 		}
 };
-

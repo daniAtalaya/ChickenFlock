@@ -64,8 +64,8 @@ class Game {
 		Camera camera;
 		Player player;
 		SDL_Event event;
-		SDL_Window* window;
-		const Uint8* keyboard;
+		SDL_Window* window = nullptr;
+		const Uint8* keyboard = nullptr;
 		Almacen<Mix_Chunk*> sfxs;
 		Avestruz avestruz;
 		std::vector<Rupia*> rupias;

@@ -3,38 +3,41 @@
 #include "game.h"
 
 template <>
-bool Almacen<SDL_Texture*>::load(std::string name, std::string filename) {
-	mapa[name] = SDL_CreateTextureFromSurface(Game::renderer, IMG_Load(assetPath("images/" + filename).c_str()));
-	return mapa[name] != NULL;
+bool Almacen<SDL_Texture*>::load(const std::string &name, const std::string &filename) {
+	SDL_Surface* surface = IMG_Load(assetPath("images/" + filename).c_str());
+	if (surface == nullptr) return false;
+	mapa[name] = SDL_CreateTextureFromSurface(Game::renderer, surface);
+	SDL_FreeSurface(surface);
+	return mapa[name] != nullptr;
 }
 template <>
-bool Almacen<Mix_Music*>::load(std::string name, std::string filename) {
+bool Almacen<Mix_Music*>::load(const std::string &name, const std::string &filename) {
 	mapa[name] = Mix_LoadMUS(assetPath("audio/music/" + filename).c_str());
-	return mapa[name] != NULL;
+	return mapa[name] != nullptr;
 }
 template <>
-bool Almacen<Mix_Chunk*>::load(std::string name, std::string filename) {
+bool Almacen<Mix_Chunk*>::load(const std::string &name, const std::string &filename) {
 	mapa[name] = Mix_LoadWAV(assetPath("audio/sfx/" + filename).c_str());
-	return mapa[name] != NULL;
+	return mapa[name] != nullptr;
 }
 template <>
 void Almacen<SDL_Texture*>::clear() {
-	for (std::map<std::string, SDL_Texture*>::iterator iterador = mapa.begin(); iterador != mapa.end(); iterador++) {
-		SDL_DestroyTexture(iterador->second);
+	for (auto iterator = mapa.begin(); iterator != mapa.end(); ++iterator) {
+		SDL_DestroyTexture(iterator->second);
 	}
 	IMG_Quit();
 }
 template <>
 void Almacen<Mix_Music*>::clear() {
-	for (std::map<std::string, Mix_Music*>::iterator iterador = mapa.begin(); iterador != mapa.end(); iterador++) {
-		Mix_FreeMusic(iterador->second);
+	for (auto iterator = mapa.begin(); iterator != mapa.end(); ++iterator) {
+		Mix_FreeMusic(iterator->second);
 	}
 	Mix_CloseAudio();
 }
 template <>
 void Almacen<Mix_Chunk*>::clear() {
-	for (std::map<std::string, Mix_Chunk*>::iterator iterador = mapa.begin(); iterador != mapa.end(); iterador++) {
-		Mix_FreeChunk(iterador->second);
+	for (auto iterator = mapa.begin(); iterator != mapa.end(); ++iterator) {
+		Mix_FreeChunk(iterator->second);
 	}
 	while (Mix_Init(0)) Mix_Quit();
 }

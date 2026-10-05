@@ -2,8 +2,8 @@
 #include "cuadrado.h"
 class Corazon : public Cuadrado {
 	public:
-		SDL_Texture* alive;
-		SDL_Texture* dead;
+		SDL_Texture* alive = nullptr;
+		SDL_Texture* dead = nullptr;
 		Corazon() {};
 		Corazon(int i) {
 			Cuadrado::Cuadrado();

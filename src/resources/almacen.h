@@ -5,6 +5,9 @@ class Almacen {
 	public:
 		void clear();
 		std::map<std::string, T> mapa;
-		bool load(std::string, std::string);
-		T get(std::string name) { return mapa[name]; }
+		bool load(const std::string &, const std::string &);
+		T get(std::string name) {
+			auto entry = mapa.find(name);
+			return entry == mapa.end() ? T{} : entry->second;
+		}
 };
