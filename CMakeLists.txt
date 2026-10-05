@@ -1,5 +1,34 @@
 cmake_minimum_required(VERSION 3.25)
 
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    if(DEFINED ENV{VCPKG_ROOT})
+        set(_vcpkg_root "$ENV{VCPKG_ROOT}")
+    elseif(WIN32 AND DEFINED ENV{USERPROFILE})
+        set(_vcpkg_root "$ENV{USERPROFILE}/dev/vcpkg")
+    endif()
+
+    if(DEFINED _vcpkg_root AND
+       EXISTS "${_vcpkg_root}/scripts/buildsystems/vcpkg.cmake")
+        set(CMAKE_TOOLCHAIN_FILE
+            "${_vcpkg_root}/scripts/buildsystems/vcpkg.cmake"
+            CACHE FILEPATH "vcpkg CMake toolchain"
+        )
+    endif()
+endif()
+
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE OR
+   NOT EXISTS "${CMAKE_TOOLCHAIN_FILE}")
+    message(FATAL_ERROR
+        "ChickenFlock uses vcpkg manifest mode for SDL dependencies. "
+        "Set VCPKG_ROOT to your vcpkg checkout or configure "
+        "-DCMAKE_TOOLCHAIN_FILE=<vcpkg-root>/scripts/buildsystems/vcpkg.cmake."
+    )
+endif()
+
+if(WIN32 AND NOT DEFINED VCPKG_TARGET_TRIPLET)
+    set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "vcpkg target triplet")
+endif()
+
 project(ChickenFlock VERSION 1.0.0 LANGUAGES CXX)
 
 find_package(SDL2 CONFIG REQUIRED)

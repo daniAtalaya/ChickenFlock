@@ -43,8 +43,8 @@ directory uses the same files.
 ## Requirements
 
 - CMake 3.25 or newer
-- Ninja
-- A C++17 compiler (MSVC 2022 Build Tools is the supported Windows setup)
+- Visual Studio 2026 or Visual Studio 2026 Build Tools with the **Desktop
+  development with C++** workload
 - Git and vcpkg
 
 SDL2, SDL2_image, and SDL2_mixer are restored automatically from the pinned
@@ -57,7 +57,6 @@ Run these once in PowerShell, choosing a stable location for vcpkg:
 
 ```powershell
 winget install Kitware.CMake
-winget install Ninja-build.Ninja
 New-Item -ItemType Directory -Force "$env:USERPROFILE\dev" | Out-Null
 git clone https://github.com/microsoft/vcpkg $env:USERPROFILE\dev\vcpkg
 & "$env:USERPROFILE\dev\vcpkg\bootstrap-vcpkg.bat"
@@ -70,34 +69,37 @@ the project in new terminals or IDE sessions without setting it again.
 
 ## Build and run from the CLI
 
-Use a Developer PowerShell for Visual Studio 2022 so Ninja can find the MSVC
-compiler. From the repository root:
+From the repository root, configure with the Visual Studio generator and build
+the Debug configuration:
 
 ```powershell
-cmake --preset windows-debug
+cmake --preset windows-msvc
 cmake --build --preset debug
-.\build\windows-debug\ChickenFlock.exe
+.\build\windows-msvc\Debug\ChickenFlock.exe
 ```
 
 For an optimized build:
 
 ```powershell
-cmake --preset windows-release
 cmake --build --preset release
-.\build\windows-release\ChickenFlock.exe
+.\build\windows-msvc\Release\ChickenFlock.exe
 ```
 
-The generated executable and its staged `assets` directory are in the
-corresponding `build\windows-*` directory. To remove local build output, delete
-the `build` directory.
+The Visual Studio generator selects the MSVC compiler and doesn't require Ninja
+or a preconfigured Developer PowerShell. The generated executable and staged
+`assets` directory are in the matching configuration under
+`build\windows-msvc`. To remove local build output, delete the `build`
+directory.
 
 ## Build and run in CLion
 
-1. Install CLion and configure a C++ toolchain with MSVC 2022 and Ninja.
+1. Install CLion and configure a Visual Studio 2022 C++ toolchain with the
+   Desktop development with C++ workload.
 2. Make `VCPKG_ROOT` available to CLion (restart it after setting a persistent
    environment variable).
 3. Open this repository's root directory. CLion reads `CMakePresets.json`;
-   select **Windows x64 Debug** or **Windows x64 Release** as the CMake profile.
+   select **Windows x64 (Visual Studio 2026)** as the CMake profile, then
+   choose Debug or Release in the build configuration selector.
 4. Let CMake configure and restore the vcpkg dependencies. Build the
    `ChickenFlock` target, then run or debug that target.
 
