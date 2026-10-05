@@ -3,6 +3,7 @@
 #include "cuadrado.h"
 #include "spritesheet.h"
 #include "corazon.h"
+
 class Player : public Cuadrado {
 	public:
 		SpriteSheet spritesheet;
@@ -16,21 +17,26 @@ class Player : public Cuadrado {
 		bool goldenComprada = false;
 		int gallinasDesbloqueadas = 1;
 		Corazon corazones[3];
+
 		Player() {
 			Cuadrado::Cuadrado();
 			srcRect = new SDL_Rect();
 			srcRect->x = 0;
 			for (int i = 0; i < 3; i++) corazones[i] = Corazon(i);
 		}
+
 		void init(SDL_Texture*);
+
 		void damage() {
 			if (vides <= 0) return;
 			--vides;
 			corazones[vides].img = corazones[vides].dead;
 		}
-		void animateY(){
+
+		void animateY() const {
 			srcRect->y = spritesheet.frameH * direccion;
 		}
+
 		void animateX() {
 			srcRect->x = spritesheet.frameW * index;
 			if (++index >= spritesheet.maxC) index = 0;

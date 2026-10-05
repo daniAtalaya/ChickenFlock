@@ -3,9 +3,8 @@
 class Arbol : public Cuadrado {
 	public:
 		Arbol() {
-			Cuadrado::Cuadrado();
-			srcRect = NULL;
+			Cuadrado();
+			srcRect = nullptr;
 			dstRect = new SDL_Rect();
 		};
 };
-

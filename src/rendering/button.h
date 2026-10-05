@@ -1,12 +1,12 @@
 #pragma once
 #include "general.h"
 #include "cuadrado.h"
+
 class Button : public Cuadrado {
 	public:
 		Button() {
-			Cuadrado::Cuadrado();
+			Cuadrado();
 		};
 
-		bool isClicked(SDL_Rect*);
+		bool isClicked(const SDL_Rect*) const;
 };
-

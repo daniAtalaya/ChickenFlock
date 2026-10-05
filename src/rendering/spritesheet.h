@@ -1,5 +1,6 @@
 #pragma once
 #include "general.h"
+
 class SpriteSheet {
 	public:
 		int frameW = 0;

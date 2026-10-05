@@ -1,4 +1,5 @@
 #include "perro.h"
+
 void Perro::init(SDL_Texture* image) {
 	img = image;
 	spritesheet.setSpritesheet(img, 7, 4);

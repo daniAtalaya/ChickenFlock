@@ -305,6 +305,8 @@ void Game::input() {
 		case SDL_MOUSEBUTTONUP:
 			isClicking = true;
 			break;
+		default:
+			break;
 		}
 	}
 }
@@ -811,7 +813,7 @@ void Game::draw() {
 		for (int i = num.length() - 1; i >= 0; i--) {
 			s = "n";
 			s.append(1, num[i]);
-			renderTexture(images.get(s), { WINDOW_W - 80 - ((int)num.length() - i) * 30, 88, 35, 40 });
+			renderTexture(images.get(s), { WINDOW_W - 80 - (static_cast<int>(num.length()) - i) * 30, 88, 35, 40 });
 		}
 		horda.draw();
 		if (hardMode) {
@@ -867,7 +869,7 @@ void Game::draw() {
 		for (int i = num.length() - 1; i >= 0; i--) {
 			s = "n";
 			s.append(1, num[i]);
-			renderTexture(images.get(s), { WINDOW_W - 80 - ((int)num.length() - i) * 30, 88, 35, 40 });
+			renderTexture(images.get(s), { WINDOW_W - 80 - (static_cast<int>(num.length()) - i) * 30, 88, 35, 40 });
 		}
 		break;
 	case PAUSA:
@@ -881,7 +883,7 @@ void Game::draw() {
 		for (int i = 0; i < 3; i++) player.corazones[i].draw();
 		if ((SDL_GetTicks() / 16) % 40 == 0) showPausaText = !showPausaText;
 		if (showPausaText) {
-			SDL_QueryTexture(images.get("pausaT"), NULL, NULL, &w, &h);
+			SDL_QueryTexture(images.get("pausaT"), nullptr, nullptr, &w, &h);
 			renderTexture(images.get("pausaT"), { (WINDOW_W / 2) - 320 , WINDOW_H / 2 - h * 2 / 10, w * 1 / 3, h * 4 / 10 });
 		}
 		break;
@@ -908,8 +910,7 @@ void Game::destroy() {
 	//std::cout << "Arboles despues: " + arboles.size() << std::endl;
 	//std::cout << "Rocas antes: " + rocas.size() << std::endl;
 	rocas.erase(std::remove_if(rocas.begin(), rocas.end(), [](Roca* o) {
-		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
-		if (o->disposable || temp) {
+		if (const bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h; o->disposable || temp) {
 			destroyEntity(o);
 			return true;
 		}
@@ -918,8 +919,7 @@ void Game::destroy() {
 	//std::cout << "Rocas despues: " + rocas.size() << std::endl;
 	//std::cout << "Rupias antes: " + rupias.size() << std::endl;
 	rupias.erase(std::remove_if(rupias.begin(), rupias.end(), [](Rupia* o) {
-		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
-		if (o->disposable || temp) {
+		if (const bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h; o->disposable || temp) {
 			destroyEntity(o);
 			return true;
 		}

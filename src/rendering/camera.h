@@ -1,10 +1,11 @@
 #pragma once
 #include "cuadrado.h"
+
 class Camera : public Cuadrado {
 	public:
 		Camera() {
-			Cuadrado::Cuadrado();
+			Cuadrado();
 		}
-		void update();
-};
 
+		void update() const;
+};

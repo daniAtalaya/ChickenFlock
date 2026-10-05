@@ -16,6 +16,5 @@ inline std::string assetPath(const std::string& relativePath) {
 	if (!basePath) {
 		throw std::runtime_error(std::string("Unable to locate game executable: ") + SDL_GetError());
 	}
-
 	return std::string(basePath.get()) + "assets/" + relativePath;
 }

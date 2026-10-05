@@ -12,9 +12,9 @@ class Cuadrado {
 		bool disposable = false;
 		int sY = 5; 
 		SDL_Texture* img = nullptr;
-		void draw();
-		void drawHitbox();
-		void update(int, int);
-		void update();
-		bool checkCollision(SDL_Rect*);
+		void draw() const;
+		void drawHitbox() const;
+		void update(int, int) const;
+		void update() const;
+		bool checkCollision(SDL_Rect*) const;
 };

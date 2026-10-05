@@ -2,14 +2,15 @@
 #include "cuadrado.h"
 #include "general.h"
 #include "spritesheet.h"
+
 class Avestruz : public Cuadrado {
 	public:
 		SpriteSheet spritesheet;
 		int index = 0;
 		int direccion = 1;
 		Avestruz() {
-			Cuadrado::Cuadrado();
-			srcRect = NULL;
+			Cuadrado();
+			srcRect = nullptr;
 			dstRect = new SDL_Rect({0, 0, 0, 0});
 		}
 		void init(SDL_Texture*);
@@ -22,4 +23,3 @@ class Avestruz : public Cuadrado {
 			if (++index > spritesheet.maxC - 1) index = 0;
 		}
 };
-
