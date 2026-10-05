@@ -9,9 +9,25 @@
 #define SSTR( x ) dynamic_cast< std::ostringstream & >( \
             ( std::ostringstream() << std::dec << x ) ).str()
 
+namespace {
+void assignRect(SDL_Rect*& target, const SDL_Rect& value) {
+	if (target == nullptr) target = new SDL_Rect(value);
+	else *target = value;
+}
+
+template <typename T>
+void destroyEntity(T* entity) {
+	if (entity == nullptr) return;
+	delete entity->srcRect;
+	delete entity->dstRect;
+	delete entity;
+}
+}
+
 Game::Game() {
 	INIT_R;
-	SDL_Init(SDL_INIT_EVERYTHING);
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) return;
+	if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) return;
 	window = SDL_CreateWindow(
 		"Cock Flock",
 		SDL_WINDOWPOS_CENTERED,
@@ -19,17 +35,24 @@ Game::Game() {
 		WINDOW_W, WINDOW_H,
 		SDL_WINDOW_HIDDEN
 	);
-	SDL_SetWindowIcon(window, IMG_Load(assetPath("images/icon.png").c_str()));
+	if (window == nullptr) return;
+	SDL_Surface* icon = IMG_Load(assetPath("images/icon.png").c_str());
+	if (icon != nullptr) {
+		SDL_SetWindowIcon(window, icon);
+		SDL_FreeSurface(icon);
+	}
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) return;
+	if (renderer == nullptr) return;
 	if (Mix_Init(MIX_INIT_OGG) != MIX_INIT_OGG) return;
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1) return;
 	keyboard = SDL_GetKeyboardState(NULL);
+	if (keyboard == nullptr) return;
 	SDL_RenderSetScale(renderer, 1, 1);
 	//for (const auto& entry : std::filesystem::directory_iterator("./sprites")) std::cout << entry.path() << std::endl;
-	isOpen = load();
+	if (!load()) return;
 	assignImg();
 	init();
+	isOpen = true;
 	SDL_ShowWindow(window);
 	SDL_GetMouseState(&mouse->x, &mouse->y);
 	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -47,45 +70,44 @@ void Game::assignImg() {
 
 void Game::init() {
 	botonPlay.img = images.get("play");
-	paredHitboxLeft = Cuadrado();
-	paredHitboxRight = Cuadrado();
-	paredHitboxLeft.dstRect = new SDL_Rect({ 1, 1, 150, 8100 });
-	paredHitboxRight.dstRect = new SDL_Rect({ 810, 1, 150, 8100 });
+	assignRect(paredHitboxLeft.dstRect, { 1, 1, 150, 8100 });
+	assignRect(paredHitboxRight.dstRect, { 810, 1, 150, 8100 });
 	//rioHitboxLeft = Cuadrado();
 	//rioHitboxLeft.dstRect = new SDL_Rect({ 150, -300, 210, 300 });
 	//rioHitboxRight = Cuadrado();
 	//rioHitboxRight.dstRect = new SDL_Rect({ 600, -300, 210, 300 });
 	botonSonido.img = images.get("soundOn");
-	botonSonido.dstRect = new SDL_Rect({ 10, 20, 100, 100 });
-	botonPlay.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
-	botonBack.dstRect = new SDL_Rect({ 10, 250, 100, 100 });
-	botonShop.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
-	botonExitShop.dstRect = new SDL_Rect({ 335, 650, 305, 65 });
-	botonCompraAzul.dstRect = new SDL_Rect({ 535, 320, 130, 40 });
-	botonCompraGolden.dstRect = new SDL_Rect({ 535, 540, 130, 40 });
-	botonCompraDark.dstRect = new SDL_Rect({ 320, 540, 130, 40 });
-	botonCompraBrown.dstRect = new SDL_Rect({ 320, 320, 130, 40 });
-	botonHardcore.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 410, 750, 330, 100 });
-	botonCreditos.dstRect = new SDL_Rect({ WINDOW_W - 410, 750, 330, 100 });
-	creditos.dstRect = new SDL_Rect({ 75, (WINDOW_H * 15 / 10), WINDOW_W - 150, WINDOW_H * 16 / 10 });
+	assignRect(botonSonido.dstRect, { 10, 20, 100, 100 });
+	assignRect(botonPlay.dstRect, { 10, 135, 100, 100 });
+	assignRect(botonBack.dstRect, { 10, 250, 100, 100 });
+	assignRect(botonShop.dstRect, { 10, 135, 100, 100 });
+	assignRect(botonExitShop.dstRect, { 335, 650, 305, 65 });
+	assignRect(botonCompraAzul.dstRect, { 535, 320, 130, 40 });
+	assignRect(botonCompraGolden.dstRect, { 535, 540, 130, 40 });
+	assignRect(botonCompraDark.dstRect, { 320, 540, 130, 40 });
+	assignRect(botonCompraBrown.dstRect, { 320, 320, 130, 40 });
+	assignRect(botonHardcore.dstRect, { (WINDOW_W / 2) - 410, 750, 330, 100 });
+	assignRect(botonCreditos.dstRect, { WINDOW_W - 410, 750, 330, 100 });
+	assignRect(creditos.dstRect, { 75, (WINDOW_H * 15 / 10), WINDOW_W - 150, WINDOW_H * 16 / 10 });
 	creditos.sY = 2;
-	nivel.dstRect = new SDL_Rect({ 0, 0, WINDOW_W, 0 });
-	player.dstRect = new SDL_Rect({ (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
+	assignRect(nivel.dstRect, { 0, 0, WINDOW_W, 0 });
+	assignRect(player.dstRect, { (WINDOW_W / 2) - 42, WINDOW_H - 300 , 50, 50 });
 	SDL_QueryTexture(images.get("mapa3"), NULL, NULL, NULL, &nivel.dstRect->h);
-	camera.srcRect = new SDL_Rect({ 0, nivel.dstRect->h - WINDOW_H, WINDOW_W, WINDOW_H });
-	horda.dstRect = new SDL_Rect({ 130, WINDOW_H, 0, 0 });
+	assignRect(camera.dstRect, { 0, 0, WINDOW_W, WINDOW_H });
+	assignRect(camera.srcRect, { 0, nivel.dstRect->h - WINDOW_H, WINDOW_W, WINDOW_H });
+	assignRect(horda.dstRect, { 130, WINDOW_H, 0, 0 });
 	continuara.img = images.get("continuara");
 	continuara.sY = 6;
 	pajaro.init(images.get("pajaro"));
-	pajaro.dstRect = new SDL_Rect({ -200, R_NUM(0, WINDOW_H - 200), 70, 100 });
+	assignRect(pajaro.dstRect, { -200, R_NUM(0, WINDOW_H - 200), 70, 100 });
 	pajaro.sX = 8;
 	pajaro.sY = R_NUM(-4, 4);
 	avestruz.sY = 1;
-	continuara.dstRect = new SDL_Rect({ WINDOW_H / 2 - 325, (WINDOW_H * 15 / 10), 700 , 450 });
+	assignRect(continuara.dstRect, { WINDOW_H / 2 - 325, (WINDOW_H * 15 / 10), 700 , 450 });
 	avestruz.init(images.get("avestruz"));
 	mascota.init(images.get("mascota"));
-	mascota.dstRect = new SDL_Rect({ (WINDOW_W / 2) + 150, 75, 200, 200 });
-	avestruz.dstRect = new SDL_Rect({ WINDOW_H / 2 - 100, (WINDOW_H * 15 / 10), 200, 200 });
+	assignRect(mascota.dstRect, { (WINDOW_W / 2) + 150, 75, 200, 200 });
+	assignRect(avestruz.dstRect, { WINDOW_H / 2 - 100, (WINDOW_H * 15 / 10), 200, 200 });
 	player.init(images.get("link"));
 	SDL_QueryTexture(images.get("horda"), NULL, NULL, &horda.dstRect->w, &horda.dstRect->h);
 	horda.dstRect->y = WINDOW_H - horda.dstRect->h;
@@ -94,6 +116,7 @@ void Game::init() {
 		player.corazones[i].img = images.get("corazon");
 		player.corazones[i].alive = player.corazones[i].img;
 		player.corazones[i].dead = images.get("corazont");
+		player.corazones[i].img = player.corazones[i].alive;
 	}
 }
 
@@ -122,7 +145,6 @@ bool Game::load() {
 	if (!images.load("continuara", "continuara.png")) return false;
 	if (!images.load("soldOut", "soldOut.png")) return false;
 	if (!images.load("creditos", "creditos.png")) return false;
-	if (!images.load("play", "play.png")) return false;
 	if (!images.load("link", "link.png")) return false;
 	if (!images.load("rupia1", "rupia1.png")) return false;
 	if (!images.load("rupia2", "rupia2.png")) return false;
@@ -201,11 +223,17 @@ bool Game::load() {
 }
 
 Game::~Game() {
+	for (Arbol* entity : arboles) destroyEntity(entity);
+	for (Roca* entity : rocas) destroyEntity(entity);
+	for (Rupia* entity : rupias) destroyEntity(entity);
+	for (Gallina* entity : gallinas) destroyEntity(entity);
+	for (Flecha* entity : flechas) destroyEntity(entity);
 	images.clear();
 	tracks.clear();
 	sfxs.clear();
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
+	if (renderer != nullptr) SDL_DestroyRenderer(renderer);
+	if (window != nullptr) SDL_DestroyWindow(window);
+	delete mouse;
 	SDL_Quit();
 }
 
@@ -259,8 +287,7 @@ void Game::input() {
 						flecha->sX = 0;
 						flecha->sY = 6;
 					}
-					SDL_Rect* origin = new SDL_Rect({ player.dstRect->x + 15, player.direccion == 3 ? (player.dstRect->y + player.dstRect->h + 5) : (player.dstRect->y - 5) , 30, 60 });
-					flecha->dstRect = origin;
+					*flecha->dstRect = { player.dstRect->x + 15, player.direccion == 3 ? (player.dstRect->y + player.dstRect->h + 5) : (player.dstRect->y - 5), 30, 60 };
 					flechas.push_back(flecha);
 				}
 			}
@@ -344,9 +371,11 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 	if (escena == MENU && nuevaEscena == LORE) partidesJugades++;
 	//std::cout << partidesJugades << std::endl;
 	if (escena == PAUSA && nuevaEscena == MENU) hardMode = false;
+	if (escena != LORE && escena != PAUSA) {
+		while (Mix_PlayingMusic()) Mix_HaltMusic();
+	}
 	escena = nuevaEscena;
 	switch (nuevaEscena) {
-		if (escena != LORE && escena != PAUSA) while (Mix_PlayingMusic()) Mix_HaltMusic();
 	case INICI:
 		break;
 	case MENU:
@@ -375,7 +404,7 @@ void Game::cambiaEscena(Escena nuevaEscena) {
 		Mix_PlayMusic(tracks.get("Victoria"), 1);
 		break;
 	case TIENDA:
-		botonBack.dstRect = new SDL_Rect({ 10, 135, 100, 100 });
+		assignRect(botonBack.dstRect, { 10, 135, 100, 100 });
 		Mix_PlayMusic(tracks.get("Tienda"), -1);
 		player.dstRect->y = WINDOW_H - 120;
 		if (++loreTienda > 9) loreTienda = 1;
@@ -538,7 +567,7 @@ void Game::update() {
 					rupia->tipus = 1;
 					rupia->valor = 1;
 					rupia->img = images.get("rupia" + std::to_string(rupia->tipus));
-					rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 55, 55 });
+					*rupia->dstRect = { R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 55, 55 };
 					rupias.push_back(rupia);
 				}
 				if ((SDL_GetTicks() / 16) % 450 == 0) for (int i = 0; i < 1; i++) {
@@ -546,40 +575,40 @@ void Game::update() {
 					rupia->tipus = R_NUM(2, 4);
 					rupia->valor = 2;
 					rupia->img = images.get("rupia" + std::to_string(rupia->tipus));
-					rupia->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 55, 55 });
+					*rupia->dstRect = { R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 55, 55 };
 					rupias.push_back(rupia);
 				}
 				if ((SDL_GetTicks() / 16) % 150 == 0) {
 					Gallina* gallina = new Gallina();
 					gallina->tipus = 1;
-					gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+					*gallina->dstRect = { R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 };
 					gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
 					gallinas.push_back(gallina);
 					gallina = new Gallina();
 					if (player.brownComprada) {
 						gallina->tipus = 2;
-						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+						*gallina->dstRect = { R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 };
 						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
 						gallinas.push_back(gallina);
 					}
 					if (player.azulComprada) {
 						gallina = new Gallina();
 						gallina->tipus = 3;
-						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+						*gallina->dstRect = { R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 };
 						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
 						gallinas.push_back(gallina);
 					}
 					if (player.darkComprada) {
 						gallina = new Gallina();
 						gallina->tipus = 4;
-						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+						*gallina->dstRect = { R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 };
 						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
 						gallinas.push_back(gallina);
 					}
 					if (player.goldenComprada) {
 						gallina = new Gallina();
 						gallina->tipus = 5;
-						gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 });
+						*gallina->dstRect = { R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-250, -50), 40, 40 };
 						gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
 						gallinas.push_back(gallina);
 					}
@@ -592,7 +621,7 @@ void Game::update() {
 					if (tipoGallinaTrasera == 3 && !player.azulComprada) tipoGallinaTrasera = 2;
 					if (tipoGallinaTrasera == 2 && !player.brownComprada) tipoGallinaTrasera = 1;
 					gallina->tipus = tipoGallinaTrasera;
-					gallina->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 });
+					*gallina->dstRect = { R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), WINDOW_H + R_NUM(-150, -50), 40, 40 };
 					gallina->init(images.get("gallina" + std::to_string(gallina->tipus)));
 					gallina->sY = -5;
 					gallinas.push_back(gallina);
@@ -602,7 +631,7 @@ void Game::update() {
 					arbol->sX = 0;
 					arbol->sY = camera.sY;
 					arbol->img = images.get("arbol" + std::to_string(R_NUM(1, 4)));
-					arbol->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), -150 * R_NUM(1, 3), 40, 40 });
+					*arbol->dstRect = { R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), -150 * R_NUM(1, 3), 40, 40 };
 					SDL_QueryTexture(arbol->img, NULL, NULL, &arbol->dstRect->w, &arbol->dstRect->h);
 					arbol->dstRect->w *= (35 / 10);
 					arbol->dstRect->h *= (35 / 10);
@@ -613,7 +642,7 @@ void Game::update() {
 					roca->sX = 0;
 					roca->sY = camera.sY;
 					roca->img = images.get("roca" + std::to_string(R_NUM(1, 4)));
-					roca->dstRect = new SDL_Rect({ R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-450, -150), 40, 40 });
+					*roca->dstRect = { R_NUM(paredHitboxLeft.dstRect->w, WINDOW_W - (paredHitboxRight.dstRect->w * 2)), R_NUM(-450, -150), 40, 40 };
 					roca->dstRect->x *= (15 / 10);
 					roca->dstRect->y *= (15 / 10);
 					rocas.push_back(roca);
@@ -701,27 +730,33 @@ void Game::draw() {
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
+	const auto renderTexture = [this](SDL_Texture* texture, SDL_Rect destination) {
+		SDL_RenderCopy(renderer, texture, NULL, &destination);
+	};
+	const auto fillRect = [this](SDL_Rect rectangle) {
+		SDL_RenderFillRect(renderer, &rectangle);
+	};
 	int w, h;
 	std::string num, s;
 	switch (escena) {
 	case INICI:
 		SDL_QueryTexture(images.get("studio"), NULL, NULL, &w, &h);
-		SDL_RenderCopy(renderer, images.get("studio"), NULL, new SDL_Rect({ (WINDOW_W / 2) - 220, 150, 440, 440 }));
+		renderTexture(images.get("studio"), { (WINDOW_W / 2) - 220, 150, 440, 440 });
 		SDL_QueryTexture(images.get("enter"), NULL, NULL, &w, &h);
-		SDL_RenderCopy(renderer, images.get("enter"), NULL, new SDL_Rect({ WINDOW_W - 55 - w / 2, 550, w / 2, h * 7 / 10 }));
+		renderTexture(images.get("enter"), { WINDOW_W - 55 - w / 2, 550, w / 2, h * 7 / 10 });
 		break;
 	case MENU:
 		camera.sY = 0;
 		camera.draw();
 		player.draw();
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
-		SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
+		fillRect({ 0, 0, WINDOW_W, WINDOW_H });
 		botonSonido.draw();
 		botonShop.draw();
 		SDL_QueryTexture(images.get("start"), NULL, NULL, &w, &h);
-		SDL_RenderCopy(renderer, images.get("start"), NULL, new SDL_Rect({ WINDOW_W - 100 - w / 3, (WINDOW_H / 2) - (h * 4 / 10) / 2, w * 1 / 3, h * 4 / 10 }));
+		renderTexture(images.get("start"), { WINDOW_W - 100 - w / 3, (WINDOW_H / 2) - (h * 4 / 10) / 2, w * 1 / 3, h * 4 / 10 });
 		SDL_QueryTexture(images.get("tituloCockFlock"), NULL, NULL, &w, &h);
-		SDL_RenderCopy(renderer, images.get("tituloCockFlock"), NULL, new SDL_Rect({ (WINDOW_W / 2) - 160, 50, w / 2, h / 2 }));
+		renderTexture(images.get("tituloCockFlock"), { (WINDOW_W / 2) - 160, 50, w / 2, h / 2 });
 		botonCreditos.draw();
 		if (!hardMode) botonHardcore.draw();
 		if (player.gallinasDesbloqueadas == 5) {
@@ -737,7 +772,7 @@ void Game::draw() {
 		for (int i = 0; i < 3; i++) player.corazones[i].draw();
 		if (loreShown == 0) loreShown = 1;
 		SDL_QueryTexture(images.get("lore" + std::to_string(loreShown)), NULL, NULL, &w, &h);
-		SDL_RenderCopy(renderer, images.get("lore" + std::to_string(loreShown)), NULL, new SDL_Rect({ (WINDOW_W / 2) - (w * 7 / 5) / 2, WINDOW_H - h - 50, w * 7 / 5, h * 12 / 10 }));
+		renderTexture(images.get("lore" + std::to_string(loreShown)), { (WINDOW_W / 2) - (w * 7 / 5) / 2, WINDOW_H - h - 50, w * 7 / 5, h * 12 / 10 });
 		break;
 	case JOC:
 		camera.sY = 2;
@@ -771,17 +806,17 @@ void Game::draw() {
 		paredHitboxLeft.draw();
 		paredHitboxRight.draw();
 		for (int i = 0; i < 3; i++) player.corazones[i].draw();
-		SDL_RenderCopy(renderer, images.get("rupia1"), NULL, new SDL_Rect({ WINDOW_W - 60, 90, 40, 40 }));
+		renderTexture(images.get("rupia1"), { WINDOW_W - 60, 90, 40, 40 });
 		num = std::to_string(dineroTemporal);
 		for (int i = num.length() - 1; i >= 0; i--) {
 			s = "n";
 			s.append(1, num[i]);
-			SDL_RenderCopy(renderer, images.get(s), NULL, new SDL_Rect({ WINDOW_W - 80 - ((int)num.length() - i) * 30, 88, 35, 40 }));
+			renderTexture(images.get(s), { WINDOW_W - 80 - ((int)num.length() - i) * 30, 88, 35, 40 });
 		}
 		horda.draw();
 		if (hardMode) {
 			for (int i = 1; i < 3; i++) {
-				SDL_RenderCopy(renderer, images.get("horda"), NULL, new SDL_Rect({ horda.dstRect->x, WINDOW_H - horda.dstRect->h * i, horda.dstRect->w, horda.dstRect->h }));
+				renderTexture(images.get("horda"), { horda.dstRect->x, WINDOW_H - horda.dstRect->h * i, horda.dstRect->w, horda.dstRect->h });
 			}
 		}
 		for (Flecha* f : flechas) f->draw();
@@ -795,31 +830,31 @@ void Game::draw() {
 		camera.draw();
 		player.draw();
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
-		SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
+		fillRect({ 0, 0, WINDOW_W, WINDOW_H });
 		SDL_QueryTexture(images.get("gameoverT"), NULL, NULL, &w, &h);
-		SDL_RenderCopy(renderer, images.get("gameoverT"), NULL, new SDL_Rect({ WINDOW_W - 100 - w / 3, 100, w * 1 / 3, h * 4 / 10 }));
-		SDL_RenderCopy(renderer, images.get("linksad"), NULL, new SDL_Rect({ (WINDOW_W / 2) - 200, (WINDOW_H / 2), 350, 350 }));
+		renderTexture(images.get("gameoverT"), { WINDOW_W - 100 - w / 3, 100, w * 1 / 3, h * 4 / 10 });
+		renderTexture(images.get("linksad"), { (WINDOW_W / 2) - 200, (WINDOW_H / 2), 350, 350 });
 		break;
 	case GUANYAT:
 		camera.sY = 0;
 		camera.draw();
 		player.draw();
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
-		SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
+		fillRect({ 0, 0, WINDOW_W, WINDOW_H });
 		SDL_QueryTexture(images.get("winner"), NULL, NULL, &w, &h);
-		SDL_RenderCopy(renderer, images.get("winner"), NULL, new SDL_Rect({ WINDOW_W / 2 - w / 2, WINDOW_H / 2 - h / 2, w, h }));
+		renderTexture(images.get("winner"), { WINDOW_W / 2 - w / 2, WINDOW_H / 2 - h / 2, w, h });
 		break;
 	case TIENDA:
 		camera.sY = 0;
 		camera.draw();
 		player.draw();
 		SDL_QueryTexture(images.get("popupTienda"), NULL, NULL, &w, &h);
-		SDL_RenderCopy(renderer, images.get("popupTienda"), NULL, new SDL_Rect({ WINDOW_W / 4 , 20, w - 100, h - 100 }));
+		renderTexture(images.get("popupTienda"), { WINDOW_W / 4 , 20, w - 100, h - 100 });
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 32);
-		SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
+		fillRect({ 0, 0, WINDOW_W, WINDOW_H });
 		if (loreTienda == 0) loreTienda = 1;
 		SDL_QueryTexture(images.get("tiendalore" + std::to_string(loreTienda)), NULL, NULL, &w, &h);
-		SDL_RenderCopy(renderer, images.get("tiendalore" + std::to_string(loreTienda)), NULL, new SDL_Rect({ WINDOW_W - 280, 640, w , h }));
+		renderTexture(images.get("tiendalore" + std::to_string(loreTienda)), { WINDOW_W - 280, 640, w , h });
 		botonExitShop.draw();
 		botonCompraAzul.draw();
 		botonCompraGolden.draw();
@@ -827,19 +862,19 @@ void Game::draw() {
 		botonCompraBrown.draw();
 		botonBack.draw();
 		botonSonido.draw();
-		SDL_RenderCopy(renderer, images.get("rupia1"), NULL, new SDL_Rect({ WINDOW_W - 60, 90, 40, 40 }));
+		renderTexture(images.get("rupia1"), { WINDOW_W - 60, 90, 40, 40 });
 		num = std::to_string(player.money);
 		for (int i = num.length() - 1; i >= 0; i--) {
 			s = "n";
 			s.append(1, num[i]);
-			SDL_RenderCopy(renderer, images.get(s), NULL, new SDL_Rect({ WINDOW_W - 80 - ((int)num.length() - i) * 30, 88, 35, 40 }));
+			renderTexture(images.get(s), { WINDOW_W - 80 - ((int)num.length() - i) * 30, 88, 35, 40 });
 		}
 		break;
 	case PAUSA:
 		camera.draw();
 		player.draw();
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
-		SDL_RenderFillRect(renderer, new SDL_Rect({ 0, 0, WINDOW_W, WINDOW_H }));
+		fillRect({ 0, 0, WINDOW_W, WINDOW_H });
 		botonSonido.draw();
 		botonPlay.draw();
 		botonBack.draw();
@@ -847,7 +882,7 @@ void Game::draw() {
 		if ((SDL_GetTicks() / 16) % 40 == 0) showPausaText = !showPausaText;
 		if (showPausaText) {
 			SDL_QueryTexture(images.get("pausaT"), NULL, NULL, &w, &h);
-			SDL_RenderCopy(renderer, images.get("pausaT"), NULL, new SDL_Rect({ (WINDOW_W / 2) - 320 , WINDOW_H / 2 - h * 2 / 10, w * 1 / 3, h * 4 / 10 }));
+			renderTexture(images.get("pausaT"), { (WINDOW_W / 2) - 320 , WINDOW_H / 2 - h * 2 / 10, w * 1 / 3, h * 4 / 10 });
 		}
 		break;
 	case CREDITS:
@@ -862,40 +897,63 @@ void Game::draw() {
 
 void Game::destroy() {
 	//std::cout << "Arboles antes: " + arboles.size() << std::endl;
-	arboles.erase(std::remove_if(arboles.begin(), arboles.end(), [](const Cuadrado* o) {
+	arboles.erase(std::remove_if(arboles.begin(), arboles.end(), [](Arbol* o) {
 		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
-		return o->disposable || temp;
+		if (o->disposable || temp) {
+			destroyEntity(o);
+			return true;
+		}
+		return false;
 		}), arboles.end());
 	//std::cout << "Arboles despues: " + arboles.size() << std::endl;
 	//std::cout << "Rocas antes: " + rocas.size() << std::endl;
-	rocas.erase(std::remove_if(rocas.begin(), rocas.end(), [](const Cuadrado* o) {
+	rocas.erase(std::remove_if(rocas.begin(), rocas.end(), [](Roca* o) {
 		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
-		return o->disposable || temp;
+		if (o->disposable || temp) {
+			destroyEntity(o);
+			return true;
+		}
+		return false;
 		}), rocas.end());
 	//std::cout << "Rocas despues: " + rocas.size() << std::endl;
 	//std::cout << "Rupias antes: " + rupias.size() << std::endl;
-	rupias.erase(std::remove_if(rupias.begin(), rupias.end(), [](const Cuadrado* o) {
+	rupias.erase(std::remove_if(rupias.begin(), rupias.end(), [](Rupia* o) {
 		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
-		return o->disposable || temp;
+		if (o->disposable || temp) {
+			destroyEntity(o);
+			return true;
+		}
+		return false;
 		}), rupias.end());
 	//std::cout << "Rupias despues: " + rupias.size() << std::endl;
 	//std::cout << "Gallinas antes: " + gallinas.size() << std::endl;
-	gallinas.erase(std::remove_if(gallinas.begin(), gallinas.end(), [](const Cuadrado* o) {
+	gallinas.erase(std::remove_if(gallinas.begin(), gallinas.end(), [](Gallina* o) {
 		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y > WINDOW_H + o->dstRect->h;
-		return o->disposable || temp;
+		if (o->disposable || temp) {
+			destroyEntity(o);
+			return true;
+		}
+		return false;
 		}), gallinas.end());
 	//std::cout << "Gallinas despues: " + gallinas.size() << std::endl;
 	//std::cout << "Flechas antes: " + flechas.size() << std::endl;
-	flechas.erase(std::remove_if(flechas.begin(), flechas.end(), [](const Cuadrado* o) {
+	flechas.erase(std::remove_if(flechas.begin(), flechas.end(), [](Flecha* o) {
 		bool temp = o->dstRect->x < -o->dstRect->w || o->dstRect->x > WINDOW_W + o->dstRect->w || o->dstRect->y < -o->dstRect->h || o->dstRect->y > WINDOW_H + o->dstRect->h;
-		return o->disposable || temp;
+		if (o->disposable || temp) {
+			destroyEntity(o);
+			return true;
+		}
+		return false;
 		}), flechas.end());
 	//std::cout << "Flechas despues: " + flechas.size() << std::endl;
 }
 
 void Game::loop() {
+	const Uint32 frameStart = SDL_GetTicks();
 	input();
 	update();
 	draw();
-	SDL_Delay(1000 / 60);
+	constexpr Uint32 frameDurationMs = 1000 / 60;
+	const Uint32 elapsed = SDL_GetTicks() - frameStart;
+	if (elapsed < frameDurationMs) SDL_Delay(frameDurationMs - elapsed);
 }

@@ -5,13 +5,13 @@
 class Cuadrado {
 	public:
 		Cuadrado() = default;
-		SDL_Rect* dstRect;
-		SDL_Rect* srcRect;
+		SDL_Rect* dstRect = nullptr;
+		SDL_Rect* srcRect = nullptr;
 		Color color;
 		int sX = 5;
 		bool disposable = false;
 		int sY = 5; 
-		SDL_Texture* img;
+		SDL_Texture* img = nullptr;
 		void draw();
 		void drawHitbox();
 		void update(int, int);
