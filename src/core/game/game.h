@@ -2,17 +2,15 @@
 #include "general.h"
 #include "ui/button.h"
 #include "player/player.h"
-#include "economy/rupia.h"
 #include "enums.h"
 #include "easter/avestruz/avestruz.h"
-#include "enemies/arbol/arbol.h"
-#include "enemies/gallina/gallina.h"
-#include "enemies/roca/roca.h"
 #include "gameplay/camera.h"
 #include "npc/pajaro/pajaro.h"
 #include "npc/perro/perro.h"
-#include "player/weapon/flecha.h"
-#include "resources/almacen.h"
+#include "resources/game_assets.h"
+#include "game_world.h"
+#include "game_scene_factory_context.h"
+#include "game_scene_manager.h"
 
 class Game {
 	public:
@@ -31,33 +29,25 @@ class Game {
 	private:
 		void init();
 		void assignImg();
-		void destroy();
 		void update();
 		void input();
 		void draw();
-		bool load();
 		void mute();
 		void pause();
+		void playSound(const std::string&, int);
+		void playMusic(const std::string&, int);
+		void haltMusic();
+		void haltChannels();
+		GameSceneFactoryContext sceneFactoryContext();
 		bool hardMode = false;
-		bool ostrichShown = false;
-		bool creditsShown = false;
 		void cambiaEscena(Escena);
-		bool showPausaText = true;
 		Button botonSonido; 
-		int loreShown = 0;
-		int loreTienda = 0;
 		int dineroTemporal = 0;
 		int tipoGallinaTrasera=0;
 		Button botonPlay;
 		Button botonShop;
 		Button botonBack;
-		Button botonExitShop;
-		Button botonCompraAzul;
-		Button botonCompraGolden;
-		Button botonCompraDark;
-		Button botonCompraBrown;
 		Button botonHardcore;
-		Button botonCreditos;
 		Cuadrado nivel;
 		Cuadrado horda;
 		Pajaro pajaro;
@@ -67,20 +57,13 @@ class Game {
 		SDL_Event event;
 		SDL_Window* window = nullptr;
 		const Uint8* keyboard = nullptr;
-		Almacen<Mix_Chunk*> sfxs;
 		Avestruz avestruz;
-		std::vector<Rupia*> rupias;
-		Almacen<Mix_Music*> tracks;
-		Almacen<SDL_Texture*> images;
-		std::vector<Gallina*> gallinas;
-		std::vector<Arbol*> arboles;
-		std::vector<Roca*> rocas;
-		std::vector<Flecha*> flechas;
+		GameAssets assets;
+		GameWorld world;
+		GameSceneManager sceneManager;
 		Cuadrado paredHitboxLeft;
 		Cuadrado paredHitboxRight;
 		Cuadrado creditos;
 		Cuadrado continuara;
-		//Avestruz avestruz;
-		//Cuadrado rioHitboxLeft;
-		//Cuadrado rioHitboxRight;
+
 };

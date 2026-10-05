@@ -1,26 +1,25 @@
 #include "almacen.h"
 #include "asset_path.h"
-#include "game/game.h"
 
 template <>
-bool Almacen<SDL_Texture*>::load(const std::string &name, const std::string &filename) {
+bool Almacen<SDL_Texture*>::load(const std::string &name, const std::string &filename, SDL_Renderer* renderer) {
 	SDL_Surface* surface = IMG_Load(assetPath("images/" + filename).c_str());
 	if (surface == nullptr) {
 		return false;
 	}
-	mapa[name] = SDL_CreateTextureFromSurface(Game::renderer, surface);
+	mapa[name] = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
 	return mapa[name] != nullptr;
 }
 
 template <>
-bool Almacen<Mix_Music*>::load(const std::string &name, const std::string &filename) {
+bool Almacen<Mix_Music*>::load(const std::string &name, const std::string &filename, SDL_Renderer*) {
 	mapa[name] = Mix_LoadMUS(assetPath("audio/music/" + filename).c_str());
 	return mapa[name] != nullptr;
 }
 
 template <>
-bool Almacen<Mix_Chunk*>::load(const std::string &name, const std::string &filename) {
+bool Almacen<Mix_Chunk*>::load(const std::string &name, const std::string &filename, SDL_Renderer*) {
 	mapa[name] = Mix_LoadWAV(assetPath("audio/sfx/" + filename).c_str());
 	return mapa[name] != nullptr;
 }

@@ -1,0 +1,113 @@
+#include "game_assets.h"
+
+bool GameAssets::load(SDL_Renderer* renderer) {
+	//sfxs
+	if (!sfxs.load("dañoGallina", "DanoContraGallina.wav")) return false;
+	if (!sfxs.load("dañoQueja", "Danoqueja.wav")) return false;
+	if (!sfxs.load("muerteGallina", "muertegallinaex.wav")) return false;
+	if (!sfxs.load("disparoFlecha", "disparoflecha.wav")) return false;
+	if (!sfxs.load("SMoneda", "Sonidomoneda.wav")) return false;
+	if (!sfxs.load("MultitudG", "multitudG.wav")) return false;
+	if (!sfxs.load("SStart", "sonidostart.wav")) return false;
+	if (!tracks.load("Creditos", "Creditos.ogg")) return false;
+	if (!tracks.load("Victoria", "VICTORIA.ogg")) return false;
+	if (!tracks.load("Intro", "Intro Colibri Studios.ogg")) return false;
+	if (!tracks.load("Game Over", "Game Over.ogg")) return false;
+	if (!tracks.load("Gameplay", "Gameplay.ogg")) return false;
+	if (!tracks.load("Menu", "Menu.ogg")) return false;
+	if (!tracks.load("Tienda", "Tienda.ogg")) return false;
+	if (!tracks.load("sonido de start", "sonidostart.ogg")) return false;
+	//if (!tracks.load("Multidud de gallinas", "Multidud de gallinas.ogg")) return false;
+	if (!images.load("soundOn", "soundOn.png", renderer)) return false;
+	if (!images.load("soundOff", "soundOff.png", renderer)) return false;
+	if (!images.load("mapa3", "mapa3.png", renderer)) return false;
+	if (!images.load("play", "play.png", renderer)) return false;
+	if (!images.load("continuara", "continuara.png", renderer)) return false;
+	if (!images.load("soldOut", "soldOut.png", renderer)) return false;
+	if (!images.load("creditos", "creditos.png", renderer)) return false;
+	if (!images.load("link", "link.png", renderer)) return false;
+	if (!images.load("rupia1", "rupia1.png", renderer)) return false;
+	if (!images.load("rupia2", "rupia2.png", renderer)) return false;
+	if (!images.load("rupia3", "rupia3.png", renderer)) return false;
+	if (!images.load("rupia4", "rupia4.png", renderer)) return false;
+	if (!images.load("pajaro", "pajaro.png", renderer)) return false;
+	if (!images.load("mascota", "mascota.png", renderer)) return false;
+	if (!images.load("corazon", "corazon.png", renderer)) return false;
+	if (!images.load("corazont", "corazont.png", renderer)) return false;
+	if (!images.load("enter", "press_enter.png", renderer)) return false;
+	if (!images.load("pause", "pause.png", renderer)) return false;
+	if (!images.load("studio", "studio.png", renderer)) return false;
+	if (!images.load("horda", "horda.png", renderer)) return false;
+	if (!images.load("flecha", "flecha.png", renderer)) return false;
+	if (!images.load("flechab", "flecha_b.png", renderer)) return false;
+	if (!images.load("start", "start.png", renderer)) return false;
+	if (!images.load("back", "back.png", renderer)) return false;
+	if (!images.load("gameoverT", "gameoverT.png", renderer)) return false;
+	if (!images.load("linksad", "linksad.png", renderer)) return false;
+	if (!images.load("popupTienda", "popupTienda.png", renderer)) return false;
+	if (!images.load("arbol1", "arbol1.png", renderer)) return false;
+	if (!images.load("tienda", "tienda.png", renderer)) return false;
+	if (!images.load("roca4", "roca4.png", renderer)) return false;
+	if (!images.load("roca1", "roca1.png", renderer)) return false;
+	if (!images.load("roca2", "roca2.png", renderer)) return false;
+	if (!images.load("roca3", "roca3.png", renderer)) return false;
+	if (!images.load("lore1", "lore1.png", renderer)) return false;
+	if (!images.load("lore2", "lore2.png", renderer)) return false;
+	if (!images.load("lore3", "lore3.png", renderer)) return false;
+	if (!images.load("lore4", "lore4.png", renderer)) return false;
+	if (!images.load("lore5", "lore5.png", renderer)) return false;
+	if (!images.load("lore6", "lore6.png", renderer)) return false;
+	if (!images.load("lore7", "lore7.png", renderer)) return false;
+	if (!images.load("lore8", "lore8.png", renderer)) return false;
+	if (!images.load("lore9", "lore9.png", renderer)) return false;
+	if (!images.load("lore10", "lore10.png", renderer)) return false;
+	if (!images.load("lore11", "lore11.png", renderer)) return false;
+	if (!images.load("lore12", "lore12.png", renderer)) return false;
+	if (!images.load("lore13", "lore13.png", renderer)) return false;
+	if (!images.load("tiendalore1", "tiendalore_1.png", renderer)) return false;
+	if (!images.load("tiendalore2", "tiendalore_2.png", renderer)) return false;
+	if (!images.load("tiendalore3", "tiendalore_3.png", renderer)) return false;
+	if (!images.load("tiendalore4", "tiendalore_4.png", renderer)) return false;
+	if (!images.load("tiendalore5", "tiendalore_5.png", renderer)) return false;
+	if (!images.load("tiendalore6", "tiendalore_6.png", renderer)) return false;
+	if (!images.load("tiendalore7", "tiendalore_7.png", renderer)) return false;
+	if (!images.load("tiendalore8", "tiendalore_8.png", renderer)) return false;
+	if (!images.load("tiendalore9", "Tiendalore_9.png", renderer)) return false;
+	if (!images.load("n0", "0.png", renderer)) return false;
+	if (!images.load("n1", "1.png", renderer)) return false;
+	if (!images.load("n2", "2.png", renderer)) return false;
+	if (!images.load("n3", "3.png", renderer)) return false;
+	if (!images.load("n4", "4.png", renderer)) return false;
+	if (!images.load("n5", "5.png", renderer)) return false;
+	if (!images.load("n6", "6.png", renderer)) return false;
+	if (!images.load("n7", "7.png", renderer)) return false;
+	if (!images.load("n8", "8.png", renderer)) return false;
+	if (!images.load("n9", "9.png", renderer)) return false;
+	if (!images.load("arbol2", "arbol2.png", renderer)) return false;
+	if (!images.load("arbol3", "arbol3.png", renderer)) return false;
+	if (!images.load("arbol4", "arbol4.png", renderer)) return false;
+	if (!images.load("pausaT", "pausaT.png", renderer)) return false;
+	if (!images.load("gallina1", "gallinaBlanca.png", renderer)) return false;
+	if (!images.load("gallina2", "gallinaMarron.png", renderer)) return false;
+	if (!images.load("gallina3", "gallinaAzul.png", renderer)) return false;
+	if (!images.load("gallina4", "gallinaOscura.png", renderer)) return false;
+	if (!images.load("gallina5", "gallinaGolden.png", renderer)) return false;
+	if (!images.load("hardcore", "hardcore.png", renderer)) return false;
+	if (!images.load("winner", "winner.png", renderer)) return false;
+	if (!images.load("tituloCockFlock", "tituloCockFlock.png", renderer)) return false;
+	if (!images.load("creditosBoton", "creditosBoton.png", renderer)) return false;
+	if (!images.load("avestruz", "avestruz.png", renderer)) return false;
+	Mix_PlayMusic(tracks.get("Intro"), 1);
+	return true;
+}
+
+
+void GameAssets::clear() {
+	if (cleared) {
+		return;
+	}
+	images.clear();
+	tracks.clear();
+	sfxs.clear();
+	cleared = true;
+}
