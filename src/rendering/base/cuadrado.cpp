@@ -1,6 +1,6 @@
 #include "cuadrado.h"
 #include "general.h"
-#include "game.h"
+#include "game/game.h"
 
 void Cuadrado::draw() const {
 	if (dstRect == nullptr) return;
@@ -37,6 +37,6 @@ void Cuadrado::drawHitbox() const {
 	SDL_RenderDrawRect(Game::renderer, dstRect);
 }
 
-bool Cuadrado::checkCollision(SDL_Rect* otherRect) const {
+bool Cuadrado::checkCollision(const SDL_Rect* otherRect) const {
 	return dstRect != nullptr && otherRect != nullptr && SDL_HasIntersection(dstRect, otherRect);
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "cuadrado.h"
+#include "base/cuadrado.h"
 class Corazon : public Cuadrado {
 	public:
 		SDL_Texture* alive = nullptr;

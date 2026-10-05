@@ -1,6 +1,6 @@
 #pragma once
-#include "cuadrado.h"
 #include "general.h"
+#include "base/cuadrado.h"
 
 class Rupia : public Cuadrado {
 	public:

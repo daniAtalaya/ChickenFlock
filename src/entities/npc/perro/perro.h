@@ -1,6 +1,6 @@
 #pragma once
-#include "spritesheet.h"
-#include "cuadrado.h"
+#include "base/spritesheet.h"
+#include "base/cuadrado.h"
 
 class Perro : public Cuadrado {
 public:

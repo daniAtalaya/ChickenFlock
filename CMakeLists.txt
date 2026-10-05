@@ -43,12 +43,15 @@ file(GLOB_RECURSE CHICKEN_FLOCK_HEADERS CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
 )
 
+file(GLOB CHICKEN_FLOCK_SOURCE_GROUPS LIST_DIRECTORIES true
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*"
+)
 set(CHICKEN_FLOCK_INCLUDE_DIRS)
-foreach(header IN LISTS CHICKEN_FLOCK_HEADERS)
-    get_filename_component(header_directory "${header}" DIRECTORY)
-    list(APPEND CHICKEN_FLOCK_INCLUDE_DIRS "${header_directory}")
+foreach(source_group IN LISTS CHICKEN_FLOCK_SOURCE_GROUPS)
+    if(IS_DIRECTORY "${source_group}")
+        list(APPEND CHICKEN_FLOCK_INCLUDE_DIRS "${source_group}")
+    endif()
 endforeach()
-list(REMOVE_DUPLICATES CHICKEN_FLOCK_INCLUDE_DIRS)
 
 add_executable(ChickenFlock
     ${CHICKEN_FLOCK_SOURCES}

@@ -1,6 +1,6 @@
 #include "almacen.h"
 #include "asset_path.h"
-#include "game.h"
+#include "game/game.h"
 
 template <>
 bool Almacen<SDL_Texture*>::load(const std::string &name, const std::string &filename) {

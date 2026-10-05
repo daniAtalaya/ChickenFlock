@@ -1,6 +1,6 @@
 #pragma once
 #include "general.h"
-#include "cuadrado.h"
+#include "base/cuadrado.h"
 
 class Button : public Cuadrado {
 	public:

@@ -1,8 +1,8 @@
 #pragma once
 #include "general.h"
-#include "cuadrado.h"
-#include "spritesheet.h"
-#include "corazon.h"
+#include "base/cuadrado.h"
+#include "base/spritesheet.h"
+#include "health/corazon.h"
 
 class Player : public Cuadrado {
 	public:

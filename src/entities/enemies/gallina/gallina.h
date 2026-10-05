@@ -1,7 +1,7 @@
 #pragma once
-#include "cuadrado.h"
 #include "general.h"
-#include "spritesheet.h"
+#include "base/cuadrado.h"
+#include "base/spritesheet.h"
 
 class Gallina : public Cuadrado {
 	public:

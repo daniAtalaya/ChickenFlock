@@ -1,11 +1,11 @@
 #pragma once
-#include "cuadrado.h"
+#include "base/cuadrado.h"
 
 class Roca : public Cuadrado {
 public:
 	Roca() {
 		Cuadrado();
-		srcRect = NULL;
+		srcRect = nullptr;
 		dstRect = new SDL_Rect();
 	};
 };

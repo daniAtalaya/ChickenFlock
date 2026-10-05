@@ -1,6 +1,6 @@
 #pragma once
-#include "general.h"
 #include "color.h"
+#include "general.h"
 
 class Cuadrado {
 	public:
@@ -9,12 +9,12 @@ class Cuadrado {
 		SDL_Rect* srcRect = nullptr;
 		Color color;
 		int sX = 5;
-		bool disposable = false;
+		mutable bool disposable = false;
 		int sY = 5; 
 		SDL_Texture* img = nullptr;
 		void draw() const;
 		void drawHitbox() const;
 		void update(int, int) const;
 		void update() const;
-		bool checkCollision(SDL_Rect*) const;
+		bool checkCollision(const SDL_Rect*) const;
 };

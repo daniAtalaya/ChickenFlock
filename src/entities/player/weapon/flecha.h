@@ -1,8 +1,9 @@
 #pragma once
-#include "cuadrado.h"
-class Arbol : public Cuadrado {
+#include "base/cuadrado.h"
+
+class Flecha : public Cuadrado {
 	public:
-		Arbol() {
+		Flecha() {
 			Cuadrado();
 			srcRect = nullptr;
 			dstRect = new SDL_Rect();

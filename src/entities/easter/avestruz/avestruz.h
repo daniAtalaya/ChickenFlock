@@ -1,7 +1,7 @@
 #pragma once
-#include "cuadrado.h"
+#include "base/cuadrado.h"
 #include "general.h"
-#include "spritesheet.h"
+#include "base/spritesheet.h"
 
 class Avestruz : public Cuadrado {
 	public:

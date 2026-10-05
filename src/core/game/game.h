@@ -1,18 +1,19 @@
 #pragma once
 #include "general.h"
-#include "camera.h"
-#include "button.h"
-#include "almacen.h"
-#include "player.h"
-#include "gallina.h"
-#include "rupia.h"
+#include "ui/button.h"
+#include "player/player.h"
+#include "economy/rupia.h"
 #include "enums.h"
-#include "pajaro.h"
-#include "avestruz.h"
-#include "perro.h"
-#include "arbol.h"
-#include "roca.h"
-#include "flecha.h"
+#include "easter/avestruz/avestruz.h"
+#include "enemies/arbol/arbol.h"
+#include "enemies/gallina/gallina.h"
+#include "enemies/roca/roca.h"
+#include "gameplay/camera.h"
+#include "npc/pajaro/pajaro.h"
+#include "npc/perro/perro.h"
+#include "player/weapon/flecha.h"
+#include "resources/almacen.h"
+
 class Game {
 	public:
 		Game();
