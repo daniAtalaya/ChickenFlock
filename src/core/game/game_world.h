@@ -10,6 +10,7 @@
 #include "enemies/gallina/gallina.h"
 #include "enemies/roca/roca.h"
 #include "player/weapon/flecha.h"
+#include "game_progress.h"
 
 #include <functional>
 #include <string>
@@ -26,8 +27,8 @@ struct GameplayContext {
 	const Uint8* keyboard;
 	bool godMode;
 	bool hardMode;
-	int playedGames;
-	int& temporaryMoney;
+	GameProgress& progress;
+	int& temporaryRupees;
 	std::function<void(Escena)> changeScene;
 	std::function<void(const std::string&, int)> playSound;
 };
@@ -43,18 +44,18 @@ public:
 
 	void update(GameplayContext& context);
 	void shoot(const Player& player, GameAssets& assets,
-		const std::function<void(const std::string&, int)>& playSound);
-	bool collectBird(Pajaro& bird, const SDL_Rect* mouse, int playedGames, int& temporaryMoney);
+	const std::function<void(const std::string&, int)>& playSound);
+	bool collectBird(Pajaro& bird, const SDL_Rect* mouse, int playedGames, int& temporaryRupees);
 	void cleanup();
 	void markForRemoval();
 	void markForVictory();
 	void clear();
 
-	void drawRupias() const;
-	void drawRocas() const;
-	void drawArboles() const;
-	void drawGallinas(bool paused);
-	void drawFlechas() const;
+	void drawRupias(SDL_Renderer* renderer, bool showHitboxes) const;
+	void drawRocas(SDL_Renderer* renderer, bool showHitboxes) const;
+	void drawArboles(SDL_Renderer* renderer, bool showHitboxes) const;
+	void drawGallinas(SDL_Renderer* renderer, bool showHitboxes);
+	void drawFlechas(SDL_Renderer* renderer, bool showHitboxes) const;
 
 private:
 	void spawn(GameplayContext& context);

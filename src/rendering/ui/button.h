@@ -8,5 +8,5 @@ class Button : public Cuadrado {
 			Cuadrado();
 		};
 
-		bool isClicked(const SDL_Rect*) const;
+		bool isClicked(const SDL_Point&) const;
 };

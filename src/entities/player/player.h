@@ -10,12 +10,6 @@ class Player : public Cuadrado {
 		int direccion = 1; 
 		int index = 0;
 		int vides = 3;
-		int money = 500;
-		bool brownComprada = false;
-		bool azulComprada = false;
-		bool darkComprada = false;
-		bool goldenComprada = false;
-		int gallinasDesbloqueadas = 1;
 		Corazon corazones[3];
 
 		Player() {
@@ -27,10 +21,19 @@ class Player : public Cuadrado {
 
 		void init(SDL_Texture*);
 
-		void damage() {
-			if (vides <= 0) return;
+		bool damage() {
+			if (vides <= 0 || isInvulnerable()) {
+				return false;
+			}
 			--vides;
+			lastDamageTick = SDL_GetTicks();
+			hasTakenDamage = true;
 			corazones[vides].img = corazones[vides].dead;
+			return true;
+		}
+
+		bool isInvulnerable() const {
+			return hasTakenDamage && SDL_GetTicks() - lastDamageTick < damageInvulnerabilityMs;
 		}
 
 		void animateY() const {
@@ -41,4 +44,9 @@ class Player : public Cuadrado {
 			srcRect->x = spritesheet.frameW * index;
 			if (++index >= spritesheet.maxC) index = 0;
 		}
+
+	private:
+		static constexpr Uint32 damageInvulnerabilityMs = 1000;
+		Uint32 lastDamageTick = 0;
+		bool hasTakenDamage = false;
 };

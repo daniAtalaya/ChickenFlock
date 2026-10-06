@@ -11,10 +11,11 @@ Colibri Studios as a first-year game-development project.
 - **T:** open the store from the menu
 - **Q:** leave the store or return to the menu from pause
 - **WASD** or **arrow keys:** move
-- **F1:** toggle God Mode
+- **F1:** toggle God Mode during gameplay and show red hitbox outlines
 - **F2:** toggle Hard Mode
 - **F3:** show credits
-- **F4:** graphics room (not implemented)
+- **F4 from the menu or Graphics Room:** open or leave the Graphics Room
+- **Left/Right in the Graphics Room:** browse the visual gallery
 
 ## Project layout
 
@@ -25,8 +26,8 @@ assets/
   audio/sfx/              Sound effects loaded by the game
   audio/source/           Additional source audio, not loaded at runtime
 src/
-  app/                    Game loop and entry point
-  core/                   Shared definitions and asset paths
+  core/                   Shared definitions, game state, and asset paths
+    game/scenes/          Scene implementations, factories, and scene-only contexts
   entities/               Player, enemies, pickups, and world objects
   rendering/              Sprites, buttons, camera, and shapes
   resources/              Image and audio resource store
@@ -39,6 +40,22 @@ vcpkg.json                Pinned SDL2 dependency manifest
 The build stages runtime assets beside the executable. Asset lookup is based on
 the executable path, so launching from a terminal, CLion, or another working
 directory uses the same files.
+
+Rupees, unlocked chicken types, and gameplay count are stored in a versioned
+save file named `save.dat` under SDL's per-user preferences directory. The
+game requests SDL's path with organization name `Colibri Studios` and
+application name `Chicken Flock`. On Windows, the default file is:
+
+```text
+%APPDATA%\Colibri Studios\Chicken Flock\save.dat
+```
+
+`%APPDATA%` expands to the current Windows user's roaming application-data
+directory (typically `C:\Users\<user>\AppData\Roaming`). SDL chooses the
+corresponding per-user preferences location on other platforms. Updates are
+coalesced and written on a background thread; pending data is drained when the
+game shuts down. Rupees collected during a run are added to the saved balance
+when the run ends in either victory or defeat.
 
 ## Requirements
 

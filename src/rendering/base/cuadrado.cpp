@@ -1,15 +1,14 @@
 #include "cuadrado.h"
 #include "general.h"
-#include "game/game.h"
 
-void Cuadrado::draw() const {
+void Cuadrado::draw(SDL_Renderer* renderer, const bool showHitboxes) const {
 	if (dstRect == nullptr) return;
-	SDL_SetRenderDrawColor(Game::renderer, color.r, color.g, color.b, color.a);
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	if (img != nullptr) {
-		SDL_RenderCopy(Game::renderer, img, srcRect, dstRect);
+		SDL_RenderCopy(renderer, img, srcRect, dstRect);
 	}
-	if (Game::god) {
-		drawHitbox();
+	if (showHitboxes) {
+		drawHitbox(renderer);
 	}
 }
 
@@ -29,12 +28,12 @@ void Cuadrado::update() const {
 	dstRect->y += sY;
 }
 
-void Cuadrado::drawHitbox() const {
+void Cuadrado::drawHitbox(SDL_Renderer* renderer) const {
 	if (dstRect == nullptr) {
 		return;
 	}
-	SDL_SetRenderDrawColor(Game::renderer, 192, 0, 0, 255);
-	SDL_RenderDrawRect(Game::renderer, dstRect);
+	SDL_SetRenderDrawColor(renderer, 192, 0, 0, 255);
+	SDL_RenderDrawRect(renderer, dstRect);
 }
 
 bool Cuadrado::checkCollision(const SDL_Rect* otherRect) const {

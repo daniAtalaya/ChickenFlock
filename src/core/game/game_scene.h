@@ -11,7 +11,7 @@ public:
 	virtual void enter(Escena) {}
 	virtual void exit(Escena) {}
 	virtual void handleInput(const SDL_Event&) {}
-	virtual void handleClick() {}
+	virtual void handleClick(const SDL_Point&) {}
 	virtual void update() {}
-	virtual void render() = 0;
+	virtual void render(SDL_Renderer*, bool showHitboxes) = 0;
 };

@@ -99,12 +99,12 @@ void GameWorld::shoot(const Player& player, GameAssets& assets,
 	flechas.push_back(arrow);
 }
 
-bool GameWorld::collectBird(Pajaro& bird, const SDL_Rect* mouse, int playedGames, int& temporaryMoney) {
+bool GameWorld::collectBird(Pajaro& bird, const SDL_Rect* mouse, int playedGames, int& temporaryRupees) {
 	if (playedGames % 2 != 0 || !bird.checkCollision(mouse)) {
 		return false;
 	}
 	bird.dstRect->h = 0;
-	temporaryMoney += 5;
+	temporaryRupees += 5;
 	return true;
 }
 
@@ -135,7 +135,7 @@ void GameWorld::movePlayer(GameplayContext& context) {
 }
 
 void GameWorld::updateBird(GameplayContext& context) {
-	if (context.playedGames % 2 != 0) {
+	if (context.progress.gamesPlayed % 2 != 0) {
 		return;
 	}
 	Pajaro& bird = context.bird;
@@ -157,7 +157,6 @@ void GameWorld::spawn(GameplayContext& context) {
 		return;
 	}
 
-	Player& player = context.player;
 	Camera& camera = context.camera;
 	GameAssets& assets = context.assets;
 	const auto randomX = [&context]() {
@@ -198,17 +197,14 @@ void GameWorld::spawn(GameplayContext& context) {
 			return makeChicken(type, x, y);
 		};
 		gallinas.push_back(spawnChicken(1));
-		if (player.brownComprada) gallinas.push_back(spawnChicken(2));
-		if (player.azulComprada) gallinas.push_back(spawnChicken(3));
-		if (player.darkComprada) gallinas.push_back(spawnChicken(4));
-		if (player.goldenComprada) gallinas.push_back(spawnChicken(5));
+		if (context.progress.brownChickenUnlocked) gallinas.push_back(spawnChicken(2));
+		if (context.progress.blueChickenUnlocked) gallinas.push_back(spawnChicken(3));
+		if (context.progress.darkChickenUnlocked) gallinas.push_back(spawnChicken(4));
+		if (context.progress.goldenChickenUnlocked) gallinas.push_back(spawnChicken(5));
 	}
 	if (SDL_GetTicks() / 16 % 100 == 0) {
 		tipoGallinaTrasera = R_NUM(1, 5);
-		if (tipoGallinaTrasera == 5 && !player.goldenComprada) tipoGallinaTrasera = 4;
-		if (tipoGallinaTrasera == 4 && !player.darkComprada) tipoGallinaTrasera = 3;
-		if (tipoGallinaTrasera == 3 && !player.azulComprada) tipoGallinaTrasera = 2;
-		if (tipoGallinaTrasera == 2 && !player.brownComprada) tipoGallinaTrasera = 1;
+		while (!context.progress.isChickenUnlocked(tipoGallinaTrasera)) --tipoGallinaTrasera;
 		const int x = randomX();
 		const int y = WINDOW_H + R_NUM(-150, -50);
 		auto* chicken = makeChicken(tipoGallinaTrasera, x, y);
@@ -249,31 +245,32 @@ void GameWorld::resolveCollisions(GameplayContext& context) {
 		if (player.checkCollision(rupee->dstRect)) {
 			rupee->disposable = true;
 			context.playSound("SMoneda", 0);
-			context.temporaryMoney += rupee->valor;
+			context.temporaryRupees += rupee->valor;
 		}
 	}
 	for (const Gallina* chicken : gallinas) {
 		chicken->update();
 		if (player.checkCollision(chicken->dstRect)) {
 			chicken->disposable = true;
-			context.playSound(u8"dañoGallina", 0);
-			if (!context.godMode) player.damage();
+			if (!context.godMode && player.damage()) {
+				context.playSound(u8"dañoGallina", 0);
+			}
 		}
 	}
 	for (const Roca* rock : rocas) {
 		rock->update();
 		if (player.checkCollision(rock->dstRect)) {
-			context.playSound(u8"dañoQueja", 0);
-			if (!context.hardMode) context.changeScene(GAMEOVER);
-			context.temporaryMoney = 0;
+			if (!context.godMode) {
+				context.playSound(u8"dañoQueja", 0);
+				if (!context.hardMode) context.changeScene(GAMEOVER);
+			}
 		}
 	}
 	for (const Arbol* tree : arboles) {
 		tree->update();
-		if (player.checkCollision(tree->dstRect) && !context.hardMode) {
+		if (player.checkCollision(tree->dstRect) && !context.hardMode && !context.godMode) {
 			context.playSound(u8"dañoQueja", 0);
 			if (!context.hardMode) context.changeScene(GAMEOVER);
-			context.temporaryMoney = 0;
 		}
 	}
 	for (const Flecha* arrow : flechas) {
@@ -283,7 +280,7 @@ void GameWorld::resolveCollisions(GameplayContext& context) {
 				context.playSound("muerteGallina", 0);
 				chicken->disposable = true;
 				arrow->disposable = true;
-				context.temporaryMoney += R_NUM(0, chicken->tipus * 2);
+				context.temporaryRupees += R_NUM(0, chicken->tipus * 2);
 			}
 		}
 	}
@@ -293,34 +290,36 @@ void GameWorld::update(GameplayContext& context) {
 	movePlayer(context);
 	updateBird(context);
 	if (context.player.checkCollision(context.horda.dstRect)) {
-		context.player.damage();
+		const bool damaged = !context.godMode && context.player.damage();
 		context.player.dstRect->y -= context.horda.dstRect->h + 10;
-		context.playSound(u8"dañoGallina", 0);
+		if (damaged) {
+			context.playSound(u8"dañoGallina", 0);
+		}
 	}
 	spawn(context);
 	resolveCollisions(context);
 }
 
-void GameWorld::drawRupias() const {
-	for (const Rupia* rupee : rupias) rupee->draw();
+void GameWorld::drawRupias(SDL_Renderer* renderer, const bool showHitboxes) const {
+	for (const Rupia* rupee : rupias) rupee->draw(renderer, showHitboxes);
 }
 
-void GameWorld::drawRocas() const {
-	for (const Roca* rock : rocas) rock->draw();
+void GameWorld::drawRocas(SDL_Renderer* renderer, const bool showHitboxes) const {
+	for (const Roca* rock : rocas) rock->draw(renderer, showHitboxes);
 }
 
-void GameWorld::drawArboles() const {
-	for (const Arbol* tree : arboles) tree->draw();
+void GameWorld::drawArboles(SDL_Renderer* renderer, const bool showHitboxes) const {
+	for (const Arbol* tree : arboles) tree->draw(renderer, showHitboxes);
 }
 
-void GameWorld::drawGallinas(bool paused) {
+void GameWorld::drawGallinas(SDL_Renderer* renderer, const bool showHitboxes) {
 	for (Gallina* chicken : gallinas) {
-		chicken->draw();
-		if (SDL_GetTicks() / 16 % 20 == 0 && !paused) chicken->animateX();
-		if (SDL_GetTicks() / 16 % 200 * chicken->spritesheet.maxC == 0 && !paused) chicken->animateY();
+		chicken->draw(renderer, showHitboxes);
+		if (SDL_GetTicks() / 16 % 20 == 0) chicken->animateX();
+		if (SDL_GetTicks() / 16 % 200 * chicken->spritesheet.maxC == 0) chicken->animateY();
 	}
 }
 
-void GameWorld::drawFlechas() const {
-	for (const Flecha* arrow : flechas) arrow->draw();
+void GameWorld::drawFlechas(SDL_Renderer* renderer, const bool showHitboxes) const {
+	for (const Flecha* arrow : flechas) arrow->draw(renderer, showHitboxes);
 }

@@ -1,77 +1,111 @@
 #include "game_scene_manager.h"
-#include "game_scene_creators.h"
+#include <SDL.h>
+#include <stdexcept>
+#include <utility>
 
-void GameSceneManager::initialize(Escena scene, const GameSceneFactoryContext& context) {
-	for (std::size_t index = 0; index < sceneCount; ++index) {
-		scenes[index] = createGameScene(static_cast<Escena>(index), context);
+void GameSceneManager::initialize(const Escena scene, SceneCollection sceneCollection,
+	const GameSceneManagerContext& context) {
+	if (static_cast<std::size_t>(scene) >= sceneCount) {
+		throw std::invalid_argument("Cannot initialize the scene manager with an invalid scene");
 	}
-	currentScene = scene;
-	publishedScene = &context.currentScene;
-	gamesPlayed = &context.gamesPlayed;
-	hardMode = &context.hardMode;
-	playButton = &context.playButton;
-	mouse = context.mouse;
-	togglePause = context.togglePause;
+	for (std::size_t index = 0; index < sceneCount; ++index) {
+		if (!sceneCollection[index] || sceneCollection[index]->id() != static_cast<Escena>(index)) {
+			throw std::invalid_argument("Scene collection must contain exactly one correctly indexed scene");
+		}
+	}
+	scenes = std::move(sceneCollection);
+	state = scene;
+	progress = &context.progress;
 	haltMusic = context.haltMusic;
-	*publishedScene = scene;
-	activeScene = scenes[static_cast<std::size_t>(scene)].get();
+	saveProgress = context.saveProgress;
+	activeScene = scenes[static_cast<std::size_t>(state)].get();
 	if (activeScene != nullptr) {
 		activeScene->enter(scene);
 	}
 }
 
-void GameSceneManager::changeTo(Escena scene) {
+void GameSceneManager::changeTo(const Escena scene) {
+	if (static_cast<std::size_t>(scene) >= sceneCount) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Rejected transition to invalid scene %d", scene);
+		return;
+	}
+	if (scene == state) {
+		return;
+	}
+	if (!canTransitionTo(scene)) {
+		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Rejected invalid transition from %d to %d", state, scene);
+		return;
+	}
 	applyTransition(scene);
 }
 
-void GameSceneManager::applyTransition(Escena scene) {
-	const Escena previousScene = currentScene;
+bool GameSceneManager::canTransitionTo(const Escena scene) const {
+	switch (state) {
+	case INICI: return scene == MENU;
+	case MENU: return scene == LORE || scene == TIENDA || scene == CREDITS || scene == GRAPHICS_ROOM;
+	case LORE: return scene == JOC;
+	case JOC: return scene == PAUSA || scene == GAMEOVER || scene == GUANYAT;
+	case GAMEOVER: return scene == MENU;
+	case GUANYAT: return scene == CREDITS;
+	case TIENDA: return scene == MENU;
+	case PAUSA: return scene == MENU || scene == JOC;
+	case CREDITS: return scene == MENU;
+	case GRAPHICS_ROOM: return scene == MENU;
+	default: return false;
+	}
+}
+
+void GameSceneManager::applyTransition(const Escena scene) {
+	const Escena previousScene = state;
 	if (activeScene != nullptr) {
 		activeScene->exit(scene);
 	}
 
 	if (previousScene == MENU && scene == LORE) {
-		++*gamesPlayed;
+		++progress->gamesPlayed;
+		saveProgress(*progress);
 	}
 	if (previousScene == PAUSA && scene == MENU) {
-		*hardMode = false;
+		hardMode = false;
+		scenes[static_cast<std::size_t>(JOC)]->exit(MENU);
 	}
-	if (previousScene != LORE && previousScene != PAUSA) {
+	if (previousScene == GAMEOVER || previousScene == GUANYAT || previousScene == CREDITS) {
+		hardMode = false;
+	}
+	const bool pausingGameplay = previousScene == JOC && scene == PAUSA;
+	const bool resumingGameplay = previousScene == PAUSA && scene == JOC;
+	if (previousScene != LORE && !pausingGameplay && !resumingGameplay) {
 		haltMusic();
 	}
 
-	currentScene = scene;
-	*publishedScene = scene;
-	activeScene = scenes[static_cast<std::size_t>(scene)].get();
+	state = scene;
+	activeScene = scenes[static_cast<std::size_t>(state)].get();
 	if (activeScene != nullptr) {
 		activeScene->enter(previousScene);
 	}
 }
 
-void GameSceneManager::handleInput(const SDL_Event& event) {
+void GameSceneManager::handleInput(const SDL_Event& event) const {
 	if (activeScene != nullptr) {
 		activeScene->handleInput(event);
 	}
 }
 
-void GameSceneManager::handleClick() {
+void GameSceneManager::handleClick(const SDL_Point& position) const {
 	if (activeScene == nullptr) {
 		return;
 	}
-	activeScene->handleClick();
-	if (playButton->isClicked(mouse)) {
-		togglePause();
-	}
+	activeScene->handleClick(position);
 }
 
-void GameSceneManager::update() {
+void GameSceneManager::update() const {
 	if (activeScene != nullptr) {
 		activeScene->update();
 	}
 }
 
-void GameSceneManager::render() {
+void GameSceneManager::render(SDL_Renderer* renderer, const bool showHitboxes) const {
 	if (activeScene != nullptr) {
-		activeScene->render();
+		activeScene->render(renderer, showHitboxes);
 	}
 }
