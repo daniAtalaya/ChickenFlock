@@ -8,7 +8,8 @@ class Almacen {
 
 		void clear();
 
-		bool load(const std::string &, const std::string &, SDL_Renderer* renderer = nullptr);
+		bool load(const std::string &, const std::string &, SDL_Renderer* renderer = nullptr,
+			MIX_Mixer* mixer = nullptr, bool streamed = false);
 
 		T get(std::string name) {
 			auto entry = mapa.find(name);

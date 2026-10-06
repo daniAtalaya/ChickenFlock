@@ -23,7 +23,7 @@ class PauseScene final : public GameScene {
 		}
 
 		void handleInput(const SDL_Event& event) override {
-			if (event.type == SDL_KEYDOWN && !event.key.repeat && event.key.keysym.sym == SDLK_q) {
+			if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat && event.key.key == SDLK_Q) {
 				context.changeScene(MENU);
 			}
 		}
@@ -49,7 +49,7 @@ class PauseScene final : public GameScene {
 				showPauseText = !showPauseText;
 			}
 			if (showPauseText) {
-				SDL_QueryTexture(context.assets.images.get("pausaT"), nullptr, nullptr, &width, &height);
+				getTextureSize(context.assets.images.get("pausaT"), &width, &height);
 				renderTexture(renderer, context.assets.images.get("pausaT"), {
 					(WINDOW_W / 2) - 320, WINDOW_H / 2 - height * 2 / 10,
 					width * 1 / 3, height * 4 / 10

@@ -12,7 +12,7 @@ class IntroScene final : public GameScene {
 		Escena id() const override { return INICI; }
 
 		void handleInput(const SDL_Event& event) override {
-			if (event.type == SDL_KEYDOWN && !event.key.repeat && isConfirmKey(event.key.keysym.sym)) {
+			if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat && isConfirmKey(event.key.key)) {
 				context.changeScene(MENU);
 			}
 		}
@@ -25,9 +25,9 @@ class IntroScene final : public GameScene {
 			int width, height;
 			soundButton.img = context.assets.images.get(context.muted ? "soundOff" : "soundOn");
 			soundButton.draw(renderer);
-			SDL_QueryTexture(context.assets.images.get("studio"), nullptr, nullptr, &width, &height);
+			getTextureSize(context.assets.images.get("studio"), &width, &height);
 			renderTexture(renderer, context.assets.images.get("studio"), { (WINDOW_W / 2) - 220, 150, 440, 440 });
-			SDL_QueryTexture(context.assets.images.get("enter"), nullptr, nullptr, &width, &height);
+			getTextureSize(context.assets.images.get("enter"), &width, &height);
 			renderTexture(renderer, context.assets.images.get("enter"), {
 				WINDOW_W - 55 - width / 2, 550, width / 2, height * 7 / 10
 			});

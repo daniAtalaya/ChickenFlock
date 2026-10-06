@@ -46,7 +46,7 @@ class Player : public Cuadrado {
 		}
 
 	private:
-		static constexpr Uint32 damageInvulnerabilityMs = 1000;
-		Uint32 lastDamageTick = 0;
+		static constexpr Uint64 damageInvulnerabilityMs = 1000;
+		Uint64 lastDamageTick = 0;
 		bool hasTakenDamage = false;
 };

@@ -24,6 +24,11 @@ class CreditsScene final : public GameScene {
 		Escena id() const override { return CREDITS; }
 
 		void enter(Escena) override {
+			credits.dstRect->y = WINDOW_H * 15 / 10;
+			ostrich.dstRect->y = WINDOW_H * 15 / 10;
+			continueCard.dstRect->y = WINDOW_H * 15 / 10;
+			creditsShown = false;
+			ostrichShown = false;
 			context.haltChannels();
 			context.playMusic("Creditos", 1);
 		}

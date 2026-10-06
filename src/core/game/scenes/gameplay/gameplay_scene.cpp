@@ -19,7 +19,7 @@ class GameplayScene final : public GameScene {
 		explicit GameplayScene(GameplaySceneContext context) : context(std::move(context)) {
 			horda.img = this->context.assets.images.get("horda");
 			assignRect(horda.dstRect, { 130, WINDOW_H, 0, 0 });
-			SDL_QueryTexture(horda.img, nullptr, nullptr, &horda.dstRect->w, &horda.dstRect->h);
+			getTextureSize(horda.img, &horda.dstRect->w, &horda.dstRect->h);
 			hordeHeight = horda.dstRect->h;
 			resetHorde();
 			assignRect(leftWall.dstRect, { 1, 1, 150, 8100 });
@@ -57,8 +57,8 @@ class GameplayScene final : public GameScene {
 		}
 
 		void handleInput(const SDL_Event& event) override {
-			if (event.type != SDL_KEYDOWN || event.key.repeat) return;
-			if (event.key.keysym.sym == SDLK_SPACE
+			if (event.type != SDL_EVENT_KEY_DOWN || event.key.repeat) return;
+			if (event.key.key == SDLK_SPACE
 				&& (context.player.direccion == 1 || context.player.direccion == 3)) {
 				world.shoot(context.player, context.assets, context.playSound);
 			}

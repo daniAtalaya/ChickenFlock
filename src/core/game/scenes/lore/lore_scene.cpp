@@ -38,7 +38,7 @@ class LoreScene final : public GameScene {
 		}
 
 		void handleInput(const SDL_Event& event) override {
-			if (event.type == SDL_KEYDOWN && !event.key.repeat && isConfirmKey(event.key.keysym.sym)) {
+			if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat && isConfirmKey(event.key.key)) {
 				context.changeScene(JOC);
 			}
 		}

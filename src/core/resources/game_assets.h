@@ -10,11 +10,11 @@ public:
 	GameAssets(GameAssets&&) = delete;
 	GameAssets& operator=(GameAssets&&) = delete;
 
-	Almacen<Mix_Chunk*> sfxs;
-	Almacen<Mix_Music*> tracks;
+	Almacen<MIX_Audio*> sfxs;
+	Almacen<MIX_Audio*> tracks;
 	Almacen<SDL_Texture*> images;
 
-	bool load(SDL_Renderer* renderer);
+	bool load(SDL_Renderer* renderer, MIX_Mixer* mixer);
 	void clear();
 
 private:

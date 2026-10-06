@@ -57,7 +57,7 @@ namespace {
 		}
 
 		void handleInput(const SDL_Event& event) override {
-			if (event.type == SDL_KEYDOWN && !event.key.repeat && event.key.keysym.sym == SDLK_q) {
+			if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat && event.key.key == SDLK_Q) {
 				context.changeScene(MENU);
 			}
 		}
@@ -83,7 +83,7 @@ namespace {
 			context.camera.sY = 0;
 			context.camera.draw(renderer, showHitboxes);
 			context.player.draw(renderer, showHitboxes);
-			SDL_QueryTexture(context.assets.images.get("popupTienda"), nullptr, nullptr, &width, &height);
+			getTextureSize(context.assets.images.get("popupTienda"), &width, &height);
 			renderTexture(renderer, context.assets.images.get("popupTienda"), {
 				              WINDOW_W / 4, 20, width - 100, height - 100
 			              });

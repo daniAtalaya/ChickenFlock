@@ -20,7 +20,7 @@ class GameOverScene final : public GameScene {
 		}
 
 		void handleInput(const SDL_Event& event) override {
-			if (event.type == SDL_KEYDOWN && !event.key.repeat && isConfirmKey(event.key.keysym.sym)) {
+			if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat && isConfirmKey(event.key.key)) {
 				context.changeScene(MENU);
 			}
 		}
@@ -42,7 +42,7 @@ class GameOverScene final : public GameScene {
 			soundButton.draw(renderer, showHitboxes);
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
 			fillRect(renderer, { 0, 0, WINDOW_W, WINDOW_H });
-			SDL_QueryTexture(context.assets.images.get("gameoverT"), nullptr, nullptr, &width, &height);
+			getTextureSize(context.assets.images.get("gameoverT"), &width, &height);
 			renderTexture(renderer, context.assets.images.get("gameoverT"), {
 				WINDOW_W - 100 - width / 3, 100, width * 1 / 3, height * 4 / 10
 			});

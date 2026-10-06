@@ -1,30 +1,30 @@
 {
   "version": 6,
   "cmakeMinimumRequired": {
-    "major": 3,
-    "minor": 25,
+    "major": 4,
+    "minor": 2,
     "patch": 0
   },
   "configurePresets": [
     {
       "name": "windows-debug",
       "displayName": "Windows x64 Debug",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/${presetName}",
+      "generator": "Visual Studio 18 2026",
+      "binaryDir": "${sourceDir}/build/${presetName}-vs18",
+      "architecture": "x64",
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
         "VCPKG_TARGET_TRIPLET": "x64-windows"
       }
     },
     {
       "name": "windows-release",
       "displayName": "Windows x64 Release",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/${presetName}",
+      "generator": "Visual Studio 18 2026",
+      "binaryDir": "${sourceDir}/build/${presetName}-vs18",
+      "architecture": "x64",
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
         "VCPKG_TARGET_TRIPLET": "x64-windows"
       }
     }
@@ -33,12 +33,14 @@
     {
       "name": "debug",
       "displayName": "Build Debug",
-      "configurePreset": "windows-debug"
+      "configurePreset": "windows-debug",
+      "configuration": "Debug"
     },
     {
       "name": "release",
       "displayName": "Build Release",
-      "configurePreset": "windows-release"
+      "configurePreset": "windows-release",
+      "configuration": "Release"
     }
   ]
 }

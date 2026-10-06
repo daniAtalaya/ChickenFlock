@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 4.2)
 
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     if(DEFINED ENV{VCPKG_ROOT})
@@ -31,9 +31,9 @@ endif()
 
 project(ChickenFlock VERSION 1.0.0 LANGUAGES CXX)
 
-find_package(SDL2 CONFIG REQUIRED)
-find_package(SDL2_image CONFIG REQUIRED)
-find_package(SDL2_mixer CONFIG REQUIRED)
+find_package(SDL3 CONFIG REQUIRED)
+find_package(SDL3_image CONFIG REQUIRED)
+find_package(SDL3_mixer CONFIG REQUIRED)
 
 file(GLOB_RECURSE CHICKEN_FLOCK_SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
@@ -60,16 +60,15 @@ add_executable(ChickenFlock
 
 target_compile_features(ChickenFlock PRIVATE cxx_std_17)
 target_include_directories(ChickenFlock PRIVATE ${CHICKEN_FLOCK_INCLUDE_DIRS})
-
-target_link_libraries(ChickenFlock PRIVATE
-    SDL2::SDL2
-    SDL2_image::SDL2_image
-    SDL2_mixer::SDL2_mixer
+target_include_directories(ChickenFlock SYSTEM PRIVATE
+    "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include"
 )
 
-if(WIN32)
-    target_link_libraries(ChickenFlock PRIVATE SDL2::SDL2main)
-endif()
+target_link_libraries(ChickenFlock PRIVATE
+    SDL3::SDL3
+    $<IF:$<TARGET_EXISTS:SDL3_image::SDL3_image-shared>,SDL3_image::SDL3_image-shared,SDL3_image::SDL3_image-static>
+    $<IF:$<TARGET_EXISTS:SDL3_mixer::SDL3_mixer>,SDL3_mixer::SDL3_mixer,SDL3_mixer::SDL3_mixer-static>
+)
 
 if(MSVC)
     target_compile_options(ChickenFlock PRIVATE /W4 /permissive- /utf-8)
