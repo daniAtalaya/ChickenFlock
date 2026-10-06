@@ -8,7 +8,7 @@ class MenuScene final : public GameScene {
 	Button soundButton;
 	Button shopButton;
 	Button hardcoreButton;
-	SDL_Rect graphicsRoomButton{ 420, 755, 120, 95 };
+	SDL_Rect graphicsRoomButton{ 405, 770, 150, 60 };
 	Perro pet;
 	public:
 		explicit MenuScene(MenuSceneContext context) : context(std::move(context)) {
@@ -61,7 +61,7 @@ class MenuScene final : public GameScene {
 				context.hardMode = !context.hardMode;
 				return;
 			}
-			if (SDL_PointInRect(&position, &graphicsRoomButton)) {
+			if (context.debugHitboxes && SDL_PointInRect(&position, &graphicsRoomButton)) {
 				context.changeScene(GRAPHICS_ROOM);
 				return;
 			}
@@ -89,12 +89,18 @@ class MenuScene final : public GameScene {
 			});
 			creditsButton.draw(renderer, showHitboxes);
 			renderCurrencyPanel(renderer, context.assets, context.progress.rupees);
-			SDL_SetRenderDrawColor(renderer, 255, 250, 231, 255);
-			SDL_RenderFillRect(renderer, &graphicsRoomButton);
-			SDL_SetRenderDrawColor(renderer, 107, 137, 95, 255);
-			SDL_RenderDrawRect(renderer, &graphicsRoomButton);
-			drawPixelText(renderer, "F4", 458, 767, 4, { 44, 67, 53, 255 });
-			drawPixelText(renderer, "GALLERY", 439, 821, 2, { 78, 100, 74, 255 });
+			if (context.debugHitboxes) {
+				SDL_SetRenderDrawColor(renderer, 255, 239, 190, 255);
+				SDL_RenderFillRect(renderer, &graphicsRoomButton);
+				SDL_SetRenderDrawColor(renderer, 127, 82, 38, 255);
+				SDL_RenderDrawRect(renderer, &graphicsRoomButton);
+				const std::string label = "GRAPHICS ROOM";
+				const int labelScale = 1;
+				drawPixelText(renderer, label,
+					graphicsRoomButton.x + (graphicsRoomButton.w - pixelTextWidth(label, labelScale)) / 2,
+					graphicsRoomButton.y + (graphicsRoomButton.h - 7 * labelScale) / 2,
+					labelScale, { 44, 67, 53, 255 });
+			}
 			if (!context.hardMode) {
 				hardcoreButton.draw(renderer, showHitboxes);
 			}

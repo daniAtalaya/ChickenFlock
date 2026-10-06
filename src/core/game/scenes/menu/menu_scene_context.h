@@ -20,6 +20,7 @@ struct MenuSceneContext {
 	std::function<void(Escena)> changeScene;
 	std::function<void()> toggleMute;
 	bool& muted;
+	bool& debugHitboxes;
 	bool& hardMode;
 	Camera& camera;
 	Player& player;

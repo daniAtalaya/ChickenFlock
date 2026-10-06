@@ -79,18 +79,10 @@ endif()
 
 add_custom_command(TARGET ChickenFlock POST_BUILD
     COMMAND "${CMAKE_COMMAND}" -E make_directory
-        "$<TARGET_FILE_DIR:ChickenFlock>/assets/images"
-        "$<TARGET_FILE_DIR:ChickenFlock>/assets/audio/music"
-        "$<TARGET_FILE_DIR:ChickenFlock>/assets/audio/sfx"
+        "$<TARGET_FILE_DIR:ChickenFlock>/assets"
     COMMAND "${CMAKE_COMMAND}" -E copy_directory
-        "${PROJECT_SOURCE_DIR}/assets/images"
-        "$<TARGET_FILE_DIR:ChickenFlock>/assets/images"
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory
-        "${PROJECT_SOURCE_DIR}/assets/audio/music"
-        "$<TARGET_FILE_DIR:ChickenFlock>/assets/audio/music"
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory
-        "${PROJECT_SOURCE_DIR}/assets/audio/sfx"
-        "$<TARGET_FILE_DIR:ChickenFlock>/assets/audio/sfx"
+        "${PROJECT_SOURCE_DIR}/assets"
+        "$<TARGET_FILE_DIR:ChickenFlock>/assets"
     COMMAND_EXPAND_LISTS
     VERBATIM
 )

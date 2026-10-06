@@ -15,7 +15,21 @@ Colibri Studios as a first-year game-development project.
 - **F2:** toggle Hard Mode
 - **F3:** show credits
 - **F4 from the menu or Graphics Room:** open or leave the Graphics Room
-- **Left/Right in the Graphics Room:** browse the visual gallery
+  (menu entry requires F1 debug mode)
+- **Tab in the Graphics Room:** switch between the image gallery and audio
+  player; **Space** previews the selected audio file
+- **Left/Right:** browse one resource at a time; **Page Up/Page Down** jump
+  ten resources, and **Home/End** jump to the first or last
+- **Click the arrows or Back 10/Next 10 buttons:** navigate the selected
+  resource
+- **/** or the search field: filter images by name; type to search and press
+  Enter to finish
+
+The troubleshooting room recursively catalogs image and audio files below
+`assets/`, including nested folders. The catalog and the five hand-written
+curator notes in `assets/gallery/descriptions.json` are read lazily on a
+background thread the first time the room is opened. Images and audio are
+loaded only when selected for preview.
 
 ## Project layout
 
@@ -25,6 +39,7 @@ assets/
   audio/music/            Music loaded by the game
   audio/sfx/              Sound effects loaded by the game
   audio/source/           Additional source audio, not loaded at runtime
+  gallery/                Lazy-loaded image descriptions for the gallery
 src/
   core/                   Shared definitions, game state, and asset paths
     game/scenes/          Scene implementations, factories, and scene-only contexts

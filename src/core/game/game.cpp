@@ -130,7 +130,7 @@ void Game::input() {
 					}
 					if (event.key.keysym.sym == SDLK_F4) {
 						if (sceneManager.currentScene() == MENU) {
-							cambiaEscena(GRAPHICS_ROOM);
+							if (debugHitboxes) cambiaEscena(GRAPHICS_ROOM);
 						} else if (sceneManager.currentScene() == GRAPHICS_ROOM) {
 							cambiaEscena(MENU);
 						}
@@ -148,6 +148,9 @@ void Game::input() {
 				break;
 			case SDL_MOUSEBUTTONUP:
 				sceneManager.handleClick({ event.button.x, event.button.y });
+				break;
+			case SDL_TEXTINPUT:
+				sceneManager.handleInput(event);
 				break;
 			default:
 				break;
@@ -205,7 +208,7 @@ GameSceneManager::SceneCollection Game::createScenes() {
 			[this](const std::string& track, int loops) { playMusic(track, loops); },
 			progress, [this] { init(); },
 			[this](const Escena scene) { cambiaEscena(scene); },
-			[this] { mute(); }, muted, sceneManager.hardModeState(), camera, player
+			[this] { mute(); }, muted, debugHitboxes, sceneManager.hardModeState(), camera, player
 		}),
 		createLoreScene({
 			assets, muted,
@@ -254,7 +257,7 @@ GameSceneManager::SceneCollection Game::createScenes() {
 			[this] { mute(); }
 		}),
 		createGraphicsRoomScene({
-			assets,
+			assets, renderer,
 			[this](const Escena scene) { cambiaEscena(scene); }
 		})
 	};
