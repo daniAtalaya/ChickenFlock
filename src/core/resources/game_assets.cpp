@@ -1,22 +1,22 @@
 #include "game_assets.h"
 
-bool GameAssets::load(SDL_Renderer* renderer) {
+bool GameAssets::load(SDL_Renderer* renderer, MIX_Mixer* mixer) {
 	//sfxs
-	if (!sfxs.load("dañoGallina", "DanoContraGallina.wav")) return false;
-	if (!sfxs.load("dañoQueja", "Danoqueja.wav")) return false;
-	if (!sfxs.load("muerteGallina", "muertegallinaex.wav")) return false;
-	if (!sfxs.load("disparoFlecha", "disparoflecha.wav")) return false;
-	if (!sfxs.load("SMoneda", "Sonidomoneda.wav")) return false;
-	if (!sfxs.load("MultitudG", "multitudG.wav")) return false;
-	if (!sfxs.load("SStart", "sonidostart.wav")) return false;
-	if (!tracks.load("Creditos", "Creditos.ogg")) return false;
-	if (!tracks.load("Victoria", "VICTORIA.ogg")) return false;
-	if (!tracks.load("Intro", "Intro Colibri Studios.ogg")) return false;
-	if (!tracks.load("Game Over", "Game Over.ogg")) return false;
-	if (!tracks.load("Gameplay", "Gameplay.ogg")) return false;
-	if (!tracks.load("Menu", "Menu.ogg")) return false;
-	if (!tracks.load("Tienda", "Tienda.ogg")) return false;
-	if (!tracks.load("sonido de start", "sonidostart.ogg")) return false;
+	if (!sfxs.load("dañoGallina", "DanoContraGallina.wav", nullptr, mixer)) return false;
+	if (!sfxs.load("dañoQueja", "Danoqueja.wav", nullptr, mixer)) return false;
+	if (!sfxs.load("muerteGallina", "muertegallinaex.wav", nullptr, mixer)) return false;
+	if (!sfxs.load("disparoFlecha", "disparoflecha.wav", nullptr, mixer)) return false;
+	if (!sfxs.load("SMoneda", "Sonidomoneda.wav", nullptr, mixer)) return false;
+	if (!sfxs.load("MultitudG", "multitudG.wav", nullptr, mixer)) return false;
+	if (!sfxs.load("SStart", "sonidostart.wav", nullptr, mixer)) return false;
+	if (!tracks.load("Creditos", "Creditos.ogg", nullptr, mixer, true)) return false;
+	if (!tracks.load("Victoria", "VICTORIA.ogg", nullptr, mixer, true)) return false;
+	if (!tracks.load("Intro", "Intro Colibri Studios.ogg", nullptr, mixer, true)) return false;
+	if (!tracks.load("Game Over", "Game Over.ogg", nullptr, mixer, true)) return false;
+	if (!tracks.load("Gameplay", "Gameplay.ogg", nullptr, mixer, true)) return false;
+	if (!tracks.load("Menu", "Menu.ogg", nullptr, mixer, true)) return false;
+	if (!tracks.load("Tienda", "Tienda.ogg", nullptr, mixer, true)) return false;
+	if (!tracks.load("sonido de start", "sonidostart.ogg", nullptr, mixer, true)) return false;
 	//if (!tracks.load("Multidud de gallinas", "Multidud de gallinas.ogg")) return false;
 	if (!images.load("soundOn", "soundOn.png", renderer)) return false;
 	if (!images.load("soundOff", "soundOff.png", renderer)) return false;
@@ -67,7 +67,6 @@ bool GameAssets::load(SDL_Renderer* renderer) {
 	if (!images.load("tituloCockFlock", "tituloCockFlock.png", renderer)) return false;
 	if (!images.load("creditosBoton", "creditosBoton.png", renderer)) return false;
 	if (!images.load("avestruz", "avestruz.png", renderer)) return false;
-	Mix_PlayMusic(tracks.get("Intro"), 1);
 	return true;
 }
 

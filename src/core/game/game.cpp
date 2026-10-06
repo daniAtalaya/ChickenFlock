@@ -26,44 +26,46 @@ namespace {
 
 Game::Game() {
 	INIT_R;
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+	if (!SDL_Init(SDL_INIT_VIDEO)) {
 		return;
 	}
-	if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) {
-		return;
-	}
-	window = SDL_CreateWindow(
-		"Cock Flock",
-		SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED,
-		WINDOW_W, WINDOW_H,
-		SDL_WINDOW_HIDDEN
-	);
+	window = SDL_CreateWindow("Cock Flock", WINDOW_W, WINDOW_H, SDL_WINDOW_HIDDEN);
 	if (window == nullptr) {
 		return;
 	}
+	SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 	if (SDL_Surface* icon = IMG_Load(assetPath("images/icon.png").c_str()); icon != nullptr) {
 		SDL_SetWindowIcon(window, icon);
-		SDL_FreeSurface(icon);
+		SDL_DestroySurface(icon);
 	}
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	renderer = SDL_CreateRenderer(window, nullptr);
 	if (renderer == nullptr) {
 		return;
 	}
-	if (Mix_Init(MIX_INIT_OGG) != MIX_INIT_OGG) {
+	SDL_SetRenderVSync(renderer, 1);
+	if (!MIX_Init()) {
 		return;
 	}
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1) {
+	mixerInitialized = true;
+	audioMixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
+	if (audioMixer == nullptr) {
 		return;
+	}
+	musicTrack = MIX_CreateTrack(audioMixer);
+	if (musicTrack == nullptr) return;
+	for (MIX_Track*& track : soundTracks) {
+		track = MIX_CreateTrack(audioMixer);
+		if (track == nullptr) return;
 	}
 	keyboard = SDL_GetKeyboardState(NULL);
 	if (keyboard == nullptr) {
 		return;
 	}
-	SDL_RenderSetScale(renderer, 1, 1);
-	if (!assets.load(renderer)) {
+	SDL_SetRenderScale(renderer, 1.0f, 1.0f);
+	if (!assets.load(renderer, audioMixer)) {
 		return;
 	}
+	playMusic("Intro", 1);
 	progress = saveDataStore.load();
 	persistenceReady = true;
 	init();
@@ -84,7 +86,7 @@ void Game::init() {
 void Game::initializeLevel() {
 	camera.img = assets.images.get("mapa3");
 	int levelHeight = 0;
-	SDL_QueryTexture(assets.images.get("mapa3"), nullptr, nullptr, nullptr, &levelHeight);
+	getTextureSize(assets.images.get("mapa3"), nullptr, &levelHeight);
 	assignRect(camera.dstRect, { 0, 0, WINDOW_W, WINDOW_H });
 	assignRect(camera.srcRect, { 0, levelHeight - WINDOW_H, WINDOW_W, WINDOW_H });
 }
@@ -105,7 +107,20 @@ Game::~Game() {
 		saveDataStore.requestSave(progress);
 		saveDataStore.shutdown();
 	}
+	sceneManager.shutdown();
+	haltMusic();
+	haltChannels();
+	if (musicTrack != nullptr) MIX_SetTrackAudio(musicTrack, nullptr);
+	for (MIX_Track* track : soundTracks) {
+		if (track != nullptr) MIX_SetTrackAudio(track, nullptr);
+	}
 	assets.clear();
+	if (musicTrack != nullptr) MIX_DestroyTrack(musicTrack);
+	for (MIX_Track* track : soundTracks) {
+		if (track != nullptr) MIX_DestroyTrack(track);
+	}
+	if (audioMixer != nullptr) MIX_DestroyMixer(audioMixer);
+	if (mixerInitialized) MIX_Quit();
 	if (renderer != nullptr) {
 		SDL_DestroyRenderer(renderer);
 	}
@@ -117,39 +132,40 @@ Game::~Game() {
 
 void Game::input() {
 	SDL_Event event{};
-	while (SDL_PollEvent(&event) != 0) {
+	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
-			case SDL_QUIT:
+			case SDL_EVENT_QUIT:
 				isOpen = false;
 				break;
-			case SDL_KEYDOWN:
+			case SDL_EVENT_KEY_DOWN:
 				if (!event.key.repeat) {
 					sceneManager.handleInput(event);
-					if (event.key.keysym.sym == SDLK_F1) {
+					if (event.key.key == SDLK_F1) {
 						debugHitboxes = !debugHitboxes;
 					}
-					if (event.key.keysym.sym == SDLK_F4) {
+					if (event.key.key == SDLK_F4) {
 						if (sceneManager.currentScene() == MENU) {
 							if (debugHitboxes) cambiaEscena(GRAPHICS_ROOM);
 						} else if (sceneManager.currentScene() == GRAPHICS_ROOM) {
 							cambiaEscena(MENU);
 						}
 					}
-					if (event.key.keysym.sym == SDLK_F2 && sceneManager.currentScene() == MENU) {
+					if (event.key.key == SDLK_F2 && sceneManager.currentScene() == MENU) {
 						sceneManager.hardModeState() = !sceneManager.hardModeState();
 					}
-					if (event.key.keysym.sym == SDLK_m) {
+					if (event.key.key == SDLK_M) {
 						mute();
 					}
-					if (event.key.keysym.sym == SDLK_p) {
+					if (event.key.key == SDLK_P) {
 						pause();
 					}
 				}
 				break;
-			case SDL_MOUSEBUTTONUP:
-				sceneManager.handleClick({ event.button.x, event.button.y });
+			case SDL_EVENT_MOUSE_BUTTON_UP:
+				sceneManager.handleClick({ static_cast<int>(event.button.x),
+					static_cast<int>(event.button.y) });
 				break;
-			case SDL_TEXTINPUT:
+			case SDL_EVENT_TEXT_INPUT:
 				sceneManager.handleInput(event);
 				break;
 			default:
@@ -163,7 +179,7 @@ void Game::pause() {
 		const bool pausing = sceneManager.currentScene() == JOC;
 		cambiaEscena(pausing ? PAUSA : JOC);
 		if (!muted) {
-			pausing ? Mix_PauseMusic() : Mix_ResumeMusic();
+			pausing ? MIX_PauseTrack(musicTrack) : MIX_ResumeTrack(musicTrack);
 		}
 	}
 }
@@ -171,30 +187,52 @@ void Game::pause() {
 void Game::mute() {
 	muted = !muted;
 	if (muted) {
-		Mix_PauseMusic();
+		MIX_PauseTrack(musicTrack);
 	} else if (sceneManager.currentScene() != PAUSA) {
-		Mix_ResumeMusic();
+		MIX_ResumeTrack(musicTrack);
 	}
 }
 
 void Game::playSound(const std::string& sound, int loops) {
 	if (!muted) {
-		Mix_PlayChannel(-1, assets.sfxs.get(sound), loops);
+		MIX_Track* track = soundTracks[nextSoundTrack];
+		nextSoundTrack = (nextSoundTrack + 1) % soundTracks.size();
+		playTrack(track, assets.sfxs.get(sound), loops);
 	}
 }
 
 void Game::playMusic(const std::string& track, int loops) {
-	Mix_PlayMusic(assets.tracks.get(track), loops);
+	playTrack(musicTrack, assets.tracks.get(track), loops);
+}
+
+bool Game::playTrack(MIX_Track* track, MIX_Audio* audio, const int loops) {
+	if (track == nullptr || audio == nullptr
+		|| !MIX_SetTrackAudio(track, audio)) {
+		SDL_LogError(SDL_LOG_CATEGORY_AUDIO, "Unable to set audio track input: %s", SDL_GetError());
+		return false;
+	}
+	const SDL_PropertiesID options = SDL_CreateProperties();
+	if (options == 0) {
+		SDL_LogError(SDL_LOG_CATEGORY_AUDIO, "Unable to create playback options: %s", SDL_GetError());
+		return false;
+	}
+	const bool configured = SDL_SetNumberProperty(options, MIX_PROP_PLAY_LOOPS_NUMBER, loops);
+	const bool played = configured && MIX_PlayTrack(track, options);
+	SDL_DestroyProperties(options);
+	if (!played) {
+		SDL_LogError(SDL_LOG_CATEGORY_AUDIO, "Unable to play audio track: %s", SDL_GetError());
+	}
+	return played;
 }
 
 void Game::haltMusic() {
-	while (Mix_PlayingMusic()) {
-		Mix_HaltMusic();
-	}
+	if (musicTrack != nullptr) MIX_StopTrack(musicTrack, 0);
 }
 
 void Game::haltChannels() {
-	Mix_HaltChannel(-1);
+	for (MIX_Track* track : soundTracks) {
+		if (track != nullptr) MIX_StopTrack(track, 0);
+	}
 }
 
 GameSceneManager::SceneCollection Game::createScenes() {
@@ -257,7 +295,7 @@ GameSceneManager::SceneCollection Game::createScenes() {
 			[this] { mute(); }
 		}),
 		createGraphicsRoomScene({
-			assets, renderer,
+			assets, renderer, audioMixer, window,
 			[this](const Escena scene) { cambiaEscena(scene); }
 		})
 	};
@@ -284,12 +322,12 @@ void Game::draw() const {
 }
 
 void Game::loop() {
-	const Uint32 frameStart = SDL_GetTicks();
+	const Uint64 frameStart = SDL_GetTicks();
 	input();
 	update();
 	draw();
 	constexpr Uint32 frameDurationMs = 1000 / 60;
-	if (const Uint32 elapsed = SDL_GetTicks() - frameStart; elapsed < frameDurationMs) {
-		SDL_Delay(frameDurationMs - elapsed);
+	if (const Uint64 elapsed = SDL_GetTicks() - frameStart; elapsed < frameDurationMs) {
+		SDL_Delay(static_cast<Uint32>(frameDurationMs - elapsed));
 	}
 }

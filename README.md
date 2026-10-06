@@ -1,6 +1,6 @@
 # Chicken Flock
 
-Chicken Flock (also known as Cock Flock) is a small SDL2 game developed by
+Chicken Flock (also known as Cock Flock) is a SDL3 (initially SDL2) minigame developed by
 Colibri Studios as a first-year game-development project.
 
 ## Controls
@@ -49,7 +49,7 @@ src/
                           Headers live beside their matching sources
 CMakeLists.txt            Build definition
 CMakePresets.json         Shared CLI and IDE configurations
-vcpkg.json                Pinned SDL2 dependency manifest
+vcpkg.json                Pinned SDL3 dependency manifest
 ```
 
 The build stages runtime assets beside the executable. Asset lookup is based on
@@ -74,14 +74,15 @@ when the run ends in either victory or defeat.
 
 ## Requirements
 
-- CMake 3.25 or newer
+- CMake 4.2 or newer
 - Visual Studio 2026 or Visual Studio 2026 Build Tools with the **Desktop
   development with C++** workload
 - Git and vcpkg
 
-SDL2, SDL2_image, and SDL2_mixer are restored automatically from the pinned
-vcpkg manifest when CMake configures the project. The first configure needs
-network access.
+SDL3, SDL3_image, and SDL3_mixer are restored automatically from the pinned
+vcpkg manifest when CMake configures the project. SDL3_mixer is built with
+Vorbis, FLAC, MP3, Opus, and module-format support for the game and gallery.
+The first configure needs network access.
 
 ### Install vcpkg on Windows
 
@@ -101,37 +102,38 @@ the project in new terminals or IDE sessions without setting it again.
 
 ## Build and run from the CLI
 
-From the repository root, configure with the Visual Studio generator and build
-the Debug configuration:
+From the repository root, configure and build the Debug preset:
 
 ```powershell
-cmake --preset windows-msvc
+cmake --preset windows-debug
 cmake --build --preset debug
-.\build\windows-msvc\Debug\ChickenFlock.exe
+.\build\windows-debug-vs18\Debug\ChickenFlock.exe
 ```
 
 For an optimized build:
 
 ```powershell
+cmake --preset windows-release
 cmake --build --preset release
-.\build\windows-msvc\Release\ChickenFlock.exe
+.\build\windows-release-vs18\Release\ChickenFlock.exe
 ```
 
-The Visual Studio generator selects the MSVC compiler and doesn't require Ninja
-or a preconfigured Developer PowerShell. The generated executable and staged
-`assets` directory are in the matching configuration under
-`build\windows-msvc`. To remove local build output, delete the `build`
-directory.
+The Windows presets use the Visual Studio 2026 generator and MSVC. The generated
+executable and staged `assets` directory are under the corresponding
+`build\windows-*-vs18\<Configuration>` directory. To remove local build output,
+delete the `build` directory.
 
 ## Build and run in CLion
 
-1. Install CLion and configure a Visual Studio 2022 C++ toolchain with the
-   Desktop development with C++ workload.
+1. Install CMake 4.2 or newer and configure a Visual Studio 2026 C++ toolchain
+   with the Desktop development with C++ workload.
 2. Make `VCPKG_ROOT` available to CLion (restart it after setting a persistent
    environment variable).
 3. Open this repository's root directory. CLion reads `CMakePresets.json`;
-   select **Windows x64 (Visual Studio 2026)** as the CMake profile, then
-   choose Debug or Release in the build configuration selector.
+   enable and select **Windows x64 Debug** or **Windows x64 Release** as the
+   CMake profile, then choose Debug or Release in the build configuration
+   selector. If SDL headers remain unresolved after changing profiles, reload
+   the CMake project so the vcpkg include directory is indexed.
 4. Let CMake configure and restore the vcpkg dependencies. Build the
    `ChickenFlock` target, then run or debug that target.
 
@@ -152,20 +154,3 @@ plugins. Then open the repository root and use the same CMake preset and
 - `CMakePresets.json` keeps CLI and IDE configure/build settings aligned.
 - Build trees, package-manager output, and per-user IDE files are ignored by
   Git. Game art and audio remain versioned.
-
-## Future SDL3 migration guide (planning notes)
-
-The current game remains on SDL2; these are suggested steps for a separate,
-future SDL3 effort, not changes included in the present build:
-
-1. Create a migration branch and record a working SDL2 build and playthrough.
-2. Upgrade the SDL2, SDL2_image, and SDL2_mixer manifest entries together only
-   after confirming compatible SDL3 package versions are available in vcpkg.
-3. Port initialization, window/rendering, input/event handling, and timing to
-   SDL3. Compile and run after each area rather than mixing API changes into
-   one large rewrite.
-4. Migrate image and audio integration to SDL3_image and SDL3_mixer, checking
-   format support, initialization, and error handling against the new APIs.
-5. Verify every scene, control, music track, sound effect, and asset on each
-   supported platform; update this guide and the dependency manifest only
-   after the SDL3 version is reproducible from a clean configure.

@@ -1,5 +1,5 @@
 #include "game_scene_manager.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <stdexcept>
 #include <utility>
 
@@ -22,6 +22,11 @@ void GameSceneManager::initialize(const Escena scene, SceneCollection sceneColle
 	if (activeScene != nullptr) {
 		activeScene->enter(scene);
 	}
+}
+
+void GameSceneManager::shutdown() {
+	activeScene = nullptr;
+	scenes = SceneCollection{};
 }
 
 void GameSceneManager::changeTo(const Escena scene) {

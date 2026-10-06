@@ -17,7 +17,7 @@ struct GameplaySceneContext {
 	bool& hardMode;
 	Player& player;
 	Camera& camera;
-	const Uint8* keyboard;
+	const bool* keyboard;
 	GameProgress& progress;
 	std::function<void(Escena)> changeScene;
 	std::function<void()> toggleMute;

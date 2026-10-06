@@ -35,14 +35,14 @@ class MenuScene final : public GameScene {
 		}
 
 		void handleInput(const SDL_Event& event) override {
-			if (event.type != SDL_KEYDOWN || event.key.repeat) {
+			if (event.type != SDL_EVENT_KEY_DOWN || event.key.repeat) {
 				return;
 			}
-			const SDL_Keycode key = event.key.keysym.sym;
+			const SDL_Keycode key = event.key.key;
 			if (isConfirmKey(key)) {
 				context.changeScene(LORE);
 			}
-			if (key == SDLK_t) {
+			if (key == SDLK_T) {
 				context.changeScene(TIENDA);
 			}
 		}
@@ -78,12 +78,12 @@ class MenuScene final : public GameScene {
 			soundButton.img = context.assets.images.get(context.muted ? "soundOff" : "soundOn");
 			soundButton.draw(renderer, showHitboxes);
 			shopButton.draw(renderer, showHitboxes);
-			SDL_QueryTexture(context.assets.images.get("start"), nullptr, nullptr, &width, &height);
+			getTextureSize(context.assets.images.get("start"), &width, &height);
 			renderTexture(renderer, context.assets.images.get("start"), {
 				WINDOW_W - 100 - width / 3, (WINDOW_H / 2) - (height * 4 / 10) / 2,
 				width * 1 / 3, height * 4 / 10
 			});
-			SDL_QueryTexture(context.assets.images.get("tituloCockFlock"), nullptr, nullptr, &width, &height);
+			getTextureSize(context.assets.images.get("tituloCockFlock"), &width, &height);
 			renderTexture(renderer, context.assets.images.get("tituloCockFlock"), {
 				(WINDOW_W / 2) - 160, 50, width / 2, height / 2
 			});
@@ -91,9 +91,9 @@ class MenuScene final : public GameScene {
 			renderCurrencyPanel(renderer, context.assets, context.progress.rupees);
 			if (context.debugHitboxes) {
 				SDL_SetRenderDrawColor(renderer, 255, 239, 190, 255);
-				SDL_RenderFillRect(renderer, &graphicsRoomButton);
+				fillRect(renderer, graphicsRoomButton);
 				SDL_SetRenderDrawColor(renderer, 127, 82, 38, 255);
-				SDL_RenderDrawRect(renderer, &graphicsRoomButton);
+				drawRect(renderer, graphicsRoomButton);
 				const std::string label = "GRAPHICS ROOM";
 				const int labelScale = 1;
 				drawPixelText(renderer, label,

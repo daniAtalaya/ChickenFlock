@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -28,27 +29,27 @@ namespace {
 		const int centerY = area.y + area.h / 2;
 		const int direction = pointsRight ? 1 : -1;
 		SDL_SetRenderDrawColor(renderer, 55, 92, 70, 255);
-		SDL_RenderDrawLine(renderer, centerX - 8 * direction, centerY - 15,
-			centerX + 8 * direction, centerY);
-		SDL_RenderDrawLine(renderer, centerX + 8 * direction, centerY,
-			centerX - 8 * direction, centerY + 15);
-		SDL_RenderDrawLine(renderer, centerX - 8 * direction, centerY - 15,
-			centerX - 8 * direction, centerY + 15);
+		SDL_RenderLine(renderer, static_cast<float>(centerX - 8 * direction), static_cast<float>(centerY - 15),
+			static_cast<float>(centerX + 8 * direction), static_cast<float>(centerY));
+		SDL_RenderLine(renderer, static_cast<float>(centerX + 8 * direction), static_cast<float>(centerY),
+			static_cast<float>(centerX - 8 * direction), static_cast<float>(centerY + 15));
+		SDL_RenderLine(renderer, static_cast<float>(centerX - 8 * direction), static_cast<float>(centerY - 15),
+			static_cast<float>(centerX - 8 * direction), static_cast<float>(centerY + 15));
 	}
 
 	void drawTab(SDL_Renderer* renderer, const SDL_Rect& area, const std::string& label,
 		const bool selected) {
 		SDL_SetRenderDrawColor(renderer, selected ? 255 : 218, selected ? 250 : 224,
 			selected ? 231 : 190, 255);
-		SDL_RenderFillRect(renderer, &area);
+		fillRect(renderer, area);
 		SDL_SetRenderDrawColor(renderer, border.r, border.g, border.b, border.a);
-		SDL_RenderDrawRect(renderer, &area);
+		drawRect(renderer, area);
 		drawPixelText(renderer, label,
 			area.x + (area.w - pixelTextWidth(label, 2)) / 2, area.y + 17, 2, ink);
 	}
 
 	bool pointIn(const SDL_Point& point, const SDL_Rect& area) {
-		return SDL_PointInRect(&point, &area) == SDL_TRUE;
+		return SDL_PointInRect(&point, &area);
 	}
 }
 
@@ -58,12 +59,12 @@ class GraphicsRoomScene final : public GameScene {
 	AssetCatalogResult catalogResult;
 	std::vector<std::size_t> visibleResources;
 	SDL_Texture* previewTexture = nullptr;
-	Mix_Music* previewMusic = nullptr;
-	std::string previewPath;
+	MIX_Audio* previewAudio = nullptr;
+	MIX_Track* previewTrack = nullptr;
 	std::string query;
 	std::string errorMessage;
 	std::string catalogError;
-	Uint32 queryUpdatedAt = 0;
+	Uint64 queryUpdatedAt = 0;
 	std::size_t selectedImage = 0;
 	std::size_t selectedAudio = 0;
 	std::size_t cachedImageIndex = static_cast<std::size_t>(-1);
@@ -89,17 +90,23 @@ public:
 	explicit GraphicsRoomScene(GraphicsRoomSceneContext context) : context(std::move(context)) {
 		backButton.img = this->context.assets.images.get("back");
 		assignRect(backButton.dstRect, { 24, 24, 72, 72 });
+		previewTrack = MIX_CreateTrack(this->context.mixer);
+		if (previewTrack == nullptr) {
+			throw std::runtime_error(std::string("Unable to create gallery audio track: ")
+				+ SDL_GetError());
+		}
 	}
 
 	~GraphicsRoomScene() override {
 		stopAudio();
+		if (previewTrack != nullptr) MIX_DestroyTrack(previewTrack);
 		if (previewTexture != nullptr) SDL_DestroyTexture(previewTexture);
 	}
 
 	Escena id() const override { return GRAPHICS_ROOM; }
 
 	void enter(Escena) override {
-		SDL_StartTextInput();
+		SDL_StartTextInput(context.window);
 		if (!scanStarted) {
 			catalog.start(std::filesystem::u8path(assetPath("")));
 			scanStarted = true;
@@ -107,14 +114,15 @@ public:
 	}
 
 	void exit(Escena) override {
-		SDL_StopTextInput();
+		SDL_StopTextInput(context.window);
 		stopAudio();
 	}
 
 	void update() override {
-		if (previewMusic != nullptr && !Mix_PlayingMusic()) {
-			Mix_FreeMusic(previewMusic);
-			previewMusic = nullptr;
+		if (previewAudio != nullptr && !MIX_TrackPlaying(previewTrack)) {
+			MIX_SetTrackAudio(previewTrack, nullptr);
+			MIX_DestroyAudio(previewAudio);
+			previewAudio = nullptr;
 		}
 		if (!catalogReady && catalog.ready()) {
 			catalogResult = catalog.take();
@@ -129,7 +137,7 @@ public:
 	}
 
 	void handleInput(const SDL_Event& event) override {
-		if (event.type == SDL_TEXTINPUT) {
+		if (event.type == SDL_EVENT_TEXT_INPUT) {
 			if (searchFocused && !audioTab) {
 				if (suppressSlashTextInput) {
 					suppressSlashTextInput = false;
@@ -140,9 +148,9 @@ public:
 			}
 			return;
 		}
-		if (event.type != SDL_KEYDOWN || event.key.repeat) return;
+		if (event.type != SDL_EVENT_KEY_DOWN || event.key.repeat) return;
 
-		const SDL_Keycode key = event.key.keysym.sym;
+		const SDL_Keycode key = event.key.key;
 		if (key == SDLK_TAB) {
 			switchTab();
 			return;
@@ -229,9 +237,9 @@ public:
 		SDL_RenderClear(renderer);
 		SDL_SetRenderDrawColor(renderer, 218, 224, 190, 255);
 		const SDL_Rect topBand{ 0, 0, WINDOW_W, 150 };
-		SDL_RenderFillRect(renderer, &topBand);
+		fillRect(renderer, topBand);
 		SDL_SetRenderDrawColor(renderer, 107, 137, 95, 255);
-		SDL_RenderDrawLine(renderer, 0, 150, WINDOW_W, 150);
+		SDL_RenderLine(renderer, 0.0f, 150.0f, static_cast<float>(WINDOW_W), 150.0f);
 
 		backButton.draw(renderer, showHitboxes);
 		const std::string title = "FLOCK TROUBLESHOOTING ROOM";
@@ -254,9 +262,9 @@ public:
 
 		const SDL_Rect card{ 170, 230, 620, 435 };
 		SDL_SetRenderDrawColor(renderer, cream.r, cream.g, cream.b, cream.a);
-		SDL_RenderFillRect(renderer, &card);
+		fillRect(renderer, card);
 		SDL_SetRenderDrawColor(renderer, border.r, border.g, border.b, border.a);
-		SDL_RenderDrawRect(renderer, &card);
+		drawRect(renderer, card);
 
 		if (audioTab) {
 			renderAudio(renderer);
@@ -354,9 +362,9 @@ private:
 	void renderImage(SDL_Renderer* renderer) {
 		const SDL_Rect artwork{ 215, 245, 530, 290 };
 		SDL_SetRenderDrawColor(renderer, 225, 232, 211, 255);
-		SDL_RenderFillRect(renderer, &artwork);
+		fillRect(renderer, artwork);
 		SDL_SetRenderDrawColor(renderer, 191, 207, 171, 255);
-		SDL_RenderDrawRect(renderer, &artwork);
+		drawRect(renderer, artwork);
 
 		const CatalogResource* resource = selectedResource();
 		if (resource == nullptr) {
@@ -366,7 +374,7 @@ private:
 			if (previewTexture != nullptr) {
 				int width = 0;
 				int height = 0;
-				SDL_QueryTexture(previewTexture, nullptr, nullptr, &width, &height);
+				getTextureSize(previewTexture, &width, &height);
 				if (width > 0 && height > 0) {
 					const double fit = std::min(
 						static_cast<double>(artwork.w - 32) / width,
@@ -379,7 +387,7 @@ private:
 						fittedWidth,
 						fittedHeight
 					};
-					SDL_RenderCopy(renderer, previewTexture, nullptr, &destination);
+					renderTexture(renderer, previewTexture, destination);
 				}
 			} else if (!errorMessage.empty()) {
 				drawWrappedPixelText(renderer, errorMessage, { 235, 370, 490, 90 }, 2,
@@ -399,16 +407,16 @@ private:
 	void renderAudio(SDL_Renderer* renderer) {
 		const SDL_Rect waveform{ 240, 290, 480, 220 };
 		SDL_SetRenderDrawColor(renderer, 225, 232, 211, 255);
-		SDL_RenderFillRect(renderer, &waveform);
+		fillRect(renderer, waveform);
 		SDL_SetRenderDrawColor(renderer, 191, 207, 171, 255);
-		SDL_RenderDrawRect(renderer, &waveform);
+		drawRect(renderer, waveform);
 
 		for (int bar = 0; bar < 40; ++bar) {
 			const int height = 22 + ((bar * 29 + 17) % 125);
 			const SDL_Rect waveBar{ waveform.x + 14 + bar * 11,
 				waveform.y + (waveform.h - height) / 2, 4, height };
 			SDL_SetRenderDrawColor(renderer, 107, 137, 95, 255);
-			SDL_RenderFillRect(renderer, &waveBar);
+			fillRect(renderer, waveBar);
 		}
 
 		const CatalogResource* resource = selectedResource();
@@ -417,7 +425,7 @@ private:
 		} else {
 			const std::string path = resource->relativePath.generic_u8string();
 			drawWrappedPixelText(renderer, path, { 220, 540, 520, 56 }, 2, ink);
-			drawCentered(renderer, previewMusic != nullptr && Mix_PlayingMusic()
+			drawCentered(renderer, previewAudio != nullptr && MIX_TrackPlaying(previewTrack)
 				? "PLAYING" : "READY", 615, leaf, 2);
 			const std::string position = std::to_string(selectedAudio + 1)
 				+ "/" + std::to_string(catalogResult.audio.size()) + " AUDIO";
@@ -426,10 +434,11 @@ private:
 		}
 
 		SDL_SetRenderDrawColor(renderer, cream.r, cream.g, cream.b, cream.a);
-		SDL_RenderFillRect(renderer, &playButton);
+		fillRect(renderer, playButton);
 		SDL_SetRenderDrawColor(renderer, border.r, border.g, border.b, border.a);
-		SDL_RenderDrawRect(renderer, &playButton);
-		const std::string label = previewMusic != nullptr && Mix_PlayingMusic() ? "STOP" : "PLAY";
+		drawRect(renderer, playButton);
+		const std::string label = previewAudio != nullptr && MIX_TrackPlaying(previewTrack)
+			? "STOP" : "PLAY";
 		drawPixelText(renderer, label,
 			playButton.x + (playButton.w - pixelTextWidth(label, 2)) / 2,
 			playButton.y + (playButton.h - 14) / 2, 2, ink);
@@ -442,13 +451,13 @@ private:
 	void renderSearch(SDL_Renderer* renderer) {
 		SDL_SetRenderDrawColor(renderer, searchFocused ? 255 : 249, searchFocused ? 250 : 244,
 			searchFocused ? 231 : 224, 255);
-		SDL_RenderFillRect(renderer, &searchBox);
+		fillRect(renderer, searchBox);
 		SDL_SetRenderDrawColor(renderer, searchFocused ? 107 : border.r,
 			searchFocused ? 137 : border.g, searchFocused ? 95 : border.b, 255);
-		SDL_RenderDrawRect(renderer, &searchBox);
+		drawRect(renderer, searchBox);
 		SDL_Rect textClip{ searchBox.x + 12, searchBox.y + 8,
 			searchBox.w - clearSearchButton.w - 28, searchBox.h - 16 };
-		SDL_RenderSetClipRect(renderer, &textClip);
+		SDL_SetRenderClipRect(renderer, &textClip);
 		std::string label = query.empty() ? "SEARCH ASSETS" : query;
 		constexpr int textScale = 2;
 		const int maxCharacters = std::max(1, textClip.w / (6 * textScale) - 1);
@@ -461,25 +470,29 @@ private:
 		if (searchFocused && (SDL_GetTicks() / 450) % 2 == 0) {
 			const int cursorX = textClip.x + pixelTextWidth(label, textScale) + 3;
 			SDL_SetRenderDrawColor(renderer, ink.r, ink.g, ink.b, ink.a);
-			SDL_RenderDrawLine(renderer, cursorX, textY, cursorX, textY + 7 * textScale);
+			SDL_RenderLine(renderer, static_cast<float>(cursorX), static_cast<float>(textY),
+				static_cast<float>(cursorX), static_cast<float>(textY + 7 * textScale));
 		}
-		SDL_RenderSetClipRect(renderer, nullptr);
+		SDL_SetRenderClipRect(renderer, nullptr);
 
 		SDL_SetRenderDrawColor(renderer, 255, 239, 190, 255);
-		SDL_RenderFillRect(renderer, &clearSearchButton);
+		fillRect(renderer, clearSearchButton);
 		SDL_SetRenderDrawColor(renderer, border.r, border.g, border.b, 255);
-		SDL_RenderDrawRect(renderer, &clearSearchButton);
+		drawRect(renderer, clearSearchButton);
 		SDL_SetRenderDrawColor(renderer, leaf.r, leaf.g, leaf.b, leaf.a);
 		if (query.empty()) {
 			SDL_Rect lens{ clearSearchButton.x + 10, clearSearchButton.y + 9, 17, 17 };
-			SDL_RenderDrawRect(renderer, &lens);
-			SDL_RenderDrawLine(renderer, clearSearchButton.x + 25, clearSearchButton.y + 25,
-				clearSearchButton.x + 32, clearSearchButton.y + 32);
+			drawRect(renderer, lens);
+			SDL_RenderLine(renderer, static_cast<float>(clearSearchButton.x + 25),
+				static_cast<float>(clearSearchButton.y + 25), static_cast<float>(clearSearchButton.x + 32),
+				static_cast<float>(clearSearchButton.y + 32));
 		} else {
-			SDL_RenderDrawLine(renderer, clearSearchButton.x + 14,
-				clearSearchButton.y + 14, clearSearchButton.x + 28, clearSearchButton.y + 28);
-			SDL_RenderDrawLine(renderer, clearSearchButton.x + 28,
-				clearSearchButton.y + 14, clearSearchButton.x + 14, clearSearchButton.y + 28);
+			SDL_RenderLine(renderer, static_cast<float>(clearSearchButton.x + 14),
+				static_cast<float>(clearSearchButton.y + 14), static_cast<float>(clearSearchButton.x + 28),
+				static_cast<float>(clearSearchButton.y + 28));
+			SDL_RenderLine(renderer, static_cast<float>(clearSearchButton.x + 28),
+				static_cast<float>(clearSearchButton.y + 14), static_cast<float>(clearSearchButton.x + 14),
+				static_cast<float>(clearSearchButton.y + 28));
 		}
 
 		const std::string count = searchPending ? "FILTERING..."
@@ -490,11 +503,11 @@ private:
 
 	void renderNavigation(SDL_Renderer* renderer) {
 		SDL_SetRenderDrawColor(renderer, cream.r, cream.g, cream.b, cream.a);
-		SDL_RenderFillRect(renderer, &previousButton);
-		SDL_RenderFillRect(renderer, &nextButton);
+		fillRect(renderer, previousButton);
+		fillRect(renderer, nextButton);
 		SDL_SetRenderDrawColor(renderer, border.r, border.g, border.b, border.a);
-		SDL_RenderDrawRect(renderer, &previousButton);
-		SDL_RenderDrawRect(renderer, &nextButton);
+		drawRect(renderer, previousButton);
+		drawRect(renderer, nextButton);
 		drawArrow(renderer, previousButton, false);
 		drawArrow(renderer, nextButton, true);
 		drawNavigationButton(renderer, previousPageButton, "BACK 10");
@@ -509,9 +522,9 @@ private:
 	void drawNavigationButton(SDL_Renderer* renderer, const SDL_Rect& area,
 		const std::string& label) const {
 		SDL_SetRenderDrawColor(renderer, 255, 250, 231, 255);
-		SDL_RenderFillRect(renderer, &area);
+		fillRect(renderer, area);
 		SDL_SetRenderDrawColor(renderer, border.r, border.g, border.b, 255);
-		SDL_RenderDrawRect(renderer, &area);
+		drawRect(renderer, area);
 		drawPixelText(renderer, label, area.x + (area.w - pixelTextWidth(label, 2)) / 2,
 			area.y + (area.h - 14) / 2, 2, ink);
 	}
@@ -541,39 +554,48 @@ private:
 			errorMessage = SDL_GetError();
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unable to display gallery image %s: %s",
 				path.c_str(), errorMessage.c_str());
+		} else if (!SDL_SetTextureScaleMode(previewTexture, SDL_SCALEMODE_NEAREST)) {
+			errorMessage = SDL_GetError();
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unable to set gallery image scale mode %s: %s",
+				path.c_str(), errorMessage.c_str());
+			SDL_DestroyTexture(previewTexture);
+			previewTexture = nullptr;
 		}
 	}
 
 	void toggleAudio() {
 		const CatalogResource* resource = selectedResource();
 		if (resource == nullptr) return;
-		if (previewMusic != nullptr) {
+		if (previewAudio != nullptr) {
 			stopAudio();
 			return;
 		}
 		errorMessage.clear();
 		const std::string path = resource->absolutePath.u8string();
-		previewMusic = Mix_LoadMUS(path.c_str());
-		if (previewMusic == nullptr) {
-			errorMessage = Mix_GetError();
+		previewAudio = MIX_LoadAudio(context.mixer, path.c_str(), false);
+		if (previewAudio == nullptr) {
+			errorMessage = SDL_GetError();
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unable to load gallery audio %s: %s",
 				path.c_str(), errorMessage.c_str());
 			return;
 		}
-		if (Mix_PlayMusic(previewMusic, 0) != 0) {
-			errorMessage = Mix_GetError();
+		if (!MIX_SetTrackAudio(previewTrack, previewAudio) || !MIX_PlayTrack(previewTrack, 0)) {
+			errorMessage = SDL_GetError();
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unable to play gallery audio %s: %s",
 				path.c_str(), errorMessage.c_str());
-			Mix_FreeMusic(previewMusic);
-			previewMusic = nullptr;
+			MIX_SetTrackAudio(previewTrack, nullptr);
+			MIX_DestroyAudio(previewAudio);
+			previewAudio = nullptr;
 		}
 	}
 
 	void stopAudio() {
-		if (previewMusic == nullptr) return;
-		if (Mix_PlayingMusic()) Mix_HaltMusic();
-		Mix_FreeMusic(previewMusic);
-		previewMusic = nullptr;
+		if (previewTrack != nullptr) {
+			MIX_StopTrack(previewTrack, 0);
+			MIX_SetTrackAudio(previewTrack, nullptr);
+		}
+		if (previewAudio != nullptr) MIX_DestroyAudio(previewAudio);
+		previewAudio = nullptr;
 	}
 };
 

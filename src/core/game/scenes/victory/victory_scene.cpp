@@ -21,7 +21,7 @@ class VictoryScene final : public GameScene {
 		}
 
 		void handleInput(const SDL_Event& event) override {
-			if (event.type == SDL_KEYDOWN && !event.key.repeat && isConfirmKey(event.key.keysym.sym)) {
+			if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat && isConfirmKey(event.key.key)) {
 				context.changeScene(CREDITS);
 			}
 		}
@@ -43,7 +43,7 @@ class VictoryScene final : public GameScene {
 			soundButton.draw(renderer, showHitboxes);
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
 			fillRect(renderer, { 0, 0, WINDOW_W, WINDOW_H });
-			SDL_QueryTexture(context.assets.images.get("winner"), nullptr, nullptr, &width, &height);
+			getTextureSize(context.assets.images.get("winner"), &width, &height);
 			renderTexture(renderer, context.assets.images.get("winner"), {
 				WINDOW_W / 2 - width / 2, WINDOW_H / 2 - height / 2, width, height
 			});

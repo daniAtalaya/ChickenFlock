@@ -24,7 +24,7 @@ struct GameplayContext {
 	const Cuadrado& leftWall;
 	const Cuadrado& rightWall;
 	GameAssets& assets;
-	const Uint8* keyboard;
+	const bool* keyboard;
 	bool godMode;
 	bool hardMode;
 	GameProgress& progress;

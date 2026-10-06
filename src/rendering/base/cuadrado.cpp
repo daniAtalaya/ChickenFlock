@@ -1,11 +1,18 @@
 #include "cuadrado.h"
 #include "general.h"
+#include <algorithm>
 
 void Cuadrado::draw(SDL_Renderer* renderer, const bool showHitboxes) const {
 	if (dstRect == nullptr) return;
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	SDL_SetRenderDrawColor(
+		renderer,
+		static_cast<Uint8>(std::clamp(color.r, 0, 255)),
+		static_cast<Uint8>(std::clamp(color.g, 0, 255)),
+		static_cast<Uint8>(std::clamp(color.b, 0, 255)),
+		static_cast<Uint8>(std::clamp(color.a, 0, 255))
+	);
 	if (img != nullptr) {
-		SDL_RenderCopy(renderer, img, srcRect, dstRect);
+		renderTexture(renderer, img, srcRect, dstRect);
 	}
 	if (showHitboxes) {
 		drawHitbox(renderer);
@@ -33,9 +40,9 @@ void Cuadrado::drawHitbox(SDL_Renderer* renderer) const {
 		return;
 	}
 	SDL_SetRenderDrawColor(renderer, 192, 0, 0, 255);
-	SDL_RenderDrawRect(renderer, dstRect);
+	drawRect(renderer, *dstRect);
 }
 
 bool Cuadrado::checkCollision(const SDL_Rect* otherRect) const {
-	return dstRect != nullptr && otherRect != nullptr && SDL_HasIntersection(dstRect, otherRect);
+	return dstRect != nullptr && otherRect != nullptr && SDL_HasRectIntersection(dstRect, otherRect);
 }

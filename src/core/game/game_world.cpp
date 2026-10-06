@@ -218,7 +218,7 @@ void GameWorld::spawn(GameplayContext& context) {
 			tree->sY = camera.sY;
 			tree->img = assets.images.get("arbol" + std::to_string(R_NUM(1, 4)));
 			*tree->dstRect = { randomX(), -150 * R_NUM(1, 3), 40, 40 };
-			SDL_QueryTexture(tree->img, NULL, NULL, &tree->dstRect->w, &tree->dstRect->h);
+			getTextureSize(tree->img, &tree->dstRect->w, &tree->dstRect->h);
 			tree->dstRect->w *= (35 / 10);
 			tree->dstRect->h *= (35 / 10);
 			arboles.push_back(tree);

@@ -2,25 +2,30 @@
 #include "asset_path.h"
 
 template <>
-bool Almacen<SDL_Texture*>::load(const std::string &name, const std::string &filename, SDL_Renderer* renderer) {
+bool Almacen<SDL_Texture*>::load(const std::string &name, const std::string &filename,
+	SDL_Renderer* renderer, MIX_Mixer*, bool) {
 	SDL_Surface* surface = IMG_Load(assetPath("images/" + filename).c_str());
 	if (surface == nullptr) {
 		return false;
 	}
-	mapa[name] = SDL_CreateTextureFromSurface(renderer, surface);
-	SDL_FreeSurface(surface);
-	return mapa[name] != nullptr;
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+	SDL_DestroySurface(surface);
+	if (texture == nullptr) {
+		return false;
+	}
+	if (!SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST)) {
+		SDL_DestroyTexture(texture);
+		return false;
+	}
+	mapa[name] = texture;
+	return true;
 }
 
 template <>
-bool Almacen<Mix_Music*>::load(const std::string &name, const std::string &filename, SDL_Renderer*) {
-	mapa[name] = Mix_LoadMUS(assetPath("audio/music/" + filename).c_str());
-	return mapa[name] != nullptr;
-}
-
-template <>
-bool Almacen<Mix_Chunk*>::load(const std::string &name, const std::string &filename, SDL_Renderer*) {
-	mapa[name] = Mix_LoadWAV(assetPath("audio/sfx/" + filename).c_str());
+bool Almacen<MIX_Audio*>::load(const std::string &name, const std::string &filename,
+	SDL_Renderer*, MIX_Mixer* mixer, bool streamed) {
+	const std::string folder = streamed ? "audio/music/" : "audio/sfx/";
+	mapa[name] = MIX_LoadAudio(mixer, assetPath(folder + filename).c_str(), !streamed);
 	return mapa[name] != nullptr;
 }
 
@@ -29,21 +34,11 @@ void Almacen<SDL_Texture*>::clear() {
 	for (auto iterator = mapa.begin(); iterator != mapa.end(); ++iterator) {
 		SDL_DestroyTexture(iterator->second);
 	}
-	IMG_Quit();
 }
 
 template <>
-void Almacen<Mix_Music*>::clear() {
+void Almacen<MIX_Audio*>::clear() {
 	for (auto iterator = mapa.begin(); iterator != mapa.end(); ++iterator) {
-		Mix_FreeMusic(iterator->second);
+		MIX_DestroyAudio(iterator->second);
 	}
-	Mix_CloseAudio();
-}
-
-template <>
-void Almacen<Mix_Chunk*>::clear() {
-	for (auto iterator = mapa.begin(); iterator != mapa.end(); ++iterator) {
-		Mix_FreeChunk(iterator->second);
-	}
-	while (Mix_Init(0)) Mix_Quit();
 }

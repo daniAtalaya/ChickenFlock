@@ -3,8 +3,22 @@
   "version-string": "1.0.0",
   "builtin-baseline": "19780d9cdf84d0944cf9a318666703b89ab6629c",
   "dependencies": [
-    "sdl2",
-    "sdl2-image",
-    "sdl2-mixer"
+    "sdl3",
+    {
+      "name": "sdl3-image",
+      "features": [
+        "png"
+      ]
+    },
+    {
+      "name": "sdl3-mixer",
+      "features": [
+        "libflac",
+        "libvorbis",
+        "mpg123",
+        "opusfile",
+        "libxmp"
+      ]
+    }
   ]
 }

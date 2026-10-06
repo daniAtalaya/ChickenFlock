@@ -1,6 +1,6 @@
 #include "save_data_store.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <algorithm>
 #include <fstream>
